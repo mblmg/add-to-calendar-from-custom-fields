@@ -1,0 +1,179 @@
+# German translation for Add to Calendar from Custom Fields.
+msgid ""
+msgstr ""
+"Project-Id-Version: Add to Calendar from Custom Fields 1.0.0\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: add-to-calendar-from-custom-fields\n"
+
+msgid "Add to Calendar"
+msgstr "Zum Kalender hinzufügen"
+
+msgid "Add to Calendar from Custom Fields"
+msgstr "Add to Calendar from Custom Fields"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Post type"
+msgstr "Beitragstyp"
+
+msgid "Slug of the post type that holds the events, e.g. <code>event</code>."
+msgstr "Slug des Beitragstyps, der die Termine enthält, z. B. <code>event</code>."
+
+msgid "Date field"
+msgstr "Datumsfeld"
+
+msgid "Field name (meta key) of the date. Required."
+msgstr "Feldname (Meta-Key) des Datums. Pflichtfeld."
+
+msgid "End date field (optional)"
+msgstr "Enddatum-Feld (optional)"
+
+msgid "Only needed for events spanning several days."
+msgstr "Nur für mehrtägige Termine nötig."
+
+msgid "Start time fields"
+msgstr "Startzeit-Felder"
+
+msgid "One or more fields, separated by commas. The first field with a value is used. If none has a value, the event is added as an all-day event."
+msgstr "Ein oder mehrere Felder, durch Komma getrennt. Das erste befüllte Feld wird verwendet. Ist keins befüllt, wird der Termin ganztägig eingetragen."
+
+msgid "End time field (optional)"
+msgstr "Endzeit-Feld (optional)"
+
+msgid "If the end time is earlier than the start time, the event ends on the next day."
+msgstr "Liegt die Endzeit vor der Startzeit, endet der Termin am Folgetag."
+
+msgid "Default duration in minutes"
+msgstr "Standard-Dauer in Minuten"
+
+msgid "Used when no end time is set."
+msgstr "Gilt, wenn keine Endzeit gepflegt ist."
+
+msgid "Location fields (optional)"
+msgstr "Ort-Felder (optional)"
+
+msgid "One or more fields, separated by commas. They are combined into one location."
+msgstr "Ein oder mehrere Felder, durch Komma getrennt. Sie werden zu einer Ortsangabe zusammengesetzt."
+
+msgid "Description field (optional)"
+msgstr "Beschreibungs-Feld (optional)"
+
+msgid "Field for the calendar description. Empty = the post excerpt. The link to the post is always added."
+msgstr "Feld für die Beschreibung im Kalender. Leer = Textauszug des Beitrags. Der Link zur Seite wird immer angehängt."
+
+msgid "Base path"
+msgstr "Basis-Adresse"
+
+msgid "Results in the addresses /<em>base</em>/event-123.ics and /<em>base</em>/<em>feed</em>.ics."
+msgstr "Ergibt die Adressen /<em>basis</em>/event-123.ics und /<em>basis</em>/<em>feed</em>.ics."
+
+msgid "Feed file name"
+msgstr "Dateiname des Abos"
+
+msgid "Without .ics."
+msgstr "Ohne .ics."
+
+msgid "Subscription calendar name"
+msgstr "Name des Abo-Kalenders"
+
+msgid "The name subscribers see in their calendar app."
+msgstr "So heißt der Kalender in der Kalender-App der Abonnent:innen."
+
+msgid "Past days in the feed"
+msgstr "Vergangene Tage im Abo"
+
+msgid "How long past events stay visible in the subscription."
+msgstr "So lange bleiben vergangene Termine im Abo sichtbar."
+
+msgid "Reads the event data from existing fields (ACF, ACPT or plain post meta). Nothing has to be entered twice."
+msgstr "Liest die Termindaten aus vorhandenen Feldern (ACF, ACPT oder normale Post-Meta). Es muss nichts doppelt gepflegt werden."
+
+msgid "Save settings"
+msgstr "Einstellungen speichern"
+
+msgid "Available fields"
+msgstr "Verfügbare Felder"
+
+#, php-format
+msgid "Field names and values of the sample post \"%s\":"
+msgstr "Feldnamen und Werte am Beispiel von „%s“:"
+
+msgid "Field name"
+msgstr "Feldname"
+
+msgid "Value"
+msgstr "Wert"
+
+msgid "Preview"
+msgstr "Vorschau"
+
+msgid "Subscription URL:"
+msgstr "Abo-Adresse:"
+
+msgid "No events found in the feed period. Are the post type and the date field correct?"
+msgstr "Im Abo-Zeitraum wurden keine Termine gefunden. Stimmen Beitragstyp und Datumsfeld?"
+
+msgid "Event"
+msgstr "Termin"
+
+msgid "Start"
+msgstr "Beginn"
+
+msgid "End"
+msgstr "Ende"
+
+msgid "Location"
+msgstr "Ort"
+
+msgid "File"
+msgstr "Datei"
+
+msgid "(all day)"
+msgstr "(ganztägig)"
+
+msgid "Usage"
+msgstr "Verwendung"
+
+msgid "In the link field of a button or text link, choose the dynamic data category \"Add to Calendar\"."
+msgstr "Im Link-Feld eines Buttons oder Text-Links in den dynamischen Daten die Kategorie „Zum Kalender hinzufügen“ wählen."
+
+msgid "Shortcode:"
+msgstr "Shortcode:"
+
+msgid "Without \"text\" only the URL is returned."
+msgstr "Ohne „text“ wird nur die Adresse ausgegeben."
+
+msgid "Link"
+msgstr "Link"
+
+msgid "Event not found."
+msgstr "Termin nicht gefunden."
+
+msgid "Event as .ics file (Apple, Outlook, phone calendars)"
+msgstr "Termin als .ics-Datei (Apple, Outlook, Handy-Kalender)"
+
+msgid "Event in Google Calendar"
+msgstr "Termin in Google Kalender"
+
+msgid "Event in Outlook.com"
+msgstr "Termin in Outlook.com"
+
+msgid "Event in Outlook / Microsoft 365 (work)"
+msgstr "Termin in Outlook / Microsoft 365 (Firma)"
+
+msgid "Subscription: feed URL (https)"
+msgstr "Kalender-Abo: Feed-Adresse (https)"
+
+msgid "Subscription: webcal link (Apple, Outlook, phones)"
+msgstr "Kalender-Abo: webcal-Link (Apple, Outlook, Handy)"
+
+msgid "Subscription: subscribe in Google Calendar"
+msgstr "Kalender-Abo: in Google Kalender abonnieren"
+
+msgid "Turns dates you already store in custom fields (ACF, ACPT or plain post meta) into calendar entries: an .ics file per event, links for Google Calendar and Outlook, and a subscribable calendar feed. Works with any theme, with extra dynamic data fields for Breakdance."
+msgstr "Macht aus Terminen, die bereits in eigenen Feldern stehen (ACF, ACPT oder normale Post-Meta), Kalendereinträge: eine .ics-Datei pro Termin, Links für Google Kalender und Outlook sowie ein abonnierbarer Kalender-Feed. Funktioniert mit jedem Theme, mit zusätzlichen dynamischen Datenfeldern für Breakdance."

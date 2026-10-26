@@ -1,0 +1,25 @@
+name: Plugin Check
+
+# Runs the official WordPress.org Plugin Check on every push and pull request,
+# so problems that would block the directory review show up early.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  plugin-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build plugin folder
+        run: |
+          mkdir -p build/add-to-calendar-from-custom-fields
+          rsync -a --exclude-from=.distignore --exclude=build ./ build/add-to-calendar-from-custom-fields/
+
+      - name: Run Plugin Check
+        uses: wordpress/plugin-check-action@v1
+        with:
+          build-dir: build/add-to-calendar-from-custom-fields

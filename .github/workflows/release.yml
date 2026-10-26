@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      SLUG: add-to-calendar-from-custom-fields
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check version numbers match the tag
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          grep -Eq "^ \* Version:\s+${TAG}$" "${SLUG}.php" || { echo "Plugin header version does not match ${TAG}"; exit 1; }
+          grep -q "define('IMM_TK_VERSION', '${TAG}');" "${SLUG}.php" || { echo "IMM_TK_VERSION does not match ${TAG}"; exit 1; }
+          grep -Eq "^Stable tag: ${TAG}$" readme.txt || { echo "Stable tag does not match ${TAG}"; exit 1; }
+
+      - name: Build zip
+        run: |
+          mkdir -p "build/${SLUG}"
+          rsync -a --exclude-from=.distignore --exclude=build ./ "build/${SLUG}/"
+          (cd build && zip -qr "../${SLUG}.zip" "${SLUG}")
+
+      - name: Attach zip to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.SLUG }}.zip
+
+      - name: Deploy to WordPress.org
+        if: ${{ vars.WPORG_DEPLOY == 'true' }}
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: ${{ env.SLUG }}

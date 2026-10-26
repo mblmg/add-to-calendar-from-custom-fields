@@ -1,0 +1,179 @@
+# Translation template for Add to Calendar from Custom Fields.
+msgid ""
+msgstr ""
+"Project-Id-Version: Add to Calendar from Custom Fields 1.0.0\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: add-to-calendar-from-custom-fields\n"
+
+msgid "Add to Calendar"
+msgstr ""
+
+msgid "Add to Calendar from Custom Fields"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Post type"
+msgstr ""
+
+msgid "Slug of the post type that holds the events, e.g. <code>event</code>."
+msgstr ""
+
+msgid "Date field"
+msgstr ""
+
+msgid "Field name (meta key) of the date. Required."
+msgstr ""
+
+msgid "End date field (optional)"
+msgstr ""
+
+msgid "Only needed for events spanning several days."
+msgstr ""
+
+msgid "Start time fields"
+msgstr ""
+
+msgid "One or more fields, separated by commas. The first field with a value is used. If none has a value, the event is added as an all-day event."
+msgstr ""
+
+msgid "End time field (optional)"
+msgstr ""
+
+msgid "If the end time is earlier than the start time, the event ends on the next day."
+msgstr ""
+
+msgid "Default duration in minutes"
+msgstr ""
+
+msgid "Used when no end time is set."
+msgstr ""
+
+msgid "Location fields (optional)"
+msgstr ""
+
+msgid "One or more fields, separated by commas. They are combined into one location."
+msgstr ""
+
+msgid "Description field (optional)"
+msgstr ""
+
+msgid "Field for the calendar description. Empty = the post excerpt. The link to the post is always added."
+msgstr ""
+
+msgid "Base path"
+msgstr ""
+
+msgid "Results in the addresses /<em>base</em>/event-123.ics and /<em>base</em>/<em>feed</em>.ics."
+msgstr ""
+
+msgid "Feed file name"
+msgstr ""
+
+msgid "Without .ics."
+msgstr ""
+
+msgid "Subscription calendar name"
+msgstr ""
+
+msgid "The name subscribers see in their calendar app."
+msgstr ""
+
+msgid "Past days in the feed"
+msgstr ""
+
+msgid "How long past events stay visible in the subscription."
+msgstr ""
+
+msgid "Reads the event data from existing fields (ACF, ACPT or plain post meta). Nothing has to be entered twice."
+msgstr ""
+
+msgid "Save settings"
+msgstr ""
+
+msgid "Available fields"
+msgstr ""
+
+#, php-format
+msgid "Field names and values of the sample post \"%s\":"
+msgstr ""
+
+msgid "Field name"
+msgstr ""
+
+msgid "Value"
+msgstr ""
+
+msgid "Preview"
+msgstr ""
+
+msgid "Subscription URL:"
+msgstr ""
+
+msgid "No events found in the feed period. Are the post type and the date field correct?"
+msgstr ""
+
+msgid "Event"
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "End"
+msgstr ""
+
+msgid "Location"
+msgstr ""
+
+msgid "File"
+msgstr ""
+
+msgid "(all day)"
+msgstr ""
+
+msgid "Usage"
+msgstr ""
+
+msgid "In the link field of a button or text link, choose the dynamic data category \"Add to Calendar\"."
+msgstr ""
+
+msgid "Shortcode:"
+msgstr ""
+
+msgid "Without \"text\" only the URL is returned."
+msgstr ""
+
+msgid "Link"
+msgstr ""
+
+msgid "Event not found."
+msgstr ""
+
+msgid "Event as .ics file (Apple, Outlook, phone calendars)"
+msgstr ""
+
+msgid "Event in Google Calendar"
+msgstr ""
+
+msgid "Event in Outlook.com"
+msgstr ""
+
+msgid "Event in Outlook / Microsoft 365 (work)"
+msgstr ""
+
+msgid "Subscription: feed URL (https)"
+msgstr ""
+
+msgid "Subscription: webcal link (Apple, Outlook, phones)"
+msgstr ""
+
+msgid "Subscription: subscribe in Google Calendar"
+msgstr ""
+
+msgid "Turns dates you already store in custom fields (ACF, ACPT or plain post meta) into calendar entries: an .ics file per event, links for Google Calendar and Outlook, and a subscribable calendar feed. Works with any theme, with extra dynamic data fields for Breakdance."
+msgstr ""

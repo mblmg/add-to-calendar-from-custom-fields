@@ -1,0 +1,182 @@
+<?php
+/**
+ * Reads an event from the configured fields and calculates start and end.
+ *
+ * Rules:
+ * - Start time: the first non-empty field of "Start time fields" (order = priority).
+ * - No start time found: all-day event.
+ * - End: "End time" field; if it is earlier than the start, the event ends on the next day.
+ * - No end: start + default duration.
+ */
+
+defined('ABSPATH') || exit;
+
+class IMM_TK_Event
+{
+    /** @var int */
+    public $id;
+    /** @var string */
+    public $title;
+    /** @var DateTimeImmutable */
+    public $start;
+    /** @var DateTimeImmutable */
+    public $end;
+    /** @var bool */
+    public $all_day = false;
+    /** @var string */
+    public $location = '';
+    /** @var string */
+    public $description = '';
+    /** @var string */
+    public $url = '';
+    /** @var string */
+    public $uid = '';
+    /** @var DateTimeImmutable */
+    public $modified;
+
+    /** Loads the event of a post. Returns null if the post has no valid date. */
+    public static function from_post($post): ?self
+    {
+        $post = get_post($post);
+        if (!$post || !IMM_TK_Settings::is_configured()) {
+            return null;
+        }
+        if ($post->post_type !== IMM_TK_Settings::get('post_type') || $post->post_status !== 'publish') {
+            return null;
+        }
+
+        $tz   = wp_timezone();
+        $date = self::parse_date(self::first_meta($post->ID, IMM_TK_Settings::key_list('date_key')), $tz);
+        if (!$date) {
+            return null;
+        }
+        $end_date = self::parse_date(self::first_meta($post->ID, IMM_TK_Settings::key_list('end_date_key')), $tz);
+
+        $event        = new self();
+        $event->id    = $post->ID;
+        $event->title = html_entity_decode(wp_strip_all_tags(get_the_title($post)), ENT_QUOTES, 'UTF-8');
+        $event->url   = get_permalink($post);
+        $event->uid   = 'imm-tk-' . $post->ID . '@' . wp_parse_url(home_url(), PHP_URL_HOST);
+        $event->modified = new DateTimeImmutable($post->post_modified_gmt ?: 'now', new DateTimeZone('UTC'));
+
+        $start_time = null;
+        foreach (IMM_TK_Settings::key_list('start_keys') as $key) {
+            $start_time = self::parse_time(get_post_meta($post->ID, $key, true));
+            if ($start_time) {
+                break;
+            }
+        }
+
+        if ($start_time === null) {
+            // All-day. DTEND is exclusive for all-day events, hence +1 day.
+            $event->all_day = true;
+            $event->start   = $date;
+            $last_day       = ($end_date && $end_date >= $date) ? $end_date : $date;
+            $event->end     = $last_day->modify('+1 day');
+        } else {
+            $event->start = $date->setTime($start_time[0], $start_time[1]);
+            $end_time     = self::parse_time(self::first_meta($post->ID, IMM_TK_Settings::key_list('end_time_key')));
+            if ($end_time) {
+                $end_base   = ($end_date && $end_date >= $date) ? $end_date : $date;
+                $event->end = $end_base->setTime($end_time[0], $end_time[1]);
+                if ($event->end <= $event->start) {
+                    $event->end = $event->end->modify('+1 day');
+                }
+            } else {
+                $minutes    = (int) IMM_TK_Settings::get('default_duration');
+                $event->end = $event->start->modify('+' . $minutes . ' minutes');
+            }
+        }
+
+        $parts = [];
+        foreach (IMM_TK_Settings::key_list('location_keys') as $key) {
+            $value = trim(wp_strip_all_tags((string) get_post_meta($post->ID, $key, true)));
+            if ($value !== '' && !in_array($value, $parts, true)) {
+                $parts[] = $value;
+            }
+        }
+        $event->location = implode(', ', $parts);
+
+        $description = '';
+        foreach (IMM_TK_Settings::key_list('description_key') as $key) {
+            $description = trim(wp_strip_all_tags((string) get_post_meta($post->ID, $key, true)));
+            if ($description !== '') {
+                break;
+            }
+        }
+        if ($description === '' && has_excerpt($post)) {
+            $description = trim(wp_strip_all_tags(get_the_excerpt($post)));
+        }
+        $description = html_entity_decode($description, ENT_QUOTES, 'UTF-8');
+        $event->description = trim($description . "\n\n" . $event->url);
+
+        return apply_filters('imm_tk_event', $event, $post);
+    }
+
+    /** @return mixed */
+    private static function first_meta(int $post_id, array $keys)
+    {
+        foreach ($keys as $key) {
+            $value = get_post_meta($post_id, $key, true);
+            if ($value !== '' && $value !== null && $value !== false) {
+                return $value;
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Reads a date in common storage formats:
+     * ACPT "Y-m-d", ACF "Ymd", "d.m.Y", "d/m/Y", "Y-m-d H:i:s" or a Unix timestamp.
+     */
+    public static function parse_date($value, DateTimeZone $tz): ?DateTimeImmutable
+    {
+        if (is_array($value)) {
+            $value = reset($value);
+        }
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+        if (ctype_digit($value) && strlen($value) >= 9) {
+            return (new DateTimeImmutable('@' . $value))->setTimezone($tz)->setTime(0, 0);
+        }
+        foreach (['!Y-m-d', '!Ymd', '!d.m.Y', '!d/m/Y', '!Y-m-d H:i:s', '!Y-m-d H:i'] as $format) {
+            $date   = DateTimeImmutable::createFromFormat($format, $value, $tz);
+            $errors = DateTimeImmutable::getLastErrors();
+            $clean  = $errors === false || (empty($errors['warning_count']) && empty($errors['error_count']));
+            if ($date && $clean) {
+                return $date->setTime(0, 0);
+            }
+        }
+        return null;
+    }
+
+    /** Reads a time ("19:00:00", "19:00", "7:00 pm"). Returns [hour, minute] or null. */
+    public static function parse_time($value): ?array
+    {
+        if (is_array($value)) {
+            $value = reset($value);
+        }
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+        if (preg_match('/^(\d{1,2}):(\d{2})(?::\d{2})?\s*([ap]\.?m\.?)?$/i', $value, $m)) {
+            $hour   = (int) $m[1];
+            $minute = (int) $m[2];
+            if (!empty($m[3])) {
+                $pm = stripos($m[3], 'p') === 0;
+                if ($hour === 12) {
+                    $hour = $pm ? 12 : 0;
+                } elseif ($pm) {
+                    $hour += 12;
+                }
+            }
+            if ($hour < 24 && $minute < 60) {
+                return [$hour, $minute];
+            }
+        }
+        return null;
+    }
+}
