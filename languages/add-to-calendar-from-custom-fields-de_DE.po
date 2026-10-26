@@ -175,8 +175,8 @@ msgid "Description field (optional)"
 msgstr "Beschreibungs-Feld (optional)"
 
 #: includes/class-admin.php:77
-msgid "Field for the calendar description. Empty = the post excerpt. The link to the post is always added."
-msgstr "Feld für die Beschreibung im Kalender. Leer = Textauszug des Beitrags. Der Link zur Seite wird immer angehängt."
+msgid "Field for the description. Empty = the post excerpt, or the beginning of the post content if there is no excerpt. In calendars, the link to the post is always added."
+msgstr "Feld für die Beschreibung. Leer = der Textauszug des Beitrags oder, wenn es keinen gibt, der Anfang des Beitragstexts. Im Kalender wird immer der Link zum Beitrag angehängt."
 
 #: includes/class-admin.php:78
 msgid "Base path"

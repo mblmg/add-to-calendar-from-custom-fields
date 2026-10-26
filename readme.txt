@@ -61,7 +61,7 @@ Yes. The calendar files tell caching plugins not to cache them.
 
 = What does the structured data contain? =
 
-Name, start and end, doors time, description, featured image, venue and address, organizer, and optionally the ticket link and price. The first location field is read as venue name, the other location fields as address. An address like "Main Street 1, 12345 City" is split into street, postal code and city. The settings page shows the generated data for the next event and links to Google's Rich Results Test.
+Name, start and end, doors time, description (description field, excerpt or the beginning of the post content), featured image, venue and address, organizer, and optionally the ticket link and price. The first location field is read as venue name, the other location fields as address. An address like "Main Street 1, 12345 City" is split into street, postal code and city. The settings page shows the generated data for the next event and links to Google's Rich Results Test.
 
 If another plugin already outputs event markup for the same posts, turn the option off in the settings to avoid duplicates.
 
@@ -90,6 +90,7 @@ The settings page contains a link to Google's Rich Results Test. Clicking it ope
 * New: structured data (schema.org Event) for search engines on each event page.
 * New: optional fields for doors time, ticket link and price, a default venue and the organizer.
 * Settings page grouped into sections, with a preview of the structured data.
+* Without a description field or excerpt, the description now uses the beginning of the post content (also in calendars).
 
 = 1.0.0 =
 * First public release.

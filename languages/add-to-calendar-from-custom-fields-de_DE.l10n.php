@@ -47,7 +47,7 @@ return [
 		'Location fields (optional)' => 'Ort-Felder (optional)',
 		'One or more fields, separated by commas. They are combined into one location.' => 'Ein oder mehrere Felder, durch Komma getrennt. Sie werden zu einer Ortsangabe zusammengesetzt.',
 		'Description field (optional)' => 'Beschreibungs-Feld (optional)',
-		'Field for the calendar description. Empty = the post excerpt. The link to the post is always added.' => 'Feld für die Beschreibung im Kalender. Leer = Textauszug des Beitrags. Der Link zur Seite wird immer angehängt.',
+		'Field for the description. Empty = the post excerpt, or the beginning of the post content if there is no excerpt. In calendars, the link to the post is always added.' => 'Feld für die Beschreibung. Leer = der Textauszug des Beitrags oder, wenn es keinen gibt, der Anfang des Beitragstexts. Im Kalender wird immer der Link zum Beitrag angehängt.',
 		'Base path' => 'Basis-Adresse',
 		'Results in the addresses /<em>base</em>/event-123.ics and /<em>base</em>/<em>feed</em>.ics.' => 'Ergibt die Adressen /<em>basis</em>/event-123.ics und /<em>basis</em>/<em>feed</em>.ics.',
 		'Feed file name' => 'Dateiname des Abos',

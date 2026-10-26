@@ -140,6 +140,11 @@ class IMM_TK_Event
         if ($description === '' && has_excerpt($post)) {
             $description = trim(wp_strip_all_tags(get_the_excerpt($post)));
         }
+        if ($description === '' && trim($post->post_content) !== '') {
+            // No field, no excerpt: the beginning of the post content.
+            $content     = wp_strip_all_tags(strip_shortcodes(excerpt_remove_blocks($post->post_content)));
+            $description = wp_trim_words($content, 55, '…');
+        }
         $event->summary     = html_entity_decode($description, ENT_QUOTES, 'UTF-8');
         $event->description = trim($event->summary . "\n\n" . $event->url);
 

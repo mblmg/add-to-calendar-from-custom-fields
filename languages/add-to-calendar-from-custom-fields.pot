@@ -175,7 +175,7 @@ msgid "Description field (optional)"
 msgstr ""
 
 #: includes/class-admin.php:77
-msgid "Field for the calendar description. Empty = the post excerpt. The link to the post is always added."
+msgid "Field for the description. Empty = the post excerpt, or the beginning of the post content if there is no excerpt. In calendars, the link to the post is always added."
 msgstr ""
 
 #: includes/class-admin.php:78
