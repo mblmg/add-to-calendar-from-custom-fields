@@ -1,5 +1,5 @@
 === Add to Calendar from Custom Fields ===
-Contributors: YOUR-WPORG-USERNAME
+Contributors: mblmg
 Tags: calendar, ics, events, add to calendar, custom fields
 Requires at least: 6.3
 Tested up to: 7.1
