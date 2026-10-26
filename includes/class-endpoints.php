@@ -84,10 +84,10 @@ class IMM_TK_Endpoints
             'post_status'    => 'publish',
             'posts_per_page' => 300,
             'no_found_rows'  => true,
-            'meta_key'       => $date_key,
+            'meta_key'       => $date_key, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- sorting by the event date is the purpose of the feed.
             'orderby'        => 'meta_value',
             'order'          => 'ASC',
-            'meta_query'     => [[
+            'meta_query'     => [[ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- only upcoming events, limited to 300.
                 'key'     => $date_key,
                 'value'   => $since,
                 'compare' => '>=',

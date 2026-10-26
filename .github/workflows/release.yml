@@ -14,7 +14,7 @@ jobs:
     env:
       SLUG: add-to-calendar-from-custom-fields
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check version numbers match the tag
         run: |
