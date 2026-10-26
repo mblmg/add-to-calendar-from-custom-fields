@@ -38,6 +38,32 @@ class IMM_TK_Admin
         });
     }
 
+    /** Settings grouped into sections: section title => [key => [label, help]]. */
+    private static function sections(): array
+    {
+        return [
+            __('Event fields', 'add-to-calendar-from-custom-fields')   => array_slice(self::fields(), 0, 8, true),
+            __('Calendar files', 'add-to-calendar-from-custom-fields') => array_slice(self::fields(), 8, null, true),
+            __('Search engines', 'add-to-calendar-from-custom-fields') => self::schema_fields(),
+        ];
+    }
+
+    private static function schema_fields(): array
+    {
+        return [
+            'schema_enabled' => [__('Structured data', 'add-to-calendar-from-custom-fields'), __('Adds schema.org event markup (JSON-LD) to each event page, so search engines like Google can show the event with date and place in their event listings. Turn it off if another plugin already does this.', 'add-to-calendar-from-custom-fields')],
+            'doors_key'      => [__('Doors time field (optional)', 'add-to-calendar-from-custom-fields'), __('If this field is also one of the start time fields, calendars still start at the doors time, but search engines get the start of the programme as start and the doors time separately.', 'add-to-calendar-from-custom-fields')],
+            'ticket_url_key' => [__('Ticket link field (optional)', 'add-to-calendar-from-custom-fields'), __('Field with a link to buy tickets or register.', 'add-to-calendar-from-custom-fields')],
+            'price_key'      => [__('Price field (optional)', 'add-to-calendar-from-custom-fields'), __('Field with the price, e.g. <code>12</code>, <code>12,50 €</code> or <code>free</code>.', 'add-to-calendar-from-custom-fields')],
+            'currency'       => [__('Currency', 'add-to-calendar-from-custom-fields'), __('Three-letter code, e.g. <code>EUR</code>.', 'add-to-calendar-from-custom-fields')],
+            'country'        => [__('Country', 'add-to-calendar-from-custom-fields'), __('Two-letter code of the venue country, e.g. <code>DE</code>.', 'add-to-calendar-from-custom-fields')],
+            'venue_name'     => [__('Default venue name', 'add-to-calendar-from-custom-fields'), __('Used when an event has no location fields filled. The first location field is read as venue name, the others as address.', 'add-to-calendar-from-custom-fields')],
+            'venue_address'  => [__('Default venue address', 'add-to-calendar-from-custom-fields'), __('Format: <code>Street 1, 12345 City</code>.', 'add-to-calendar-from-custom-fields')],
+            'organizer_name' => [__('Organizer', 'add-to-calendar-from-custom-fields'), __('Name of the organizer. Empty = no organizer.', 'add-to-calendar-from-custom-fields')],
+            'organizer_url'  => [__('Organizer website', 'add-to-calendar-from-custom-fields'), ''],
+        ];
+    }
+
     private static function fields(): array
     {
         return [
@@ -70,20 +96,34 @@ class IMM_TK_Admin
 
             <form method="post" action="options.php">
                 <?php settings_fields('imm_tk'); ?>
+                <?php foreach (self::sections() as $section => $fields) : ?>
+                <h2><?php echo esc_html($section); ?></h2>
                 <table class="form-table" role="presentation">
-                    <?php foreach (self::fields() as $key => [$label, $help]) : ?>
+                    <?php foreach ($fields as $key => [$label, $help]) : ?>
                         <tr>
                             <th scope="row"><label for="imm-tk-<?php echo esc_attr($key); ?>"><?php echo esc_html($label); ?></label></th>
                             <td>
-                                <input type="<?php echo in_array($key, ['default_duration', 'feed_past_days'], true) ? 'number' : 'text'; ?>"
-                                       class="regular-text" id="imm-tk-<?php echo esc_attr($key); ?>"
-                                       name="<?php echo esc_attr($name . '[' . $key . ']'); ?>"
-                                       value="<?php echo esc_attr($s[$key]); ?>">
-                                <p class="description"><?php echo wp_kses($help, ['code' => [], 'em' => []]); ?></p>
+                                <?php if ($key === 'schema_enabled') : ?>
+                                    <label>
+                                        <input type="checkbox" id="imm-tk-<?php echo esc_attr($key); ?>"
+                                               name="<?php echo esc_attr($name . '[' . $key . ']'); ?>"
+                                               value="1" <?php checked(!empty($s[$key])); ?>>
+                                        <?php esc_html_e('Output structured data on event pages', 'add-to-calendar-from-custom-fields'); ?>
+                                    </label>
+                                <?php else : ?>
+                                    <input type="<?php echo in_array($key, ['default_duration', 'feed_past_days'], true) ? 'number' : 'text'; ?>"
+                                           class="regular-text" id="imm-tk-<?php echo esc_attr($key); ?>"
+                                           name="<?php echo esc_attr($name . '[' . $key . ']'); ?>"
+                                           value="<?php echo esc_attr($s[$key]); ?>">
+                                <?php endif; ?>
+                                <?php if ($help !== '') : ?>
+                                    <p class="description"><?php echo wp_kses($help, ['code' => [], 'em' => []]); ?></p>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 </table>
+                <?php endforeach; ?>
                 <?php submit_button(__('Save settings', 'add-to-calendar-from-custom-fields')); ?>
             </form>
 
@@ -151,6 +191,25 @@ class IMM_TK_Admin
             echo '<tr><td>' . esc_html($e->title) . '</td><td>' . esc_html($start) . '</td><td>' . esc_html($end) . '</td><td>' . esc_html($e->location) . '</td><td><a href="' . esc_url(IMM_TK_Links::event_ics_url($e->id)) . '">.ics</a></td></tr>';
         }
         echo '</tbody></table>';
+
+        if (!IMM_TK_Settings::get('schema_enabled')) {
+            return;
+        }
+        $next = $events[0];
+        foreach ($events as $e) {
+            if ($e->end >= new DateTimeImmutable('now', wp_timezone())) {
+                $next = $e;
+                break;
+            }
+        }
+        echo '<h3>' . esc_html__('Structured data', 'add-to-calendar-from-custom-fields') . '</h3>';
+        /* translators: %s: event title */
+        echo '<p>' . esc_html(sprintf(__('This is what search engines read on the page of "%s":', 'add-to-calendar-from-custom-fields'), $next->title)) . '</p>';
+        echo '<pre style="max-width:900px;max-height:400px;overflow:auto;background:#fff;border:1px solid #c3c4c7;padding:12px">'
+            . esc_html(wp_json_encode(IMM_TK_Schema::build($next), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE))
+            . '</pre>';
+        echo '<p><a href="' . esc_url('https://search.google.com/test/rich-results?url=' . rawurlencode($next->url)) . '" target="_blank" rel="noopener">'
+            . esc_html__('Check this page with Google\'s Rich Results Test', 'add-to-calendar-from-custom-fields') . '</a></p>';
     }
 
     private static function render_usage(): void

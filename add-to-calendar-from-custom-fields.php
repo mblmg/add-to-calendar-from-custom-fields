@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       Add to Calendar from Custom Fields
  * Plugin URI:        https://github.com/mblmg/add-to-calendar-from-custom-fields
- * Description:       Turns dates you already store in custom fields (ACF, ACPT or plain post meta) into calendar entries: an .ics file per event, links for Google Calendar and Outlook, and a subscribable calendar feed. Works with any theme, with extra dynamic data fields for Breakdance.
- * Version:           1.0.0
+ * Description:       Turns dates you already store in custom fields (ACF, ACPT or plain post meta) into calendar entries: an .ics file per event, links for Google Calendar and Outlook, a subscribable calendar feed and schema.org event markup for search engines. Works with any theme, with extra dynamic data fields for Breakdance.
+ * Version:           1.1.0
  * Requires at least: 6.3
  * Requires PHP:      7.4
  * Author:            i-make.media
@@ -16,7 +16,7 @@
 
 defined('ABSPATH') || exit;
 
-define('IMM_TK_VERSION', '1.0.0');
+define('IMM_TK_VERSION', '1.1.0');
 define('IMM_TK_FILE', __FILE__);
 define('IMM_TK_DIR', plugin_dir_path(__FILE__));
 
@@ -25,6 +25,7 @@ require_once IMM_TK_DIR . 'includes/class-event.php';
 require_once IMM_TK_DIR . 'includes/class-ics.php';
 require_once IMM_TK_DIR . 'includes/class-links.php';
 require_once IMM_TK_DIR . 'includes/class-endpoints.php';
+require_once IMM_TK_DIR . 'includes/class-schema.php';
 require_once IMM_TK_DIR . 'includes/class-admin.php';
 require_once IMM_TK_DIR . 'includes/shortcode.php';
 require_once IMM_TK_DIR . 'includes/breakdance.php';
@@ -35,6 +36,7 @@ add_action('init', function () {
 }, 1);
 
 IMM_TK_Endpoints::init();
+IMM_TK_Schema::init();
 IMM_TK_Admin::init();
 IMM_TK_Shortcode::init();
 IMM_TK_Breakdance::init();

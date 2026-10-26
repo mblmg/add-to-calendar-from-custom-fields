@@ -25,7 +25,25 @@ class IMM_TK_Settings
             'feed_slug'        => 'events',
             'feed_title'       => get_bloginfo('name'),
             'feed_past_days'   => 30,
+            // Structured data for search engines (schema.org Event).
+            'schema_enabled'   => 1,
+            'doors_key'        => '',
+            'ticket_url_key'   => '',
+            'price_key'        => '',
+            'currency'         => 'EUR',
+            'country'          => self::locale_country(),
+            'venue_name'       => '',
+            'venue_address'    => '',
+            'organizer_name'   => get_bloginfo('name'),
+            'organizer_url'    => home_url('/'),
         ];
+    }
+
+    /** Two-letter country code from the site language, e.g. "DE" for de_DE. */
+    private static function locale_country(): string
+    {
+        $parts = explode('_', get_locale());
+        return (isset($parts[1]) && strlen($parts[1]) === 2) ? strtoupper($parts[1]) : '';
     }
 
     public static function all(): array
@@ -72,6 +90,17 @@ class IMM_TK_Settings
             'feed_slug'        => sanitize_title($input['feed_slug'] ?? $d['feed_slug']) ?: 'events',
             'feed_title'       => sanitize_text_field($input['feed_title'] ?? $d['feed_title']),
             'feed_past_days'   => absint($input['feed_past_days'] ?? $d['feed_past_days']),
+            // Unchecked checkboxes are not submitted, so a missing key means "off".
+            'schema_enabled'   => empty($input['schema_enabled']) ? 0 : 1,
+            'doors_key'        => $clean_keys($input['doors_key'] ?? ''),
+            'ticket_url_key'   => $clean_keys($input['ticket_url_key'] ?? ''),
+            'price_key'        => $clean_keys($input['price_key'] ?? ''),
+            'currency'         => strtoupper(preg_replace('/[^A-Za-z]/', '', (string) ($input['currency'] ?? $d['currency']))) ?: 'EUR',
+            'country'          => strtoupper(substr(preg_replace('/[^A-Za-z]/', '', (string) ($input['country'] ?? '')), 0, 2)),
+            'venue_name'       => sanitize_text_field($input['venue_name'] ?? ''),
+            'venue_address'    => sanitize_text_field($input['venue_address'] ?? ''),
+            'organizer_name'   => sanitize_text_field($input['organizer_name'] ?? ''),
+            'organizer_url'    => esc_url_raw($input['organizer_url'] ?? ''),
         ];
     }
 

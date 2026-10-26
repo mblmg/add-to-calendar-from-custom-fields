@@ -1,179 +1,339 @@
-# Translation template for Add to Calendar from Custom Fields.
+# Copyright (C) i-make.media
+# This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Add to Calendar from Custom Fields 1.0.0\n"
-"Language: \n"
+"Project-Id-Version: Add to Calendar from Custom Fields 1.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/add-to-calendar-from-custom-fields\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: add-to-calendar-from-custom-fields\n"
 
+#. Description of the plugin
+#: add-to-calendar-from-custom-fields.php
+msgid "Turns dates you already store in custom fields (ACF, ACPT or plain post meta) into calendar entries: an .ics file per event, links for Google Calendar and Outlook, a subscribable calendar feed and schema.org event markup for search engines. Works with any theme, with extra dynamic data fields for Breakdance."
+msgstr ""
+
+#: includes/breakdance-field.php:29 includes/class-admin.php:17
 msgid "Add to Calendar"
 msgstr ""
 
+#: includes/class-admin.php:16 includes/class-admin.php:94
 msgid "Add to Calendar from Custom Fields"
 msgstr ""
 
+#: includes/class-admin.php:36
 msgid "Settings"
 msgstr ""
 
+#: includes/class-admin.php:45
+msgid "Event fields"
+msgstr ""
+
+#: includes/class-admin.php:46
+msgid "Calendar files"
+msgstr ""
+
+#: includes/class-admin.php:47
+msgid "Search engines"
+msgstr ""
+
+#: includes/class-admin.php:54 includes/class-admin.php:205
+msgid "Structured data"
+msgstr ""
+
+#: includes/class-admin.php:54
+msgid "Adds schema.org event markup (JSON-LD) to each event page, so search engines like Google can show the event with date and place in their event listings. Turn it off if another plugin already does this."
+msgstr ""
+
+#: includes/class-admin.php:55
+msgid "Doors time field (optional)"
+msgstr ""
+
+#: includes/class-admin.php:55
+msgid "If this field is also one of the start time fields, calendars still start at the doors time, but search engines get the start of the programme as start and the doors time separately."
+msgstr ""
+
+#: includes/class-admin.php:56
+msgid "Ticket link field (optional)"
+msgstr ""
+
+#: includes/class-admin.php:56
+msgid "Field with a link to buy tickets or register."
+msgstr ""
+
+#: includes/class-admin.php:57
+msgid "Price field (optional)"
+msgstr ""
+
+#: includes/class-admin.php:57
+msgid "Field with the price, e.g. <code>12</code>, <code>12,50 €</code> or <code>free</code>."
+msgstr ""
+
+#: includes/class-admin.php:58
+msgid "Currency"
+msgstr ""
+
+#: includes/class-admin.php:58
+msgid "Three-letter code, e.g. <code>EUR</code>."
+msgstr ""
+
+#: includes/class-admin.php:59
+msgid "Country"
+msgstr ""
+
+#: includes/class-admin.php:59
+msgid "Two-letter code of the venue country, e.g. <code>DE</code>."
+msgstr ""
+
+#: includes/class-admin.php:60
+msgid "Default venue name"
+msgstr ""
+
+#: includes/class-admin.php:60
+msgid "Used when an event has no location fields filled. The first location field is read as venue name, the others as address."
+msgstr ""
+
+#: includes/class-admin.php:61
+msgid "Default venue address"
+msgstr ""
+
+#: includes/class-admin.php:61
+msgid "Format: <code>Street 1, 12345 City</code>."
+msgstr ""
+
+#: includes/class-admin.php:62
+msgid "Organizer"
+msgstr ""
+
+#: includes/class-admin.php:62
+msgid "Name of the organizer. Empty = no organizer."
+msgstr ""
+
+#: includes/class-admin.php:63
+msgid "Organizer website"
+msgstr ""
+
+#: includes/class-admin.php:70
 msgid "Post type"
 msgstr ""
 
+#: includes/class-admin.php:70
 msgid "Slug of the post type that holds the events, e.g. <code>event</code>."
 msgstr ""
 
+#: includes/class-admin.php:71
 msgid "Date field"
 msgstr ""
 
+#: includes/class-admin.php:71
 msgid "Field name (meta key) of the date. Required."
 msgstr ""
 
+#: includes/class-admin.php:72
 msgid "End date field (optional)"
 msgstr ""
 
+#: includes/class-admin.php:72
 msgid "Only needed for events spanning several days."
 msgstr ""
 
+#: includes/class-admin.php:73
 msgid "Start time fields"
 msgstr ""
 
+#: includes/class-admin.php:73
 msgid "One or more fields, separated by commas. The first field with a value is used. If none has a value, the event is added as an all-day event."
 msgstr ""
 
+#: includes/class-admin.php:74
 msgid "End time field (optional)"
 msgstr ""
 
+#: includes/class-admin.php:74
 msgid "If the end time is earlier than the start time, the event ends on the next day."
 msgstr ""
 
+#: includes/class-admin.php:75
 msgid "Default duration in minutes"
 msgstr ""
 
+#: includes/class-admin.php:75
 msgid "Used when no end time is set."
 msgstr ""
 
+#: includes/class-admin.php:76
 msgid "Location fields (optional)"
 msgstr ""
 
+#: includes/class-admin.php:76
 msgid "One or more fields, separated by commas. They are combined into one location."
 msgstr ""
 
+#: includes/class-admin.php:77
 msgid "Description field (optional)"
 msgstr ""
 
+#: includes/class-admin.php:77
 msgid "Field for the calendar description. Empty = the post excerpt. The link to the post is always added."
 msgstr ""
 
+#: includes/class-admin.php:78
 msgid "Base path"
 msgstr ""
 
+#: includes/class-admin.php:78
 msgid "Results in the addresses /<em>base</em>/event-123.ics and /<em>base</em>/<em>feed</em>.ics."
 msgstr ""
 
+#: includes/class-admin.php:79
 msgid "Feed file name"
 msgstr ""
 
+#: includes/class-admin.php:79
 msgid "Without .ics."
 msgstr ""
 
+#: includes/class-admin.php:80
 msgid "Subscription calendar name"
 msgstr ""
 
+#: includes/class-admin.php:80
 msgid "The name subscribers see in their calendar app."
 msgstr ""
 
+#: includes/class-admin.php:81
 msgid "Past days in the feed"
 msgstr ""
 
+#: includes/class-admin.php:81
 msgid "How long past events stay visible in the subscription."
 msgstr ""
 
+#: includes/class-admin.php:95
 msgid "Reads the event data from existing fields (ACF, ACPT or plain post meta). Nothing has to be entered twice."
 msgstr ""
 
+#: includes/class-admin.php:111
+msgid "Output structured data on event pages"
+msgstr ""
+
+#: includes/class-admin.php:127
 msgid "Save settings"
 msgstr ""
 
+#: includes/class-admin.php:148
 msgid "Available fields"
 msgstr ""
 
-#, php-format
+#. translators: %s: title of a sample post
+#: includes/class-admin.php:150
 msgid "Field names and values of the sample post \"%s\":"
 msgstr ""
 
+#. translators: %s: title of a sample post
+#: includes/class-admin.php:151
 msgid "Field name"
 msgstr ""
 
+#. translators: %s: title of a sample post
+#: includes/class-admin.php:151
 msgid "Value"
 msgstr ""
 
+#: includes/class-admin.php:169
 msgid "Preview"
 msgstr ""
 
+#: includes/class-admin.php:170
 msgid "Subscription URL:"
 msgstr ""
 
+#: includes/class-admin.php:172
 msgid "No events found in the feed period. Are the post type and the date field correct?"
 msgstr ""
 
+#: includes/class-admin.php:178
 msgid "Event"
 msgstr ""
 
+#: includes/class-admin.php:179
 msgid "Start"
 msgstr ""
 
+#: includes/class-admin.php:180
 msgid "End"
 msgstr ""
 
+#: includes/class-admin.php:181
 msgid "Location"
 msgstr ""
 
+#: includes/class-admin.php:182
 msgid "File"
 msgstr ""
 
+#: includes/class-admin.php:186
 msgid "(all day)"
 msgstr ""
 
+#. translators: %s: event title
+#: includes/class-admin.php:207
+msgid "This is what search engines read on the page of \"%s\":"
+msgstr ""
+
+#: includes/class-admin.php:212
+msgid "Check this page with Google's Rich Results Test"
+msgstr ""
+
+#: includes/class-admin.php:217
 msgid "Usage"
 msgstr ""
 
+#: includes/class-admin.php:218
 msgid "In the link field of a button or text link, choose the dynamic data category \"Add to Calendar\"."
 msgstr ""
 
+#: includes/class-admin.php:219
 msgid "Shortcode:"
 msgstr ""
 
+#: includes/class-admin.php:219
 msgid "Without \"text\" only the URL is returned."
 msgstr ""
 
+#: includes/class-admin.php:220
 msgid "Link"
 msgstr ""
 
+#: includes/class-endpoints.php:52
 msgid "Event not found."
 msgstr ""
 
+#: includes/class-links.php:14
 msgid "Event as .ics file (Apple, Outlook, phone calendars)"
 msgstr ""
 
+#: includes/class-links.php:15
 msgid "Event in Google Calendar"
 msgstr ""
 
+#: includes/class-links.php:16
 msgid "Event in Outlook.com"
 msgstr ""
 
+#: includes/class-links.php:17
 msgid "Event in Outlook / Microsoft 365 (work)"
 msgstr ""
 
+#: includes/class-links.php:18
 msgid "Subscription: feed URL (https)"
 msgstr ""
 
+#: includes/class-links.php:19
 msgid "Subscription: webcal link (Apple, Outlook, phones)"
 msgstr ""
 
+#: includes/class-links.php:20
 msgid "Subscription: subscribe in Google Calendar"
-msgstr ""
-
-msgid "Turns dates you already store in custom fields (ACF, ACPT or plain post meta) into calendar entries: an .ics file per event, links for Google Calendar and Outlook, and a subscribable calendar feed. Works with any theme, with extra dynamic data fields for Breakdance."
 msgstr ""

@@ -1,14 +1,14 @@
 === Add to Calendar from Custom Fields ===
 Contributors: mblmg
-Tags: calendar, ics, events, add to calendar, custom fields
+Tags: calendar, ics, events, add to calendar, schema
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Add-to-calendar links, .ics files and a subscribable calendar feed, built from the date and time fields you already have.
+Add-to-calendar links, .ics files, a calendar feed and event markup for search engines, built from the date fields you already have.
 
 == Description ==
 
@@ -17,6 +17,7 @@ Your events already have a date, a start time and a location in custom fields. T
 * An .ics file per event for Apple Calendar, Outlook, Thunderbird and most phone calendars
 * Links that open Google Calendar, Outlook.com or Outlook / Microsoft 365 with the event filled in
 * A subscribable calendar feed with all upcoming events. Calendar apps re-fetch it regularly, so new and changed events show up for subscribers automatically.
+* Structured data (schema.org Event as JSON-LD) on each event page, so search engines like Google can list the event with date, time and place
 * All links as dynamic data in Breakdance (category "Add to Calendar") and as a shortcode for any other theme or builder
 
 The plugin reads regular post meta, so it works with Advanced Custom Fields (ACF), ACPT, Meta Box text fields and plain custom fields. Dates are recognised in the common storage formats: 2026-12-09 (ACPT), 20261209 (ACF), 09.12.2026, 12/09/2026 and Unix timestamps.
@@ -58,10 +59,17 @@ No. A downloaded file is a one-time copy. For automatic updates, offer the subsc
 
 Yes. The calendar files tell caching plugins not to cache them.
 
+= What does the structured data contain? =
+
+Name, start and end, doors time, description, featured image, venue and address, organizer, and optionally the ticket link and price. The first location field is read as venue name, the other location fields as address. An address like "Main Street 1, 12345 City" is split into street, postal code and city. The settings page shows the generated data for the next event and links to Google's Rich Results Test.
+
+If another plugin already outputs event markup for the same posts, turn the option off in the settings to avoid duplicates.
+
 = Developer hooks =
 
 * Filter `imm_tk_event` ($event, $post): change the event data before output.
 * Filter `imm_tk_feed_query_args` ($args): change the query for the subscription feed.
+* Filter `imm_tk_schema` ($data, $event, $post): change the structured data, e.g. add performers. Return an empty array to output nothing.
 
 == External services ==
 
@@ -74,7 +82,14 @@ The optional calendar links send the visitor to a third-party calendar service. 
 
 If you do not want to offer these services, simply do not place these links on your site.
 
+The settings page contains a link to Google's Rich Results Test. Clicking it opens that Google tool with the address of one of your event pages. Nothing is sent unless an administrator clicks the link.
+
 == Changelog ==
+
+= 1.1.0 =
+* New: structured data (schema.org Event) for search engines on each event page.
+* New: optional fields for doors time, ticket link and price, a default venue and the organizer.
+* Settings page grouped into sections, with a preview of the structured data.
 
 = 1.0.0 =
 * First public release.

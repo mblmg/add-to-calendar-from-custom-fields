@@ -23,10 +23,23 @@ class IMM_TK_Event
     public $end;
     /** @var bool */
     public $all_day = false;
+    /**
+     * Start of the actual programme. Equals $start unless the doors field is one of the
+     * start time fields; then this is the first start time field after the doors.
+     *
+     * @var DateTimeImmutable
+     */
+    public $main_start;
+    /** @var DateTimeImmutable|null Doors time, if a doors field is configured and filled. */
+    public $doors;
     /** @var string */
     public $location = '';
-    /** @var string */
+    /** @var string[] Non-empty values of the location fields, in the configured order. */
+    public $location_parts = [];
+    /** @var string Calendar description: summary plus link to the post. */
     public $description = '';
+    /** @var string Plain description without the link. */
+    public $summary = '';
     /** @var string */
     public $url = '';
     /** @var string */
@@ -59,10 +72,20 @@ class IMM_TK_Event
         $event->uid   = 'imm-tk-' . $post->ID . '@' . wp_parse_url(home_url(), PHP_URL_HOST);
         $event->modified = new DateTimeImmutable($post->post_modified_gmt ?: 'now', new DateTimeZone('UTC'));
 
+        $doors_keys = IMM_TK_Settings::key_list('doors_key');
+        $doors_time = self::parse_time(self::first_meta($post->ID, $doors_keys));
         $start_time = null;
+        $main_time  = null;
         foreach (IMM_TK_Settings::key_list('start_keys') as $key) {
-            $start_time = self::parse_time(get_post_meta($post->ID, $key, true));
-            if ($start_time) {
+            $time = self::parse_time(get_post_meta($post->ID, $key, true));
+            if (!$time) {
+                continue;
+            }
+            if ($start_time === null) {
+                $start_time = $time;
+            }
+            if (!in_array($key, $doors_keys, true)) {
+                $main_time = $time;
                 break;
             }
         }
@@ -73,8 +96,17 @@ class IMM_TK_Event
             $event->start   = $date;
             $last_day       = ($end_date && $end_date >= $date) ? $end_date : $date;
             $event->end     = $last_day->modify('+1 day');
+            $event->main_start = $event->start;
         } else {
-            $event->start = $date->setTime($start_time[0], $start_time[1]);
+            $event->start      = $date->setTime($start_time[0], $start_time[1]);
+            $event->main_start = $main_time ? $date->setTime($main_time[0], $main_time[1]) : $event->start;
+            if ($event->main_start < $event->start) {
+                // Programme start after midnight, doors before.
+                $event->main_start = $event->main_start->modify('+1 day');
+            }
+            if ($doors_time) {
+                $event->doors = $date->setTime($doors_time[0], $doors_time[1]);
+            }
             $end_time     = self::parse_time(self::first_meta($post->ID, IMM_TK_Settings::key_list('end_time_key')));
             if ($end_time) {
                 $end_base   = ($end_date && $end_date >= $date) ? $end_date : $date;
@@ -95,7 +127,8 @@ class IMM_TK_Event
                 $parts[] = $value;
             }
         }
-        $event->location = implode(', ', $parts);
+        $event->location_parts = $parts;
+        $event->location       = implode(', ', $parts);
 
         $description = '';
         foreach (IMM_TK_Settings::key_list('description_key') as $key) {
@@ -107,14 +140,14 @@ class IMM_TK_Event
         if ($description === '' && has_excerpt($post)) {
             $description = trim(wp_strip_all_tags(get_the_excerpt($post)));
         }
-        $description = html_entity_decode($description, ENT_QUOTES, 'UTF-8');
-        $event->description = trim($description . "\n\n" . $event->url);
+        $event->summary     = html_entity_decode($description, ENT_QUOTES, 'UTF-8');
+        $event->description = trim($event->summary . "\n\n" . $event->url);
 
         return apply_filters('imm_tk_event', $event, $post);
     }
 
     /** @return mixed */
-    private static function first_meta(int $post_id, array $keys)
+    public static function first_meta(int $post_id, array $keys)
     {
         foreach ($keys as $key) {
             $value = get_post_meta($post_id, $key, true);
