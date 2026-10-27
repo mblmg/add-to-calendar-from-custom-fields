@@ -11,13 +11,13 @@ class IMM_TK_Links
     public static function types(): array
     {
         return [
-            'ics'         => __('Event as .ics file (Apple, Outlook, phone calendars)', 'add-to-calendar-from-custom-fields'),
-            'google'      => __('Event in Google Calendar', 'add-to-calendar-from-custom-fields'),
-            'outlook'     => __('Event in Outlook.com', 'add-to-calendar-from-custom-fields'),
-            'office365'   => __('Event in Outlook / Microsoft 365 (work)', 'add-to-calendar-from-custom-fields'),
-            'feed'        => __('Subscription: feed URL (https)', 'add-to-calendar-from-custom-fields'),
-            'webcal'      => __('Subscription: webcal link (Apple, Outlook, phones)', 'add-to-calendar-from-custom-fields'),
-            'feed_google' => __('Subscription: subscribe in Google Calendar', 'add-to-calendar-from-custom-fields'),
+            'ics'         => __('Event as .ics file (Apple, Outlook, phone calendars)', 'event-toolkit-for-custom-fields'),
+            'google'      => __('Event in Google Calendar', 'event-toolkit-for-custom-fields'),
+            'outlook'     => __('Event in Outlook.com', 'event-toolkit-for-custom-fields'),
+            'office365'   => __('Event in Outlook / Microsoft 365 (work)', 'event-toolkit-for-custom-fields'),
+            'feed'        => __('Subscription: feed URL (https)', 'event-toolkit-for-custom-fields'),
+            'webcal'      => __('Subscription: webcal link (Apple, Outlook, phones)', 'event-toolkit-for-custom-fields'),
+            'feed_google' => __('Subscription: subscribe in Google Calendar', 'event-toolkit-for-custom-fields'),
         ];
     }
 

@@ -1,0 +1,648 @@
+# German translation for Event Toolkit for Custom Fields.
+msgid ""
+msgstr ""
+"Project-Id-Version: Event Toolkit for Custom Fields 2.0.0\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: event-toolkit-for-custom-fields\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Description of the plugin
+#: event-toolkit-for-custom-fields.php
+msgid "Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters. Extra dynamic data fields for Breakdance."
+msgstr "Verteilt die Termine aus deinen eigenen Feldern (ACF, ACPT oder normale Post-Meta): Kalender-Links und .ics-Dateien, ein abonnierbarer Kalender-Feed, eine schema.org-Auszeichnung für Suchmaschinen, eine Wochenvorschau für Telegram und ein RSS-Feed für E-Mail-Newsletter. Mit zusätzlichen dynamischen Datenfeldern für Breakdance."
+
+#: event-toolkit-for-custom-fields.php:28
+msgid "Event Toolkit for Custom Fields replaces the plugins \"Add to Calendar from Custom Fields\" and \"Event Digest for Telegram\". Please deactivate them; all settings are taken over."
+msgstr "Event Toolkit for Custom Fields ersetzt die Plugins „Add to Calendar from Custom Fields“ und „Event Digest for Telegram“. Bitte deaktiviere sie, alle Einstellungen werden übernommen."
+
+#: includes/breakdance-field.php:29
+msgid "Add to Calendar"
+msgstr "Zum Kalender hinzufügen"
+
+#: includes/class-admin.php:16 includes/class-admin.php:118
+msgid "Event Toolkit for Custom Fields"
+msgstr "Event Toolkit for Custom Fields"
+
+#: includes/class-admin.php:17
+msgid "Event Toolkit"
+msgstr "Event Toolkit"
+
+#: includes/class-admin.php:43
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: includes/class-admin.php:57
+msgid "Events"
+msgstr "Termine"
+
+#: includes/class-admin.php:58
+msgid "Calendar"
+msgstr "Kalender"
+
+#: includes/class-admin.php:59
+msgid "Search engines"
+msgstr "Suchmaschinen"
+
+#. translators: %s: link to the tab "Weekly preview"
+#: includes/class-admin.php:60 includes/class-admin.php:363
+msgid "Weekly preview"
+msgstr "Wochenvorschau"
+
+#: includes/class-admin.php:68
+msgid "If this field is also one of the start time fields, calendars still start at the doors time, but search engines and the weekly preview show the start of the programme and the doors time separately."
+msgstr "Ist dieses Feld auch eines der Startzeit-Felder, beginnt der Termin im Kalender weiterhin mit dem Einlass. Suchmaschinen und die Wochenvorschau zeigen dagegen Einlass und Programmbeginn getrennt."
+
+#: includes/class-admin.php:70
+msgid "Post type"
+msgstr "Beitragstyp"
+
+#: includes/class-admin.php:70
+msgid "Slug of the post type that holds the events, e.g. <code>event</code>."
+msgstr "Slug des Beitragstyps, der die Termine enthält, z. B. <code>event</code>."
+
+#: includes/class-admin.php:71
+msgid "Date field"
+msgstr "Datumsfeld"
+
+#: includes/class-admin.php:71
+msgid "Field name (meta key) of the date. Required."
+msgstr "Feldname (Meta-Key) des Datums. Pflichtfeld."
+
+#: includes/class-admin.php:72
+msgid "End date field (optional)"
+msgstr "Enddatum-Feld (optional)"
+
+#: includes/class-admin.php:72
+msgid "Only needed for events spanning several days."
+msgstr "Nur für mehrtägige Termine nötig."
+
+#: includes/class-admin.php:73
+msgid "Start time fields"
+msgstr "Startzeit-Felder"
+
+#: includes/class-admin.php:73
+msgid "One or more fields, separated by commas. The first field with a value is used. If none has a value, the event is added as an all-day event."
+msgstr "Ein oder mehrere Felder, durch Komma getrennt. Das erste befüllte Feld wird verwendet. Ist keins befüllt, wird der Termin ganztägig eingetragen."
+
+#: includes/class-admin.php:74
+msgid "End time field (optional)"
+msgstr "Endzeit-Feld (optional)"
+
+#: includes/class-admin.php:74
+msgid "If the end time is earlier than the start time, the event ends on the next day."
+msgstr "Liegt die Endzeit vor der Startzeit, endet der Termin am Folgetag."
+
+#: includes/class-admin.php:75
+msgid "Doors time field (optional)"
+msgstr "Feld für den Einlass (optional)"
+
+#: includes/class-admin.php:76
+msgid "Default duration in minutes"
+msgstr "Standard-Dauer in Minuten"
+
+#: includes/class-admin.php:76
+msgid "Used when no end time is set."
+msgstr "Gilt, wenn keine Endzeit gepflegt ist."
+
+#: includes/class-admin.php:77
+msgid "Location fields (optional)"
+msgstr "Ort-Felder (optional)"
+
+#: includes/class-admin.php:77
+msgid "One or more fields, separated by commas. The first is read as venue name, the others as address."
+msgstr "Ein oder mehrere Felder, durch Kommas getrennt. Das erste gilt als Name des Veranstaltungsorts, die weiteren als Adresse."
+
+#: includes/class-admin.php:78
+msgid "Description field (optional)"
+msgstr "Beschreibungs-Feld (optional)"
+
+#: includes/class-admin.php:78
+msgid "Field for the description. Empty = the post excerpt, or the beginning of the post content if there is no excerpt. In calendars, the link to the post is always added."
+msgstr "Feld für die Beschreibung. Leer = der Textauszug des Beitrags oder, wenn es keinen gibt, der Anfang des Beitragstexts. Im Kalender wird immer der Link zum Beitrag angehängt."
+
+#: includes/class-admin.php:79
+msgid "Ticket link field (optional)"
+msgstr "Feld für den Ticketlink (optional)"
+
+#: includes/class-admin.php:79
+msgid "Field with a link to buy tickets or register."
+msgstr "Feld mit einem Link zum Ticketkauf oder zur Anmeldung."
+
+#: includes/class-admin.php:80
+msgid "Price field (optional)"
+msgstr "Preisfeld (optional)"
+
+#: includes/class-admin.php:80
+msgid "Field with the price, e.g. <code>12</code>, <code>12,50 €</code> or <code>free</code>."
+msgstr "Feld mit dem Preis, z. B. <code>12</code>, <code>12,50 €</code> oder <code>frei</code>."
+
+#: includes/class-admin.php:82
+msgid "Base path"
+msgstr "Basis-Adresse"
+
+#: includes/class-admin.php:82
+msgid "Results in the addresses /<em>base</em>/event-123.ics and /<em>base</em>/<em>feed</em>.ics."
+msgstr "Ergibt die Adressen /<em>basis</em>/event-123.ics und /<em>basis</em>/<em>feed</em>.ics."
+
+#: includes/class-admin.php:83 includes/class-admin.php:103
+msgid "Feed file name"
+msgstr "Dateiname des Abos"
+
+#: includes/class-admin.php:83
+msgid "Without .ics."
+msgstr "Ohne .ics."
+
+#: includes/class-admin.php:84
+msgid "Subscription calendar name"
+msgstr "Name des Abo-Kalenders"
+
+#: includes/class-admin.php:84
+msgid "The name subscribers see in their calendar app."
+msgstr "So heißt der Kalender in der Kalender-App der Abonnent:innen."
+
+#: includes/class-admin.php:85
+msgid "Past days in the feed"
+msgstr "Vergangene Tage im Abo"
+
+#: includes/class-admin.php:85
+msgid "How long past events stay visible in the subscription."
+msgstr "So lange bleiben vergangene Termine im Abo sichtbar."
+
+#: includes/class-admin.php:87
+msgid "Structured data"
+msgstr "Strukturierte Daten"
+
+#: includes/class-admin.php:87
+msgid "Adds schema.org event markup (JSON-LD) to each event page, so search engines like Google can show the event with date and place in their event listings. Turn it off if another plugin already does this."
+msgstr "Ergänzt jede Terminseite um eine schema.org-Auszeichnung (JSON-LD). So können Suchmaschinen wie Google den Termin mit Datum und Ort in ihren Veranstaltungslisten zeigen. Schalte die Option aus, wenn ein anderes Plugin das schon übernimmt."
+
+#: includes/class-admin.php:87
+msgid "Output structured data on event pages"
+msgstr "Strukturierte Daten auf Terminseiten ausgeben"
+
+#: includes/class-admin.php:88
+msgid "Currency"
+msgstr "Währung"
+
+#: includes/class-admin.php:88
+msgid "Three-letter code, e.g. <code>EUR</code>."
+msgstr "Dreistelliger Code, z. B. <code>EUR</code>."
+
+#: includes/class-admin.php:89
+msgid "Country"
+msgstr "Land"
+
+#: includes/class-admin.php:89
+msgid "Two-letter code of the venue country, e.g. <code>DE</code>."
+msgstr "Zweistelliger Code des Landes, in dem der Veranstaltungsort liegt, z. B. <code>DE</code>."
+
+#: includes/class-admin.php:90
+msgid "Default venue name"
+msgstr "Standard-Veranstaltungsort"
+
+#: includes/class-admin.php:90
+msgid "Used when an event has no location fields filled. Not repeated in the weekly preview."
+msgstr "Wird verwendet, wenn bei einem Termin kein Ortsfeld ausgefüllt ist. In der Wochenvorschau wird er nicht wiederholt."
+
+#: includes/class-admin.php:91
+msgid "Default venue address"
+msgstr "Standard-Adresse"
+
+#: includes/class-admin.php:91
+msgid "Format: <code>Street 1, 12345 City</code>."
+msgstr "Format: <code>Straße 1, 12345 Stadt</code>."
+
+#: includes/class-admin.php:92
+msgid "Organizer"
+msgstr "Veranstalter"
+
+#: includes/class-admin.php:92
+msgid "Name of the organizer. Empty = no organizer."
+msgstr "Name des Veranstalters. Leer = keine Angabe."
+
+#: includes/class-admin.php:93
+msgid "Organizer website"
+msgstr "Website des Veranstalters"
+
+#: includes/class-admin.php:95
+msgid "Day and time"
+msgstr "Tag und Uhrzeit"
+
+#: includes/class-admin.php:95
+msgid "When a new issue starts. Telegram posts at this time; the newsletter feed switches to the new issue."
+msgstr "Wann eine neue Ausgabe beginnt. Telegram postet zu diesem Zeitpunkt, der Newsletter-Feed wechselt dann zur neuen Ausgabe."
+
+#: includes/class-admin.php:96
+msgid "Days ahead"
+msgstr "Tage im Voraus"
+
+#: includes/class-admin.php:96
+msgid "Events starting within this many days are listed in the first part."
+msgstr "Termine, die innerhalb dieser Anzahl von Tagen beginnen, stehen im ersten Teil."
+
+#: includes/class-admin.php:97
+msgid "New events"
+msgstr "Neue Termine"
+
+#: includes/class-admin.php:97
+msgid "Also list events published during the week before the issue"
+msgstr "Auch Termine aufführen, die in der Woche vor der Ausgabe veröffentlicht wurden"
+
+#: includes/class-admin.php:98
+msgid "Intro (optional)"
+msgstr "Einleitung (optional)"
+
+#: includes/class-admin.php:99
+msgid "Heading for the coming days"
+msgstr "Überschrift für die nächsten Tage"
+
+#: includes/class-admin.php:99 includes/class-digest.php:97
+msgid "This week"
+msgstr "Diese Woche"
+
+#: includes/class-admin.php:100
+msgid "Heading for new events"
+msgstr "Überschrift für neue Termine"
+
+#: includes/class-admin.php:100 includes/class-digest.php:102
+msgid "New in the programme"
+msgstr "Neu im Programm"
+
+#: includes/class-admin.php:101
+msgid "Programme page"
+msgstr "Programmseite"
+
+#: includes/class-admin.php:101
+msgid "Linked at the end of every issue."
+msgstr "Wird am Ende jeder Ausgabe verlinkt."
+
+#: includes/class-admin.php:102 includes/class-admin.php:332
+msgid "Newsletter feed"
+msgstr "Newsletter-Feed"
+
+#: includes/class-admin.php:102
+msgid "Provide the weekly preview as RSS feed for newsletter services"
+msgstr "Wochenvorschau als RSS-Feed für Newsletter-Dienste bereitstellen"
+
+#: includes/class-admin.php:103
+msgid "Without .xml."
+msgstr "Ohne .xml."
+
+#: includes/class-admin.php:119
+msgid "Reads your events from existing fields (ACF, ACPT or plain post meta) and spreads them: calendar links, search engines, Telegram and newsletters. Nothing has to be entered twice."
+msgstr "Liest deine Termine aus vorhandenen Feldern (ACF, ACPT oder normale Post-Meta) und verteilt sie: Kalender-Links, Suchmaschinen, Telegram und Newsletter. Nichts muss doppelt eingegeben werden."
+
+#: includes/class-admin.php:163
+msgid "First enter the post type and the date field in the tab \"Events\"."
+msgstr "Trag zuerst im Reiter „Termine“ den Beitragstyp und das Datumsfeld ein."
+
+#: includes/class-admin.php:203 includes/class-admin.php:411
+msgid "Save settings"
+msgstr "Einstellungen speichern"
+
+#: includes/class-admin.php:218
+msgid "Available fields"
+msgstr "Verfügbare Felder"
+
+#. translators: %s: title of a sample post
+#: includes/class-admin.php:220
+msgid "Field names and values of the sample post \"%s\":"
+msgstr "Feldnamen und Werte am Beispiel von „%s“:"
+
+#. translators: %s: title of a sample post
+#: includes/class-admin.php:221
+msgid "Field name"
+msgstr "Feldname"
+
+#. translators: %s: title of a sample post
+#: includes/class-admin.php:221
+msgid "Value"
+msgstr "Wert"
+
+#: includes/class-admin.php:239 includes/class-admin.php:296 includes/class-admin.php:338 includes/class-admin.php:504
+msgid "Preview"
+msgstr "Vorschau"
+
+#: includes/class-admin.php:241
+msgid "No events found in the feed period. Are the post type and the date field correct?"
+msgstr "Im Abo-Zeitraum wurden keine Termine gefunden. Stimmen Beitragstyp und Datumsfeld?"
+
+#: includes/class-admin.php:247
+msgid "Event"
+msgstr "Termin"
+
+#: includes/class-admin.php:248
+msgid "Start"
+msgstr "Beginn"
+
+#: includes/class-admin.php:249
+msgid "End"
+msgstr "Ende"
+
+#: includes/class-admin.php:250
+msgid "Location"
+msgstr "Ort"
+
+#: includes/class-admin.php:251
+msgid "File"
+msgstr "Datei"
+
+#: includes/class-admin.php:255
+msgid "(all day)"
+msgstr "(ganztägig)"
+
+#: includes/class-admin.php:268
+msgid "Subscription URL:"
+msgstr "Abo-Adresse:"
+
+#: includes/class-admin.php:270
+msgid "Usage"
+msgstr "Verwendung"
+
+#: includes/class-admin.php:271
+msgid "In the link field of a button or text link, choose the dynamic data category \"Add to Calendar\"."
+msgstr "Im Link-Feld eines Buttons oder Text-Links in den dynamischen Daten die Kategorie „Zum Kalender hinzufügen“ wählen."
+
+#: includes/class-admin.php:272
+msgid "Shortcode:"
+msgstr "Shortcode:"
+
+#: includes/class-admin.php:272
+msgid "Without \"text\" only the URL is returned."
+msgstr "Ohne „text“ wird nur die Adresse ausgegeben."
+
+#: includes/class-admin.php:273
+msgid "Link"
+msgstr "Link"
+
+#. translators: %s: event title
+#: includes/class-admin.php:298
+msgid "This is what search engines read on the page of \"%s\":"
+msgstr "Das lesen Suchmaschinen auf der Seite von „%s“:"
+
+#: includes/class-admin.php:303
+msgid "Check this page with Google's Rich Results Test"
+msgstr "Diese Seite mit Googles Test für Rich-Suchergebnisse prüfen"
+
+#. translators: %s: date and time of the next issue
+#: includes/class-admin.php:316
+msgid "This is what the weekly preview would look like if it went out now. Next issue: %s."
+msgstr "So sähe die Wochenvorschau aus, wenn sie jetzt verschickt würde. Nächste Ausgabe: %s."
+
+#: includes/class-admin.php:334
+msgid "Enter this address in an RSS campaign of your newsletter service (e.g. Brevo, CleverReach or Mailchimp). The feed contains one entry per issue with the whole preview, so the service sends one mail per week. In weeks with no upcoming and no new events, the feed stays empty and no mail is sent."
+msgstr "Trag diese Adresse in einer RSS-Kampagne deines Newsletter-Dienstes ein (z. B. Brevo, CleverReach oder Mailchimp). Der Feed enthält pro Ausgabe einen Eintrag mit der ganzen Vorschau, der Dienst verschickt also eine Mail pro Woche. In Wochen ohne anstehende und ohne neue Termine bleibt der Feed leer, und es geht keine Mail raus."
+
+#: includes/class-admin.php:341 includes/class-admin.php:512
+msgid "Right now there would be nothing in it: no events in the coming days and nothing new."
+msgstr "Im Moment stünde nichts darin: keine Termine in den nächsten Tagen und nichts Neues."
+
+#. translators: %s: link to the tab "Weekly preview"
+#: includes/class-admin.php:362
+msgid "Posts the weekly preview to a Telegram group, topic or channel. Schedule and content are set in the tab %s."
+msgstr "Postet die Wochenvorschau in eine Telegram-Gruppe, ein Thema oder einen Kanal. Zeitplan und Inhalt stellst du im Reiter %s ein."
+
+#: includes/class-admin.php:371
+msgid "Weekly digest"
+msgstr "Wochenvorschau"
+
+#: includes/class-admin.php:372
+msgid "Post automatically every week"
+msgstr "Jede Woche automatisch posten"
+
+#: includes/class-admin.php:375
+msgid "Bot token"
+msgstr "Bot-Token"
+
+#: includes/class-admin.php:378
+msgid "Saved. Leave empty to keep it."
+msgstr "Gespeichert. Leer lassen, um ihn zu behalten."
+
+#: includes/class-admin.php:380
+msgid "Delete token"
+msgstr "Token löschen"
+
+#: includes/class-admin.php:382
+msgid "Create a bot with <code>@BotFather</code> in Telegram (command <code>/newbot</code>) and paste the token it gives you. Keep the token secret."
+msgstr "Lege in Telegram mit <code>@BotFather</code> einen Bot an (Befehl <code>/newbot</code>) und füge den Token ein, den du bekommst. Halte den Token geheim."
+
+#: includes/class-admin.php:386 includes/class-admin.php:491
+msgid "Chat ID"
+msgstr "Chat-ID"
+
+#: includes/class-admin.php:389
+msgid "ID of the group or channel, e.g. -1001234567890. Use \"Find chats\" below to look it up."
+msgstr "ID der Gruppe oder des Kanals, z. B. -1001234567890. Mit „Chats finden“ weiter unten kannst du sie nachschlagen."
+
+#: includes/class-admin.php:393
+msgid "Topic ID (optional)"
+msgstr "Themen-ID (optional)"
+
+#: includes/class-admin.php:396
+msgid "For groups with topics: the topic the digest goes to. Empty = the general chat."
+msgstr "Für Gruppen mit Themen: das Thema, in das die Vorschau gepostet wird. Leer = allgemeiner Chat."
+
+#: includes/class-admin.php:400
+msgid "Link preview"
+msgstr "Link-Vorschau"
+
+#: includes/class-admin.php:403
+msgid "Above the text"
+msgstr "Über dem Text"
+
+#: includes/class-admin.php:404
+msgid "Below the text"
+msgstr "Unter dem Text"
+
+#: includes/class-admin.php:405
+msgid "No preview"
+msgstr "Keine Vorschau"
+
+#: includes/class-admin.php:407
+msgid "Shows the preview of the next event page with its image, as when you post a link yourself. Image, title and description come from the page (e.g. set by your SEO plugin)."
+msgstr "Zeigt die Vorschau der Seite des nächsten Termins mit Bild, wie wenn du selbst einen Link postest. Bild, Titel und Beschreibung kommen von der Seite (z. B. aus deinem SEO-Plugin)."
+
+#: includes/class-admin.php:421
+msgid "The preview was posted to the chat."
+msgstr "Die Vorschau wurde in den Chat gepostet."
+
+#: includes/class-admin.php:422
+msgid "Nothing to post: no events in the coming days and nothing new."
+msgstr "Nichts zu posten: keine Termine in den nächsten Tagen und nichts Neues."
+
+#: includes/class-admin.php:440
+msgid "Next digest"
+msgstr "Nächste Vorschau"
+
+#: includes/class-admin.php:440
+msgid "not scheduled (turn on the weekly digest and enter token and chat ID)"
+msgstr "nicht geplant (Wochenvorschau einschalten und Token und Chat-ID eintragen)"
+
+#: includes/class-admin.php:441
+msgid "Last posted"
+msgstr "Zuletzt gepostet"
+
+#: includes/class-admin.php:444
+msgid "Last run"
+msgstr "Letzter Lauf"
+
+#: includes/class-admin.php:455 includes/class-admin.php:469
+msgid "Find chats"
+msgstr "Chats finden"
+
+#: includes/class-admin.php:457
+msgid "Add the bot to your group (or as administrator to your channel) and allow it to post messages."
+msgstr "Füge den Bot zu deiner Gruppe hinzu (oder als Administrator zu deinem Kanal) und erlaube ihm, Nachrichten zu senden."
+
+#: includes/class-admin.php:458
+msgid "In a group with topics: open the topic and send <code>/start@YourBotName</code> there. In a channel: post any message. The bot does not answer; it only reads the chat ID."
+msgstr "In einer Gruppe mit Themen: Öffne das Thema und schick dort <code>/start@DeinBotName</code>. In einem Kanal: Poste irgendeine Nachricht. Der Bot antwortet nicht, er liest nur die Chat-ID aus."
+
+#: includes/class-admin.php:459
+msgid "Click the button. The chats and topics the bot has seen in the last 24 hours appear below."
+msgstr "Klick auf den Button. Darunter erscheinen die Chats und Themen, die der Bot in den letzten 24 Stunden gesehen hat."
+
+#: includes/class-admin.php:463
+msgid "Save the bot token first."
+msgstr "Speichere zuerst den Bot-Token."
+
+#. translators: %s: bot username
+#: includes/class-admin.php:485
+msgid "Bot: @%s"
+msgstr "Bot: @%s"
+
+#: includes/class-admin.php:488
+msgid "The bot has not seen any chat yet. Follow the steps above and try again."
+msgstr "Der Bot hat noch keinen Chat gesehen. Folge den Schritten oben und versuch es noch einmal."
+
+#: includes/class-admin.php:491
+msgid "Chat"
+msgstr "Chat"
+
+#: includes/class-admin.php:491
+msgid "Type"
+msgstr "Typ"
+
+#: includes/class-admin.php:491
+msgid "Topics (ID: name)"
+msgstr "Themen (ID: Name)"
+
+#: includes/class-admin.php:540
+msgid "Post this preview to the chat now"
+msgstr "Diese Vorschau jetzt in den Chat posten"
+
+#: includes/class-admin.php:541
+msgid "Goes to the chat and topic above. Does not change the weekly schedule."
+msgstr "Geht an den Chat und das Thema oben. Der wöchentliche Zeitplan bleibt unverändert."
+
+#: includes/class-admin.php:549 includes/class-admin.php:568
+msgid "Not allowed."
+msgstr "Nicht erlaubt."
+
+#. translators: %s: name of the site or calendar
+#: includes/class-digest-feed.php:59
+msgid "%s: weekly preview"
+msgstr "%s: Wochenvorschau"
+
+#: includes/class-digest-feed.php:62
+msgid "Upcoming events and new additions to the programme, once a week."
+msgstr "Anstehende Termine und Neues im Programm, einmal pro Woche."
+
+#. translators: date format for the issue title, see https://www.php.net/manual/datetime.format.php
+#: includes/class-digest.php:109
+msgid "F j"
+msgstr "j. F"
+
+#. translators: %s: date of the issue
+#: includes/class-digest.php:111
+msgid "Weekly preview, %s"
+msgstr "Wochenvorschau vom %s"
+
+#. translators: date format for the event date in the weekly preview, see https://www.php.net/manual/datetime.format.php
+#: includes/class-digest.php:117
+msgid "D, F j"
+msgstr "D, j. F"
+
+#: includes/class-digest.php:124
+msgid "all day"
+msgstr "ganztägig"
+
+#. translators: 1: doors time, 2: start time
+#: includes/class-digest.php:132
+msgid "doors %1$s, start %2$s"
+msgstr "Einlass %1$s Uhr, Beginn %2$s Uhr"
+
+#. translators: %s: start time
+#: includes/class-digest.php:138
+msgid "at %s"
+msgstr "%s Uhr"
+
+#. translators: %s: link to the programme page
+#: includes/class-digest.php:166
+msgid "Full programme and calendar subscription: %s"
+msgstr "Das ganze Programm und das Kalender-Abo: %s"
+
+#: includes/class-endpoints.php:73
+msgid "Event not found."
+msgstr "Termin nicht gefunden."
+
+#: includes/class-links.php:14
+msgid "Event as .ics file (Apple, Outlook, phone calendars)"
+msgstr "Termin als .ics-Datei (Apple, Outlook, Handy-Kalender)"
+
+#: includes/class-links.php:15
+msgid "Event in Google Calendar"
+msgstr "Termin in Google Kalender"
+
+#: includes/class-links.php:16
+msgid "Event in Outlook.com"
+msgstr "Termin in Outlook.com"
+
+#: includes/class-links.php:17
+msgid "Event in Outlook / Microsoft 365 (work)"
+msgstr "Termin in Outlook / Microsoft 365 (Firma)"
+
+#: includes/class-links.php:18
+msgid "Subscription: feed URL (https)"
+msgstr "Kalender-Abo: Feed-Adresse (https)"
+
+#: includes/class-links.php:19
+msgid "Subscription: webcal link (Apple, Outlook, phones)"
+msgstr "Kalender-Abo: webcal-Link (Apple, Outlook, Handy)"
+
+#: includes/class-links.php:20
+msgid "Subscription: subscribe in Google Calendar"
+msgstr "Kalender-Abo: in Google Kalender abonnieren"
+
+#: includes/telegram/class-telegram-scheduler.php:64
+msgid "Nothing posted: no events in the coming days and nothing new."
+msgstr "Nichts gepostet: keine Termine in den nächsten Tagen und nichts Neues."
+
+#. translators: %s: error message
+#: includes/telegram/class-telegram-scheduler.php:70
+msgid "Error: %s"
+msgstr "Fehler: %s"
+
+#: includes/telegram/class-telegram-scheduler.php:76
+msgid "Posted."
+msgstr "Gepostet."
+
+#: includes/telegram/class-telegram-settings.php:51
+msgid "The bot token does not look valid. It was not saved."
+msgstr "Der Bot-Token sieht nicht gültig aus und wurde nicht gespeichert."
+
+#: includes/telegram/class-telegram.php:19
+msgid "No bot token saved."
+msgstr "Kein Bot-Token gespeichert."
+
+#: includes/telegram/class-telegram.php:27
+msgid "Telegram could not be reached."
+msgstr "Telegram war nicht erreichbar."
+
+#. translators: %s: error message from Telegram
+#: includes/telegram/class-telegram.php:33
+msgid "Telegram reports: %s"
+msgstr "Telegram meldet: %s"

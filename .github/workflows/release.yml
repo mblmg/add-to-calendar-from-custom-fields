@@ -1,5 +1,11 @@
 name: Release
 
+# Publishing a release with a tag like 2.0.1 (or pushing such a tag):
+# - attaches event-toolkit-for-custom-fields.zip (GitHub variant) to the release.
+#   Copies installed from GitHub find it and offer it as update.
+# - deploys the WordPress.org variant to the plugin directory, once enabled with the
+#   repository variable WPORG_DEPLOY = true and the secrets SVN_USERNAME / SVN_PASSWORD.
+
 on:
   push:
     tags:
@@ -12,7 +18,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      SLUG: add-to-calendar-from-custom-fields
+      SLUG: event-toolkit-for-custom-fields
     steps:
       - uses: actions/checkout@v5
 
@@ -23,16 +29,19 @@ jobs:
           grep -q "define('IMM_TK_VERSION', '${TAG}');" "${SLUG}.php" || { echo "IMM_TK_VERSION does not match ${TAG}"; exit 1; }
           grep -Eq "^Stable tag: ${TAG}$" readme.txt || { echo "Stable tag does not match ${TAG}"; exit 1; }
 
-      - name: Build zip
+      - name: Build GitHub zip
         run: |
-          mkdir -p "build/${SLUG}"
-          rsync -a --exclude-from=.distignore --exclude=build ./ "build/${SLUG}/"
+          .github/build.sh github
           (cd build && zip -qr "../${SLUG}.zip" "${SLUG}")
 
-      - name: Attach zip to GitHub release
+      - name: Attach zip to the GitHub release
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.SLUG }}.zip
+
+      - name: Build WordPress.org variant
+        if: ${{ vars.WPORG_DEPLOY == 'true' }}
+        run: .github/build.sh wporg
 
       - name: Deploy to WordPress.org
         if: ${{ vars.WPORG_DEPLOY == 'true' }}
@@ -41,3 +50,4 @@ jobs:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG: ${{ env.SLUG }}
+          BUILD_DIR: build/${{ env.SLUG }}

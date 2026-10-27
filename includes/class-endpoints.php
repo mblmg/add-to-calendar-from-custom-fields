@@ -15,12 +15,28 @@ class IMM_TK_Endpoints
         add_filter('query_vars', function ($vars) {
             $vars[] = 'imm_tk_event';
             $vars[] = 'imm_tk_feed';
+            $vars[] = 'imm_tk_digest';
             return $vars;
         });
         add_action('template_redirect', [self::class, 'serve'], 0);
         add_filter('redirect_canonical', function ($redirect) {
-            return (get_query_var('imm_tk_event') || get_query_var('imm_tk_feed')) ? false : $redirect;
+            return (get_query_var('imm_tk_event') || get_query_var('imm_tk_feed') || get_query_var('imm_tk_digest')) ? false : $redirect;
         });
+        // Rebuild the rewrite rules if ours are missing, e.g. after an update or after another
+        // plugin rebuilt them without ours (such as the predecessor plugins on deactivation).
+        add_action('init', [self::class, 'ensure_rewrite_rules'], 99);
+    }
+
+    public static function ensure_rewrite_rules(): void
+    {
+        if (!get_option('permalink_structure')) {
+            return;
+        }
+        $rules = get_option('rewrite_rules');
+        $key   = '^' . preg_quote(IMM_TK_Settings::get('base_path'), '#') . '/' . preg_quote(IMM_TK_Settings::get('digest_feed_slug'), '#') . '\\.xml$';
+        if (is_array($rules) && !isset($rules[$key])) {
+            flush_rewrite_rules(false);
+        }
     }
 
     public static function add_rewrite_rules(): void
@@ -29,10 +45,15 @@ class IMM_TK_Endpoints
         $feed = preg_quote(IMM_TK_Settings::get('feed_slug'), '#');
         add_rewrite_rule('^' . $base . '/event-([0-9]+)\.ics$', 'index.php?imm_tk_event=$matches[1]', 'top');
         add_rewrite_rule('^' . $base . '/' . $feed . '\.ics$', 'index.php?imm_tk_feed=1', 'top');
+        $digest = preg_quote(IMM_TK_Settings::get('digest_feed_slug'), '#');
+        add_rewrite_rule('^' . $base . '/' . $digest . '\.xml$', 'index.php?imm_tk_digest=1', 'top');
     }
 
     public static function serve(): void
     {
+        if (get_query_var('imm_tk_digest')) {
+            IMM_TK_Digest_Feed::serve();
+        }
         $event_id = absint(get_query_var('imm_tk_event'));
         $is_feed  = (bool) get_query_var('imm_tk_feed');
         if (!$event_id && !$is_feed) {
@@ -49,7 +70,7 @@ class IMM_TK_Endpoints
             if (!$event) {
                 status_header(404);
                 nocache_headers();
-                echo esc_html__('Event not found.', 'add-to-calendar-from-custom-fields');
+                echo esc_html__('Event not found.', 'event-toolkit-for-custom-fields');
                 exit;
             }
             $events   = [$event];

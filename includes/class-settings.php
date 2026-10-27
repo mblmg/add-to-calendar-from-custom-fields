@@ -1,7 +1,10 @@
 <?php
 /**
- * Settings: which fields provide the event data.
+ * Settings: which fields provide the event data, and how the outputs behave.
  * All fields are read as regular post meta, which works with ACF, ACPT and plain custom fields.
+ *
+ * The settings page has tabs; each tab only submits its own fields. sanitize() therefore
+ * starts from the saved values and replaces only the fields of the submitted tab.
  */
 
 defined('ABSPATH') || exit;
@@ -10,32 +13,95 @@ class IMM_TK_Settings
 {
     const OPTION = 'imm_tk_settings';
 
+    /** Fields per settings tab, with their type (key, keys, text, int, check, url, time, weekday, textarea). */
+    public static function tabs(): array
+    {
+        return [
+            'events' => [
+                'post_type'        => 'key',
+                'date_key'         => 'keys',
+                'end_date_key'     => 'keys',
+                'start_keys'       => 'keys',
+                'end_time_key'     => 'keys',
+                'doors_key'        => 'keys',
+                'default_duration' => 'int',
+                'location_keys'    => 'keys',
+                'description_key'  => 'keys',
+                'ticket_url_key'   => 'keys',
+                'price_key'        => 'keys',
+            ],
+            'calendar' => [
+                'base_path'      => 'slug',
+                'feed_slug'      => 'slug',
+                'feed_title'     => 'text',
+                'feed_past_days' => 'int',
+            ],
+            'search' => [
+                'schema_enabled' => 'check',
+                'currency'       => 'text',
+                'country'        => 'text',
+                'venue_name'     => 'text',
+                'venue_address'  => 'text',
+                'organizer_name' => 'text',
+                'organizer_url'  => 'url',
+            ],
+            'digest' => [
+                'digest_weekday'      => 'weekday',
+                'digest_time'         => 'time',
+                'digest_days_ahead'   => 'int',
+                'digest_include_new'  => 'check',
+                'digest_intro'        => 'textarea',
+                'digest_heading_week' => 'text',
+                'digest_heading_new'  => 'text',
+                'digest_program_url'  => 'url',
+                'digest_feed_enabled' => 'check',
+                'digest_feed_slug'    => 'slug',
+            ],
+        ];
+    }
+
     public static function defaults(): array
     {
+        // Weekly preview settings used to live in the separate Telegram plugin; take them over.
+        $tg = get_option('imm_tg_settings', []);
+        $tg = is_array($tg) ? $tg : [];
+
         return [
             'post_type'        => '',
             'date_key'         => '',
             'end_date_key'     => '',
             'start_keys'       => '',
             'end_time_key'     => '',
+            'doors_key'        => '',
             'default_duration' => 180,
             'location_keys'    => '',
             'description_key'  => '',
+            'ticket_url_key'   => '',
+            'price_key'        => '',
+
             'base_path'        => 'calendar',
             'feed_slug'        => 'events',
             'feed_title'       => get_bloginfo('name'),
             'feed_past_days'   => 30,
-            // Structured data for search engines (schema.org Event).
+
             'schema_enabled'   => 1,
-            'doors_key'        => '',
-            'ticket_url_key'   => '',
-            'price_key'        => '',
             'currency'         => 'EUR',
             'country'          => self::locale_country(),
             'venue_name'       => '',
             'venue_address'    => '',
             'organizer_name'   => get_bloginfo('name'),
             'organizer_url'    => home_url('/'),
+
+            'digest_weekday'      => (int) ($tg['weekday'] ?? 1), // 1 = Monday … 7 = Sunday (ISO-8601).
+            'digest_time'         => (string) ($tg['time'] ?? '10:00'),
+            'digest_days_ahead'   => (int) ($tg['days_ahead'] ?? 7),
+            'digest_include_new'  => (int) ($tg['include_new'] ?? 1),
+            'digest_intro'        => (string) ($tg['intro'] ?? ''),
+            'digest_heading_week' => (string) ($tg['heading_week'] ?? ''), // Empty = translated default.
+            'digest_heading_new'  => (string) ($tg['heading_new'] ?? ''),
+            'digest_program_url'  => (string) ($tg['program_url'] ?? home_url('/')),
+            'digest_feed_enabled' => 1,
+            'digest_feed_slug'    => 'weekly',
         ];
     }
 
@@ -66,42 +132,68 @@ class IMM_TK_Settings
         return array_values(array_filter(array_map('trim', explode(',', $raw))));
     }
 
+    /**
+     * Sanitizes the fields of the submitted tab and keeps all other saved values.
+     * Without a "_tab" marker (e.g. programmatic updates) all known fields are taken from the input.
+     */
     public static function sanitize($input): array
     {
-        $d = self::defaults();
         $input = is_array($input) ? $input : [];
-        $clean_keys = function ($value) {
-            $parts = array_filter(array_map(function ($k) {
-                return preg_replace('/[^A-Za-z0-9_\-]/', '', trim($k));
-            }, explode(',', (string) $value)));
-            return implode(', ', $parts);
-        };
+        $out   = self::all();
+        $tabs  = self::tabs();
+        $tab   = isset($input['_tab']) ? sanitize_key($input['_tab']) : '';
+        $types = isset($tabs[$tab]) ? $tabs[$tab] : array_merge(...array_values($tabs));
 
-        return [
-            'post_type'        => sanitize_key($input['post_type'] ?? $d['post_type']),
-            'date_key'         => $clean_keys($input['date_key'] ?? ''),
-            'end_date_key'     => $clean_keys($input['end_date_key'] ?? ''),
-            'start_keys'       => $clean_keys($input['start_keys'] ?? ''),
-            'end_time_key'     => $clean_keys($input['end_time_key'] ?? ''),
-            'default_duration' => max(15, absint($input['default_duration'] ?? $d['default_duration'])),
-            'location_keys'    => $clean_keys($input['location_keys'] ?? ''),
-            'description_key'  => $clean_keys($input['description_key'] ?? ''),
-            'base_path'        => sanitize_title($input['base_path'] ?? $d['base_path']) ?: 'calendar',
-            'feed_slug'        => sanitize_title($input['feed_slug'] ?? $d['feed_slug']) ?: 'events',
-            'feed_title'       => sanitize_text_field($input['feed_title'] ?? $d['feed_title']),
-            'feed_past_days'   => absint($input['feed_past_days'] ?? $d['feed_past_days']),
-            // Unchecked checkboxes are not submitted, so a missing key means "off".
-            'schema_enabled'   => empty($input['schema_enabled']) ? 0 : 1,
-            'doors_key'        => $clean_keys($input['doors_key'] ?? ''),
-            'ticket_url_key'   => $clean_keys($input['ticket_url_key'] ?? ''),
-            'price_key'        => $clean_keys($input['price_key'] ?? ''),
-            'currency'         => strtoupper(preg_replace('/[^A-Za-z]/', '', (string) ($input['currency'] ?? $d['currency']))) ?: 'EUR',
-            'country'          => strtoupper(substr(preg_replace('/[^A-Za-z]/', '', (string) ($input['country'] ?? '')), 0, 2)),
-            'venue_name'       => sanitize_text_field($input['venue_name'] ?? ''),
-            'venue_address'    => sanitize_text_field($input['venue_address'] ?? ''),
-            'organizer_name'   => sanitize_text_field($input['organizer_name'] ?? ''),
-            'organizer_url'    => esc_url_raw($input['organizer_url'] ?? ''),
-        ];
+        foreach ($types as $key => $type) {
+            if ($type === 'check') {
+                // Unchecked checkboxes are not submitted, so a missing key means "off".
+                $out[$key] = empty($input[$key]) ? 0 : 1;
+                continue;
+            }
+            if (!array_key_exists($key, $input)) {
+                continue;
+            }
+            $out[$key] = self::clean($key, $type, $input[$key]);
+        }
+        unset($out['_tab']);
+        return $out;
+    }
+
+    /** @return mixed */
+    private static function clean(string $key, string $type, $value)
+    {
+        $value = is_scalar($value) ? (string) $value : '';
+        switch ($type) {
+            case 'key':
+                return sanitize_key($value);
+            case 'keys':
+                $parts = array_filter(array_map(function ($k) {
+                    return preg_replace('/[^A-Za-z0-9_\-]/', '', trim($k));
+                }, explode(',', $value)));
+                return implode(', ', $parts);
+            case 'int':
+                $min = ['default_duration' => 15, 'digest_days_ahead' => 1][$key] ?? 0;
+                $max = ['digest_days_ahead' => 31][$key] ?? PHP_INT_MAX;
+                return min($max, max($min, absint($value)));
+            case 'slug':
+                return sanitize_title($value) ?: self::defaults()[$key];
+            case 'url':
+                return esc_url_raw($value);
+            case 'textarea':
+                return sanitize_textarea_field($value);
+            case 'weekday':
+                return min(7, max(1, absint($value)));
+            case 'time':
+                return preg_match('/^([01]?\d|2[0-3]):([0-5]\d)$/', trim($value), $m) ? sprintf('%02d:%02d', $m[1], $m[2]) : '10:00';
+        }
+        // text
+        if ($key === 'currency') {
+            return strtoupper(preg_replace('/[^A-Za-z]/', '', $value)) ?: 'EUR';
+        }
+        if ($key === 'country') {
+            return strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $value), 0, 2));
+        }
+        return sanitize_text_field($value);
     }
 
     public static function is_configured(): bool

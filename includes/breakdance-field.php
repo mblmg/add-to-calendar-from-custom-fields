@@ -26,7 +26,7 @@ class IMM_TK_Breakdance_Field extends \Breakdance\DynamicData\StringField
 
     public function category()
     {
-        return __('Add to Calendar', 'add-to-calendar-from-custom-fields');
+        return __('Add to Calendar', 'event-toolkit-for-custom-fields');
     }
 
     public function slug()

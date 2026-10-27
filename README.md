@@ -1,43 +1,57 @@
-# Add to Calendar from Custom Fields
+# Event Toolkit for Custom Fields
 
-WordPress plugin that turns the date and time fields you already have (ACF, ACPT or plain post meta) into calendar entries:
+WordPress plugin that spreads the events you keep in custom fields (ACF, ACPT or plain post meta):
 
-- an `.ics` file per event (Apple Calendar, Outlook, phone calendars)
-- links for Google Calendar, Outlook.com and Outlook / Microsoft 365
+- an `.ics` file per event, links for Google Calendar, Outlook.com and Outlook / Microsoft 365
 - a subscribable calendar feed (`webcal://`) with all upcoming events
 - schema.org Event markup (JSON-LD) on each event page for search engines
-- all links as Breakdance dynamic data and as a shortcode
+- a weekly preview (upcoming events + new additions), posted to Telegram and provided as RSS feed for e-mail newsletters
+- all calendar links as Breakdance dynamic data and as a shortcode
+
+It replaces the earlier plugins "Add to Calendar from Custom Fields" and "Event Digest for Telegram" and takes over their settings.
 
 User documentation lives in [`readme.txt`](readme.txt), which is also what the WordPress.org plugin directory shows.
 
 ## Development
 
 ```
-add-to-calendar-from-custom-fields.php   plugin bootstrap
-includes/class-settings.php              settings (option imm_tk_settings)
-includes/class-event.php                 reads an event from post meta, start/end rules
-includes/class-ics.php                   iCalendar output (RFC 5545)
-includes/class-links.php                 .ics, Google, Outlook and feed URLs
-includes/class-endpoints.php             rewrite rules and file delivery
-includes/class-schema.php                schema.org Event (JSON-LD) on event pages
-includes/class-admin.php                 settings page
-includes/shortcode.php                   [imm_calendar_link]
-includes/breakdance*.php                 Breakdance dynamic data fields
-languages/                               .pot template and bundled German translation
+event-toolkit-for-custom-fields.php        bootstrap, waits while a predecessor plugin is active
+includes/class-settings.php                core settings (option imm_tk_settings), saved per tab
+includes/class-event.php                   reads an event from post meta, start/end/doors rules
+includes/class-ics.php                     iCalendar output (RFC 5545)
+includes/class-links.php                   .ics, Google, Outlook and feed URLs
+includes/class-endpoints.php               rewrite rules and file delivery
+includes/class-schema.php                  schema.org Event (JSON-LD) on event pages
+includes/class-digest.php                  weekly preview: issue times, event selection, e-mail HTML
+includes/class-digest-feed.php             RSS feed of the weekly preview (one item per issue)
+includes/telegram/                         Telegram: settings (imm_tg_settings), Bot API, schedule
+includes/class-admin.php                   settings page with tabs
+includes/class-updater.php                 updates from GitHub releases (GitHub builds only)
+includes/shortcode.php                     [imm_calendar_link]
+includes/breakdance*.php                   Breakdance dynamic data fields
+languages/                                 .pot template and bundled German translation
 ```
 
-The internal prefix `imm_tk` / `IMM_TK_` is kept on purpose: existing sites store their settings under `imm_tk_settings` and reference the Breakdance fields as `imm_tk_*`.
+The internal prefixes `imm_tk` / `IMM_TK_` and `imm_tg` / `IMM_TG_` are kept on purpose: existing sites store their settings under `imm_tk_settings` and `imm_tg_settings` and reference the Breakdance fields as `imm_tk_*`.
+
+### Weekly preview
+
+An issue belongs to a scheduled time (weekday and time in the settings). It lists the events starting within the next days and the events published during the week before the issue. Because both parts depend only on the issue time, Telegram and the newsletter feed always show the same content. The feed's item GUID changes per issue, so RSS-to-email campaigns send one mail per issue.
+
+### Two build variants
+
+`.github/build.sh github` builds the plugin with the GitHub updater (`Update URI` header and `includes/class-updater.php`). `.github/build.sh wporg` removes both, because WordPress.org does not allow plugins in its directory to update from elsewhere. Plugin Check runs on the WordPress.org variant.
 
 ### Translations
 
-English is the source language. After changing strings, update `languages/add-to-calendar-from-custom-fields.pot` and the German `.po`, then compile the `.mo` (e.g. with `wp i18n make-mo languages` and `wp i18n make-php languages`).
+English is the source language. After changing strings, update `languages/event-toolkit-for-custom-fields.pot` and the German `.po`, then compile the `.mo` and `.l10n.php` (e.g. with `wp i18n make-mo languages` and `wp i18n make-php languages`).
 
 ## Releasing
 
 1. Bump the version in three places: the plugin header (`Version:`), the `IMM_TK_VERSION` constant and `Stable tag:` in `readme.txt`. Add a changelog entry.
-2. Commit, then tag and push: `git tag 1.0.1 && git push --tags`
-3. The **Release** workflow checks the version numbers, builds the zip and attaches it to a GitHub release.
-4. Once the plugin is approved on WordPress.org, the same workflow also deploys to the plugin directory. Enable it by adding:
+2. Publish a GitHub release with the version as new tag (e.g. `2.0.1`).
+3. The **Release** workflow checks the version numbers, builds the GitHub zip and attaches it to the release. Sites installed from GitHub see the update within 12 hours.
+4. Once the plugin is approved on WordPress.org, the same workflow also deploys the WordPress.org variant. Enable it by adding:
    - repository secrets `SVN_USERNAME` and `SVN_PASSWORD` (WordPress.org account)
    - repository variable `WPORG_DEPLOY` = `true`
 
