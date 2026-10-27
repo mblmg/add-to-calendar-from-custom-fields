@@ -67,7 +67,8 @@ class IMM_TK_Event
 
         $event        = new self();
         $event->id    = $post->ID;
-        $event->title = html_entity_decode(wp_strip_all_tags(get_the_title($post)), ENT_QUOTES, 'UTF-8');
+        // Soft hyphens help line breaks on the website, but are noise in calendars, feeds and search results.
+        $event->title = str_replace("\u{00AD}", '', html_entity_decode(wp_strip_all_tags(get_the_title($post)), ENT_QUOTES, 'UTF-8'));
         $event->url   = get_permalink($post);
         $event->uid   = 'imm-tk-' . $post->ID . '@' . wp_parse_url(home_url(), PHP_URL_HOST);
         $event->modified = new DateTimeImmutable($post->post_modified_gmt ?: 'now', new DateTimeZone('UTC'));
