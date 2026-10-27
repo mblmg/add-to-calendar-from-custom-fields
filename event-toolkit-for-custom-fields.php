@@ -4,7 +4,7 @@
  * Plugin URI:        https://github.com/mblmg/event-toolkit-for-custom-fields
  * Description:       Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters. Extra dynamic data fields for Breakdance and abilities for AI agents.
  * Version:           2.0.0
- * Requires at least: 6.3
+ * Requires at least: 6.9
  * Requires PHP:      7.4
  * Author:            i-make.media
  * Author URI:        https://i-make.media/

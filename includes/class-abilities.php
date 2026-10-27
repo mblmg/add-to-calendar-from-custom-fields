@@ -1,6 +1,6 @@
 <?php
 /**
- * Abilities for AI agents and other tools (WordPress Abilities API, WordPress 6.9+).
+ * Abilities for AI agents and other tools (WordPress Abilities API).
  *
  * MCP adapters expose these abilities as tools, so agents get the events ready-made
  * (dates, doors and start, venue, image, links) instead of reading raw custom fields.
@@ -19,9 +19,6 @@ class IMM_TK_Abilities
 
     public static function init(): void
     {
-        if (!function_exists('wp_register_ability')) {
-            return; // WordPress before 6.9.
-        }
         add_action('wp_abilities_api_categories_init', [self::class, 'register_category']);
         add_action('wp_abilities_api_init', [self::class, 'register_abilities']);
     }

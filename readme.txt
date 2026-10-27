@@ -1,7 +1,7 @@
 === Event Toolkit for Custom Fields ===
 Contributors: mblmg
 Tags: events, calendar, ics, telegram, newsletter
-Requires at least: 6.3
+Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 2.0.0
@@ -37,7 +37,7 @@ Once a week, a preview of what is coming up: the events of the next days, plus t
 
 **AI agents**
 
-* Abilities for the WordPress Abilities API (WordPress 6.9 and later): list upcoming events, get the details of an event, get the weekly preview, and post the weekly preview to Telegram. MCP adapters offer them to AI agents as tools, so agents get the events ready-made instead of reading raw custom fields.
+* Abilities for the WordPress Abilities API: list upcoming events, get the details of an event, get the weekly preview, and post the weekly preview to Telegram. MCP adapters offer them to AI agents as tools, so agents get the events ready-made instead of reading raw custom fields.
 
 The plugin reads regular post meta, so it works with Advanced Custom Fields (ACF), ACPT, Meta Box text fields and plain custom fields. Dates are recognised in the common storage formats: 2026-12-09 (ACPT), 20261209 (ACF), 09.12.2026, 12/09/2026 and Unix timestamps.
 
@@ -153,6 +153,7 @@ No data about visitors of your site is sent. [Terms of Service](https://telegram
 * New: weekly preview as Telegram post, with link preview and image of the next event.
 * New: abilities for the WordPress Abilities API, so AI agents can read the events and the weekly preview.
 * Settings page with tabs.
+* Requires WordPress 6.9 or later.
 
 = 1.1.0 =
 * New: structured data (schema.org Event) for search engines on each event page.
