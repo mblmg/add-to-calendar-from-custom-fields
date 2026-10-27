@@ -1,9 +1,8 @@
 name: Release
 
 # Publishing a release with a tag like 2.0.1 (or pushing such a tag):
-# - attaches event-toolkit-for-custom-fields.zip (GitHub variant) to the release.
-#   Copies installed from GitHub find it and offer it as update.
-# - deploys the WordPress.org variant to the plugin directory, once enabled with the
+# - attaches event-toolkit-for-custom-fields.zip to the release,
+# - deploys the plugin to the WordPress.org directory, once enabled with the
 #   repository variable WPORG_DEPLOY = true and the secrets SVN_USERNAME / SVN_PASSWORD.
 
 on:
@@ -29,19 +28,15 @@ jobs:
           grep -q "define('IMM_TK_VERSION', '${TAG}');" "${SLUG}.php" || { echo "IMM_TK_VERSION does not match ${TAG}"; exit 1; }
           grep -Eq "^Stable tag: ${TAG}$" readme.txt || { echo "Stable tag does not match ${TAG}"; exit 1; }
 
-      - name: Build GitHub zip
+      - name: Build zip
         run: |
-          .github/build.sh github
+          .github/build.sh
           (cd build && zip -qr "../${SLUG}.zip" "${SLUG}")
 
       - name: Attach zip to the GitHub release
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.SLUG }}.zip
-
-      - name: Build WordPress.org variant
-        if: ${{ vars.WPORG_DEPLOY == 'true' }}
-        run: .github/build.sh wporg
 
       - name: Deploy to WordPress.org
         if: ${{ vars.WPORG_DEPLOY == 'true' }}

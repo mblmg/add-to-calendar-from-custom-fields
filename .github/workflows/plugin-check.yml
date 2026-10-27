@@ -1,7 +1,6 @@
 name: Plugin Check
 
-# Runs the official WordPress.org Plugin Check on every push and pull request,
-# on the variant that WordPress.org gets (without the GitHub updater).
+# Runs the official WordPress.org Plugin Check on every push and pull request.
 
 on:
   push:
@@ -14,8 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Build WordPress.org variant
-        run: .github/build.sh wporg
+      - name: Build plugin folder
+        run: .github/build.sh
 
       - name: Run Plugin Check
         uses: wordpress/plugin-check-action@v1

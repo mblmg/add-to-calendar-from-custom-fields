@@ -26,7 +26,6 @@ includes/class-digest.php                  weekly preview: issue times, event se
 includes/class-digest-feed.php             RSS feed of the weekly preview (one item per issue)
 includes/telegram/                         Telegram: settings (imm_tg_settings), Bot API, schedule
 includes/class-admin.php                   settings page with tabs
-includes/class-updater.php                 updates from GitHub releases (GitHub builds only)
 includes/shortcode.php                     [imm_calendar_link]
 includes/breakdance*.php                   Breakdance dynamic data fields
 languages/                                 .pot template and bundled German translation
@@ -38,10 +37,6 @@ The internal prefixes `imm_tk` / `IMM_TK_` and `imm_tg` / `IMM_TG_` are kept on 
 
 An issue belongs to a scheduled time (weekday and time in the settings). It lists the events starting within the next days and the events published during the week before the issue. Because both parts depend only on the issue time, Telegram and the newsletter feed always show the same content. The feed's item GUID changes per issue, so RSS-to-email campaigns send one mail per issue.
 
-### Two build variants
-
-`.github/build.sh github` builds the plugin with the GitHub updater (`Update URI` header and `includes/class-updater.php`). `.github/build.sh wporg` removes both, because WordPress.org does not allow plugins in its directory to update from elsewhere. Plugin Check runs on the WordPress.org variant.
-
 ### Translations
 
 English is the source language. After changing strings, update `languages/event-toolkit-for-custom-fields.pot` and the German `.po`, then compile the `.mo` and `.l10n.php` (e.g. with `wp i18n make-mo languages` and `wp i18n make-php languages`).
@@ -50,8 +45,8 @@ English is the source language. After changing strings, update `languages/event-
 
 1. Bump the version in three places: the plugin header (`Version:`), the `IMM_TK_VERSION` constant and `Stable tag:` in `readme.txt`. Add a changelog entry.
 2. Publish a GitHub release with the version as new tag (e.g. `2.0.1`).
-3. The **Release** workflow checks the version numbers, builds the GitHub zip and attaches it to the release. Sites installed from GitHub see the update within 12 hours.
-4. Once the plugin is approved on WordPress.org, the same workflow also deploys the WordPress.org variant. Enable it by adding:
+3. The **Release** workflow checks the version numbers, builds the zip and attaches it to the release.
+4. Once the plugin is approved on WordPress.org, the same workflow also deploys it there, and sites get updates through WordPress.org. Enable it by adding:
    - repository secrets `SVN_USERNAME` and `SVN_PASSWORD` (WordPress.org account)
    - repository variable `WPORG_DEPLOY` = `true`
 

@@ -12,7 +12,6 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       event-toolkit-for-custom-fields
  * Domain Path:       /languages
- * Update URI:        https://github.com/mblmg/event-toolkit-for-custom-fields
  */
 
 defined('ABSPATH') || exit;
@@ -61,12 +60,6 @@ IMM_TG_Scheduler::init();
 IMM_TK_Admin::init();
 IMM_TK_Shortcode::init();
 IMM_TK_Breakdance::init();
-
-// Updates from GitHub releases. Not part of the WordPress.org version, which updates from WordPress.org.
-if (file_exists(IMM_TK_DIR . 'includes/class-updater.php')) {
-    require_once IMM_TK_DIR . 'includes/class-updater.php';
-    IMM_TK_Updater::init();
-}
 
 register_activation_hook(__FILE__, function () {
     IMM_TK_Endpoints::add_rewrite_rules();
