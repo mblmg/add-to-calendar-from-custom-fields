@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Event Toolkit for Custom Fields
  * Plugin URI:        https://github.com/mblmg/event-toolkit-for-custom-fields
- * Description:       Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters. Extra dynamic data fields for Breakdance.
+ * Description:       Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters. Extra dynamic data fields for Breakdance and abilities for AI agents.
  * Version:           2.0.0
  * Requires at least: 6.3
  * Requires PHP:      7.4
@@ -46,6 +46,7 @@ require_once IMM_TK_DIR . 'includes/telegram/class-telegram-settings.php';
 require_once IMM_TK_DIR . 'includes/telegram/class-telegram.php';
 require_once IMM_TK_DIR . 'includes/telegram/class-telegram-scheduler.php';
 require_once IMM_TK_DIR . 'includes/class-admin.php';
+require_once IMM_TK_DIR . 'includes/class-abilities.php';
 require_once IMM_TK_DIR . 'includes/shortcode.php';
 require_once IMM_TK_DIR . 'includes/breakdance.php';
 
@@ -60,6 +61,7 @@ IMM_TG_Scheduler::init();
 IMM_TK_Admin::init();
 IMM_TK_Shortcode::init();
 IMM_TK_Breakdance::init();
+IMM_TK_Abilities::init();
 
 register_activation_hook(__FILE__, function () {
     IMM_TK_Endpoints::add_rewrite_rules();

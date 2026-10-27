@@ -7,6 +7,7 @@ WordPress plugin that spreads the events you keep in custom fields (ACF, ACPT or
 - schema.org Event markup (JSON-LD) on each event page for search engines
 - a weekly preview (upcoming events + new additions), posted to Telegram and provided as RSS feed for e-mail newsletters
 - all calendar links as Breakdance dynamic data and as a shortcode
+- abilities for AI agents (WordPress Abilities API, exposed by MCP adapters)
 
 It replaces the earlier plugins "Add to Calendar from Custom Fields" and "Event Digest for Telegram" and takes over their settings.
 
@@ -26,6 +27,7 @@ includes/class-digest.php                  weekly preview: issue times, event se
 includes/class-digest-feed.php             RSS feed of the weekly preview (one item per issue)
 includes/telegram/                         Telegram: settings (imm_tg_settings), Bot API, schedule
 includes/class-admin.php                   settings page with tabs
+includes/class-abilities.php               abilities (WordPress Abilities API) for AI agents / MCP
 includes/shortcode.php                     [imm_calendar_link]
 includes/breakdance*.php                   Breakdance dynamic data fields
 languages/                                 .pot template and bundled German translation

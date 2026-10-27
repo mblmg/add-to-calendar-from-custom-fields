@@ -11,10 +11,10 @@ msgstr ""
 
 #. Description of the plugin
 #: event-toolkit-for-custom-fields.php
-msgid "Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters. Extra dynamic data fields for Breakdance."
+msgid "Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters. Extra dynamic data fields for Breakdance and abilities for AI agents."
 msgstr ""
 
-#: event-toolkit-for-custom-fields.php:28
+#: event-toolkit-for-custom-fields.php:27
 msgid "Event Toolkit for Custom Fields replaces the plugins \"Add to Calendar from Custom Fields\" and \"Event Digest for Telegram\". Please deactivate them; all settings are taken over."
 msgstr ""
 
@@ -22,12 +22,60 @@ msgstr ""
 msgid "Add to Calendar"
 msgstr ""
 
-#: includes/class-admin.php:16 includes/class-admin.php:118
-msgid "Event Toolkit for Custom Fields"
+#: includes/class-abilities.php:32 includes/class-admin.php:17
+msgid "Event Toolkit"
 msgstr ""
 
-#: includes/class-admin.php:17
-msgid "Event Toolkit"
+#: includes/class-abilities.php:33
+msgid "Events from custom fields: upcoming events, event details with calendar links, and the weekly preview."
+msgstr ""
+
+#: includes/class-abilities.php:49
+msgid "List upcoming events"
+msgstr ""
+
+#: includes/class-abilities.php:50
+msgid "Lists the published events in a period, sorted by start, with date, time (doors and start), venue, image, ticket link and calendar links. Returns the same information visitors see on the website."
+msgstr ""
+
+#: includes/class-abilities.php:73
+msgid "Get event details"
+msgstr ""
+
+#: includes/class-abilities.php:74
+msgid "Returns one published event by post ID or page URL: date, time (doors and start), venue and address, description, image, ticket link and calendar links."
+msgstr ""
+
+#: includes/class-abilities.php:91
+msgid "Get the weekly preview"
+msgstr ""
+
+#: includes/class-abilities.php:92
+msgid "Returns the weekly preview: the events of the coming days and the events newly added to the programme, as structured data, as Telegram text and as e-mail HTML. \"now\" shows it as if it went out now, \"current\" is the latest issue, \"next\" the upcoming one."
+msgstr ""
+
+#: includes/class-abilities.php:124
+msgid "Post the weekly preview to Telegram"
+msgstr ""
+
+#: includes/class-abilities.php:125
+msgid "Posts the weekly preview, as it would look now, to the configured Telegram chat. Visible to all members of that chat. Does not change the weekly schedule. Ask the person before using it."
+msgstr ""
+
+#: includes/class-abilities.php:186
+msgid "No published event found with this ID or URL."
+msgstr ""
+
+#: includes/class-abilities.php:233
+msgid "Telegram is not set up: enter bot token and chat ID in the tab \"Telegram\"."
+msgstr ""
+
+#: includes/class-abilities.php:239 includes/class-admin.php:422
+msgid "Nothing to post: no events in the coming days and nothing new."
+msgstr ""
+
+#: includes/class-admin.php:16 includes/class-admin.php:118
+msgid "Event Toolkit for Custom Fields"
 msgstr ""
 
 #: includes/class-admin.php:43
@@ -467,10 +515,6 @@ msgstr ""
 
 #: includes/class-admin.php:421
 msgid "The preview was posted to the chat."
-msgstr ""
-
-#: includes/class-admin.php:422
-msgid "Nothing to post: no events in the coming days and nothing new."
 msgstr ""
 
 #: includes/class-admin.php:440

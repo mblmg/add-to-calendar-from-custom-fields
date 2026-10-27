@@ -11,10 +11,10 @@ msgstr ""
 
 #. Description of the plugin
 #: event-toolkit-for-custom-fields.php
-msgid "Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters. Extra dynamic data fields for Breakdance."
-msgstr "Verteilt die Termine aus deinen eigenen Feldern (ACF, ACPT oder normale Post-Meta): Kalender-Links und .ics-Dateien, ein abonnierbarer Kalender-Feed, eine schema.org-Auszeichnung für Suchmaschinen, eine Wochenvorschau für Telegram und ein RSS-Feed für E-Mail-Newsletter. Mit zusätzlichen dynamischen Datenfeldern für Breakdance."
+msgid "Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters. Extra dynamic data fields for Breakdance and abilities for AI agents."
+msgstr "Verteilt die Termine aus deinen eigenen Feldern (ACF, ACPT oder normale Post-Meta): Kalender-Links und .ics-Dateien, ein abonnierbarer Kalender-Feed, eine schema.org-Auszeichnung für Suchmaschinen, eine Wochenvorschau für Telegram und ein RSS-Feed für E-Mail-Newsletter. Mit zusätzlichen dynamischen Datenfeldern für Breakdance und Fähigkeiten für KI-Agenten."
 
-#: event-toolkit-for-custom-fields.php:28
+#: event-toolkit-for-custom-fields.php:27
 msgid "Event Toolkit for Custom Fields replaces the plugins \"Add to Calendar from Custom Fields\" and \"Event Digest for Telegram\". Please deactivate them; all settings are taken over."
 msgstr "Event Toolkit for Custom Fields ersetzt die Plugins „Add to Calendar from Custom Fields“ und „Event Digest for Telegram“. Bitte deaktiviere sie, alle Einstellungen werden übernommen."
 
@@ -22,13 +22,61 @@ msgstr "Event Toolkit for Custom Fields ersetzt die Plugins „Add to Calendar f
 msgid "Add to Calendar"
 msgstr "Zum Kalender hinzufügen"
 
+#: includes/class-abilities.php:32 includes/class-admin.php:17
+msgid "Event Toolkit"
+msgstr "Event Toolkit"
+
+#: includes/class-abilities.php:33
+msgid "Events from custom fields: upcoming events, event details with calendar links, and the weekly preview."
+msgstr "Termine aus eigenen Feldern: anstehende Termine, Termindetails mit Kalender-Links und die Wochenvorschau."
+
+#: includes/class-abilities.php:49
+msgid "List upcoming events"
+msgstr "Anstehende Termine auflisten"
+
+#: includes/class-abilities.php:50
+msgid "Lists the published events in a period, sorted by start, with date, time (doors and start), venue, image, ticket link and calendar links. Returns the same information visitors see on the website."
+msgstr "Listet die veröffentlichten Termine eines Zeitraums nach Beginn sortiert auf, mit Datum, Uhrzeit (Einlass und Beginn), Ort, Bild, Ticketlink und Kalender-Links. Liefert dieselben Angaben, die Besucher auf der Webseite sehen."
+
+#: includes/class-abilities.php:73
+msgid "Get event details"
+msgstr "Termindetails abrufen"
+
+#: includes/class-abilities.php:74
+msgid "Returns one published event by post ID or page URL: date, time (doors and start), venue and address, description, image, ticket link and calendar links."
+msgstr "Liefert einen veröffentlichten Termin anhand der Beitrags-ID oder der Seiten-URL: Datum, Uhrzeit (Einlass und Beginn), Ort und Adresse, Beschreibung, Bild, Ticketlink und Kalender-Links."
+
+#: includes/class-abilities.php:91
+msgid "Get the weekly preview"
+msgstr "Wochenvorschau abrufen"
+
+#: includes/class-abilities.php:92
+msgid "Returns the weekly preview: the events of the coming days and the events newly added to the programme, as structured data, as Telegram text and as e-mail HTML. \"now\" shows it as if it went out now, \"current\" is the latest issue, \"next\" the upcoming one."
+msgstr "Liefert die Wochenvorschau: die Termine der nächsten Tage und die neu ins Programm gekommenen Termine, als strukturierte Daten, als Telegram-Text und als E-Mail-HTML. \"now\" zeigt sie so, als würde sie jetzt verschickt, \"current\" ist die letzte Ausgabe, \"next\" die kommende."
+
+#: includes/class-abilities.php:124
+msgid "Post the weekly preview to Telegram"
+msgstr "Wochenvorschau in Telegram posten"
+
+#: includes/class-abilities.php:125
+msgid "Posts the weekly preview, as it would look now, to the configured Telegram chat. Visible to all members of that chat. Does not change the weekly schedule. Ask the person before using it."
+msgstr "Postet die Wochenvorschau, wie sie jetzt aussähe, in den eingestellten Telegram-Chat. Sichtbar für alle Mitglieder dieses Chats. Der wöchentliche Zeitplan bleibt unverändert. Frag vorher die Person, die dich beauftragt hat."
+
+#: includes/class-abilities.php:186
+msgid "No published event found with this ID or URL."
+msgstr "Kein veröffentlichter Termin mit dieser ID oder URL gefunden."
+
+#: includes/class-abilities.php:233
+msgid "Telegram is not set up: enter bot token and chat ID in the tab \"Telegram\"."
+msgstr "Telegram ist nicht eingerichtet: Bot-Token und Chat-ID im Reiter „Telegram“ eintragen."
+
+#: includes/class-abilities.php:239 includes/class-admin.php:422
+msgid "Nothing to post: no events in the coming days and nothing new."
+msgstr "Nichts zu posten: keine Termine in den nächsten Tagen und nichts Neues."
+
 #: includes/class-admin.php:16 includes/class-admin.php:118
 msgid "Event Toolkit for Custom Fields"
 msgstr "Event Toolkit for Custom Fields"
-
-#: includes/class-admin.php:17
-msgid "Event Toolkit"
-msgstr "Event Toolkit"
 
 #: includes/class-admin.php:43
 msgid "Settings"
@@ -468,10 +516,6 @@ msgstr "Zeigt die Vorschau der Seite des nächsten Termins mit Bild, wie wenn du
 #: includes/class-admin.php:421
 msgid "The preview was posted to the chat."
 msgstr "Die Vorschau wurde in den Chat gepostet."
-
-#: includes/class-admin.php:422
-msgid "Nothing to post: no events in the coming days and nothing new."
-msgstr "Nichts zu posten: keine Termine in den nächsten Tagen und nichts Neues."
 
 #: includes/class-admin.php:440
 msgid "Next digest"

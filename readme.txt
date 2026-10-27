@@ -35,6 +35,10 @@ Once a week, a preview of what is coming up: the events of the next days, plus t
 
 * All calendar links as dynamic data in Breakdance (category "Add to Calendar") and as a shortcode for any other theme or builder
 
+**AI agents**
+
+* Abilities for the WordPress Abilities API (WordPress 6.9 and later): list upcoming events, get the details of an event, get the weekly preview, and post the weekly preview to Telegram. MCP adapters offer them to AI agents as tools, so agents get the events ready-made instead of reading raw custom fields.
+
 The plugin reads regular post meta, so it works with Advanced Custom Fields (ACF), ACPT, Meta Box text fields and plain custom fields. Dates are recognised in the common storage formats: 2026-12-09 (ACPT), 20261209 (ACF), 09.12.2026, 12/09/2026 and Unix timestamps.
 
 = How start and end are calculated =
@@ -102,6 +106,15 @@ WordPress runs scheduled tasks when someone visits the site. On sites with few v
 
 This plugin replaces both. Install it, then deactivate the old plugins: all settings, the calendar addresses and the Breakdance fields are taken over. While an old plugin is still active, this plugin waits and shows a notice.
 
+= Which abilities are there for AI agents? =
+
+* `event-toolkit/list-events`: upcoming events in a period, with date, time (doors and start), venue, image, ticket link and calendar links
+* `event-toolkit/get-event`: one event by post ID or URL
+* `event-toolkit/get-weekly-preview`: the weekly preview as data, as Telegram text and as e-mail HTML
+* `event-toolkit/post-weekly-preview-to-telegram`: posts the weekly preview to the configured chat
+
+The first three only return what visitors can see on the website anyway. Posting to Telegram is limited to administrators. The abilities appear for AI agents once an MCP adapter is installed (for example the MCP Adapter plugin).
+
 = Developer hooks =
 
 * Filter `imm_tk_event` ($event, $post): change the event data before output.
@@ -138,6 +151,7 @@ No data about visitors of your site is sent. [Terms of Service](https://telegram
 * New: weekly preview of upcoming and new events, shared by all channels.
 * New: weekly preview as RSS feed for e-mail newsletters.
 * New: weekly preview as Telegram post, with link preview and image of the next event.
+* New: abilities for the WordPress Abilities API, so AI agents can read the events and the weekly preview.
 * Settings page with tabs.
 
 = 1.1.0 =
