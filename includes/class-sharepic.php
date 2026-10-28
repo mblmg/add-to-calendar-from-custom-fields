@@ -181,7 +181,7 @@ class IMM_TK_Sharepic
     {
         $data = [$spec, IMM_TK_VERSION, self::DESIGN, self::style(), array_map('basename', self::fonts()), get_locale(), get_option('time_format')];
         foreach ($events as $e) {
-            $data[] = [$e->id, $e->title, $e->start->format('c'), $e->main_start->format('c'), $e->doors ? $e->doors->format('c') : '', $e->location, get_post_thumbnail_id($e->id), $e->modified->format('c')];
+            $data[] = [$e->id, $e->title, $e->status, $e->start->format('c'), $e->main_start->format('c'), $e->doors ? $e->doors->format('c') : '', $e->location, get_post_thumbnail_id($e->id), $e->modified->format('c')];
         }
         return (string) wp_json_encode($data);
     }
@@ -394,10 +394,10 @@ class IMM_TK_Sharepic
      *
      * @param resource|GdImage $im
      */
-    private static function big_word($im, string $variant, array $p): int
+    private static function big_word($im, string $variant, array $p, string $word = ''): int
     {
         $font = self::fonts()['display'];
-        [$px, $lines] = self::fit($font, self::word($variant), self::W - 2 * self::MARGIN, 200, 120, 1);
+        [$px, $lines] = self::fit($font, $word !== '' ? $word : self::word($variant), self::W - 2 * self::MARGIN, 200, 120, 1);
         return self::lines($im, $font, $px, 0.98, self::MARGIN - 6, self::TOP + (int) ((200 - $px) * 0.8), $p['fg'], $lines);
     }
 
@@ -488,6 +488,9 @@ class IMM_TK_Sharepic
 
         $pic = self::photo($event->id, $photo * $s);
         if ($pic) {
+            if ($event->is_off()) {
+                imagefilter($pic, IMG_FILTER_GRAYSCALE); // Cancelled or postponed: the picture fades to grey.
+            }
             imagecopy($im, $pic, $frame * $s, $frame * $s, 0, 0, $photo * $s, $photo * $s);
             imagedestroy($pic);
         } else {
@@ -583,16 +586,18 @@ class IMM_TK_Sharepic
         $width = self::W - 2 * self::MARGIN;
 
         // "Today" / "Tomorrow", big.
-        $y = self::big_word($im, $variant, $p);
+        // A cancelled or postponed event says so instead of "Today" / "Tomorrow".
+        $y = self::big_word($im, $variant, $p, $e->status_label());
 
         // When: today only the time, tomorrow day and time.
-        $when = $today ? IMM_TK_Digest::time($e) : self::long_date($e) . ', ' . IMM_TK_Digest::time($e);
+        $when = $today && !$e->is_off() ? IMM_TK_Digest::time($e) : self::long_date($e) . ', ' . IMM_TK_Digest::time($e);
         [$px, $lines] = self::fit_short($f['text'], $when, $width, 42, 34, 30);
         $y = self::lines($im, $f['text'], $px, 1.3, self::MARGIN, $y + 18, $p['fg'], $lines);
 
         // Caption on the polaroid strip: the title.
         $frame = 30;
-        $title = IMM_TK_Digest::title($e);
+        // The big word already says "Cancelled", so the caption keeps the plain title.
+        $title = $e->is_off() ? str_replace("\u{00AD}", '', $e->title) : IMM_TK_Digest::title($e);
         $venue = self::venue_name($e);
 
         // Space left for the polaroid: down to the venue line above the footer.

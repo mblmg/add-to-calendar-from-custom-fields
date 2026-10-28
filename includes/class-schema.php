@@ -51,7 +51,7 @@ class IMM_TK_Schema
             'name'                => $event->title,
             'url'                 => $event->url,
             'startDate'           => self::date($event->main_start, $event->all_day),
-            'eventStatus'         => 'https://schema.org/EventScheduled',
+            'eventStatus'         => 'https://schema.org/' . (['cancelled' => 'EventCancelled', 'postponed' => 'EventPostponed'][$event->status] ?? 'EventScheduled'),
             'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
         ];
 

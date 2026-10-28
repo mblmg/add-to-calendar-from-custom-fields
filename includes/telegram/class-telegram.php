@@ -212,13 +212,15 @@ class IMM_TG_Telegram
         return (string) apply_filters('imm_tg_today_message', $message, $events);
     }
 
-    private static function link(IMM_TK_Event $event): string
+    /** Link to the event; $status adds "Cancelled: " / "Postponed: " to the title. */
+    public static function link(IMM_TK_Event $event, bool $status = true): string
     {
-        return '<a href="' . esc_url($event->url) . '">' . self::esc(IMM_TK_Digest::title($event)) . '</a>';
+        $title = $status ? IMM_TK_Digest::title($event) : str_replace("\u{00AD}", '', $event->title);
+        return '<a href="' . esc_url($event->url) . '">' . self::esc($title) . '</a>';
     }
 
     /** Escapes text for Telegram's HTML mode (only &, < and > are special). */
-    private static function esc(string $text): string
+    public static function esc(string $text): string
     {
         return htmlspecialchars($text, ENT_NOQUOTES, 'UTF-8');
     }

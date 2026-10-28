@@ -106,6 +106,10 @@ class IMM_IG_Scheduler
 
     private static function day_items(array $events, string $variant, string $date): array
     {
+        // Cancelled or postponed events get no "tomorrow" / "today" story.
+        $events = array_values(array_filter($events, function (IMM_TK_Event $e) {
+            return !$e->is_off();
+        }));
         $items  = [];
         $titles = [];
         foreach ($events as $e) {

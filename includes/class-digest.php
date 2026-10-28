@@ -164,7 +164,10 @@ class IMM_TK_Digest
     /** Title without soft hyphens (they help on the website, but are noise elsewhere). */
     public static function title(IMM_TK_Event $event): string
     {
-        return str_replace("\u{00AD}", '', $event->title);
+        $title = str_replace("\u{00AD}", '', $event->title);
+        $label = $event->status_label();
+        /* translators: 1: "Cancelled" or "Postponed", 2: event title */
+        return $label !== '' ? sprintf(__('%1$s: %2$s', 'event-toolkit-for-custom-fields'), $label, $title) : $title;
     }
 
     public static function program_url(): string

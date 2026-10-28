@@ -11,6 +11,9 @@ class IMM_TK_Endpoints
 {
     public static function init(): void
     {
+        foreach (['clean_post_cache', 'added_post_meta', 'updated_post_meta', 'deleted_post_meta'] as $hook) {
+            add_action($hook, [self::class, 'flush_cache']);
+        }
         add_action('init', [self::class, 'add_rewrite_rules']);
         add_filter('query_vars', function ($vars) {
             $vars[] = 'imm_tk_event';
@@ -90,10 +93,22 @@ class IMM_TK_Endpoints
     }
 
     /** @return IMM_TK_Event[] */
+    /** Events of this request, by settings; emptied when a post or its fields change. */
+    private static $cache = [];
+
+    public static function flush_cache(): void
+    {
+        self::$cache = [];
+    }
+
     public static function feed_events(): array
     {
         if (!IMM_TK_Settings::is_configured()) {
             return [];
+        }
+        $key = md5((string) wp_json_encode(IMM_TK_Settings::all()));
+        if (isset(self::$cache[$key])) {
+            return self::$cache[$key];
         }
         $date_key = IMM_TK_Settings::key_list('date_key')[0];
         $since    = (new DateTimeImmutable('today', wp_timezone()))
@@ -123,6 +138,7 @@ class IMM_TK_Endpoints
                 $events[] = $event;
             }
         }
+        self::$cache[$key] = $events;
         return $events;
     }
 }

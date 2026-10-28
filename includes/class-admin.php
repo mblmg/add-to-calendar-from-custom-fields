@@ -152,6 +152,7 @@ class IMM_TK_Admin
                 [__('Where the events are', 'event-toolkit-for-custom-fields'), '', ['post_type', 'date_key', 'end_date_key']],
                 [__('Times', 'event-toolkit-for-custom-fields'), '', ['start_keys', 'doors_key', 'end_time_key', 'default_duration']],
                 [__('Place and details', 'event-toolkit-for-custom-fields'), '', ['location_keys', 'description_key', 'ticket_url_key', 'price_key']],
+                [__('Cancelled and postponed', 'event-toolkit-for-custom-fields'), __('Search engines and subscribed calendars show the cancellation, the weekly preview and the share texts mark the event, and stories stop advertising it. Telegram, Mastodon and Bluesky get one short notice.', 'event-toolkit-for-custom-fields'), ['status_key', 'status_cancelled', 'status_postponed']],
             ],
             'calendar' => [
                 [__('Addresses and subscription', 'event-toolkit-for-custom-fields'), '', ['base_path', 'feed_slug', 'feed_title', 'feed_past_days']],
@@ -187,6 +188,9 @@ class IMM_TK_Admin
             'description_key'  => [__('Description field (optional)', 'event-toolkit-for-custom-fields'), __('Field for the description. Empty = the post excerpt, or the beginning of the post content if there is no excerpt. In calendars, the link to the post is always added.', 'event-toolkit-for-custom-fields'), 'text'],
             'ticket_url_key'   => [__('Ticket link field (optional)', 'event-toolkit-for-custom-fields'), __('Field with a link to buy tickets or register.', 'event-toolkit-for-custom-fields'), 'text'],
             'price_key'        => [__('Price field (optional)', 'event-toolkit-for-custom-fields'), __('Field with the price, e.g. <code>12</code>, <code>12,50 €</code> or <code>free</code>.', 'event-toolkit-for-custom-fields'), 'text'],
+            'status_key'       => [__('Status field (optional)', 'event-toolkit-for-custom-fields'), __('Field that marks an event as cancelled or postponed, e.g. a select or a checkbox.', 'event-toolkit-for-custom-fields'), 'text'],
+            'status_cancelled' => [__('Values for "cancelled"', 'event-toolkit-for-custom-fields'), __('Separated by commas, upper and lower case do not matter. A checkbox saves <code>1</code>.', 'event-toolkit-for-custom-fields'), 'text'],
+            'status_postponed' => [__('Values for "postponed"', 'event-toolkit-for-custom-fields'), '', 'text'],
 
             'base_path'        => [__('Base path', 'event-toolkit-for-custom-fields'), __('Results in the addresses /<em>base</em>/event-123.ics and /<em>base</em>/<em>feed</em>.ics.', 'event-toolkit-for-custom-fields'), 'text'],
             'feed_slug'        => [__('Feed file name', 'event-toolkit-for-custom-fields'), __('Without .ics.', 'event-toolkit-for-custom-fields'), 'text'],
@@ -780,6 +784,13 @@ class IMM_TK_Admin
                             <option value="none" <?php selected($s['link_preview'], 'none'); ?>><?php esc_html_e('No preview', 'event-toolkit-for-custom-fields'); ?></option>
                         </select>
                         <p class="description"><?php esc_html_e('Shows the preview of the next event page with its image, as when you post a link yourself. Image, title and description come from the page (e.g. set by your SEO plugin).', 'event-toolkit-for-custom-fields'); ?></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php esc_html_e('Cancellations', 'event-toolkit-for-custom-fields'); ?></th>
+                    <td>
+                        <label><input type="checkbox" name="<?php echo esc_attr($field('notify_status')); ?>" value="1" <?php checked(!empty($s['notify_status'])); ?>> <?php esc_html_e('Post a short notice when an upcoming event is cancelled or postponed', 'event-toolkit-for-custom-fields'); ?></label>
+                        <p class="description"><?php esc_html_e('Needs the status field on the page "Events". Goes out once, about a minute after saving.', 'event-toolkit-for-custom-fields'); ?></p>
                     </td>
                 </tr>
                 <tr>

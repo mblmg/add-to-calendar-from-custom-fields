@@ -54,7 +54,11 @@ class IMM_TK_Share
     public static function event_text(IMM_TK_Event $e, string $variant, bool $plain = false): string
     {
         $title = IMM_TK_Digest::title($e);
-        if ($variant === 'today') {
+        if ($e->is_off()) {
+            // No "Today:" for a cancelled event: the status leads.
+            $head = $title;
+            $when = IMM_TK_Sharepic::long_date($e) . ', ' . IMM_TK_Digest::time($e);
+        } elseif ($variant === 'today') {
             /* translators: %s: event title */
             $head = sprintf(__('Today: %s', 'event-toolkit-for-custom-fields'), $title);
             $when = IMM_TK_Digest::time($e);

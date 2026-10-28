@@ -29,6 +29,9 @@ class IMM_TK_Settings
                 'description_key'  => 'keys',
                 'ticket_url_key'   => 'keys',
                 'price_key'        => 'keys',
+                'status_key'       => 'keys',
+                'status_cancelled' => 'text',
+                'status_postponed' => 'text',
             ],
             'calendar' => [
                 'base_path'      => 'slug',
@@ -91,6 +94,9 @@ class IMM_TK_Settings
             'description_key'  => '',
             'ticket_url_key'   => '',
             'price_key'        => '',
+            'status_key'       => '',
+            'status_cancelled' => 'cancelled, canceled, abgesagt, 1',
+            'status_postponed' => 'postponed, verschoben',
 
             'base_path'        => 'calendar',
             'feed_slug'        => 'events',

@@ -46,6 +46,8 @@ class IMM_TK_Event
     public $uid = '';
     /** @var DateTimeImmutable */
     public $modified;
+    /** @var string 'scheduled', 'cancelled' or 'postponed' (setting "Status field"). */
+    public $status = 'scheduled';
 
     /** Loads the event of a post. Returns null if the post has no valid date. */
     public static function from_post($post): ?self
@@ -146,10 +148,53 @@ class IMM_TK_Event
             $content     = wp_strip_all_tags(strip_shortcodes(excerpt_remove_blocks($post->post_content)));
             $description = wp_trim_words($content, 55, '…');
         }
+        $event->status      = self::read_status($post->ID);
         $event->summary     = html_entity_decode($description, ENT_QUOTES, 'UTF-8');
         $event->description = trim($event->summary . "\n\n" . $event->url);
 
         return apply_filters('imm_tk_event', $event, $post);
+    }
+
+    /** Status from the status field: values are compared case-insensitively with the configured lists. */
+    public static function read_status(int $post_id): string
+    {
+        $keys = IMM_TK_Settings::key_list('status_key');
+        if (!$keys) {
+            return 'scheduled';
+        }
+        $value = self::first_meta($post_id, $keys);
+        if (is_array($value)) {
+            $value = reset($value);
+        }
+        $value = strtolower(trim(wp_strip_all_tags((string) $value)));
+        if ($value === '') {
+            return 'scheduled';
+        }
+        foreach (['cancelled' => 'status_cancelled', 'postponed' => 'status_postponed'] as $status => $setting) {
+            $list = array_map('strtolower', array_map('trim', explode(',', (string) IMM_TK_Settings::get($setting))));
+            if (in_array($value, array_filter($list, 'strlen'), true)) {
+                return $status;
+            }
+        }
+        return 'scheduled';
+    }
+
+    /** True if the event is cancelled or postponed, i.e. should not be promoted. */
+    public function is_off(): bool
+    {
+        return $this->status !== 'scheduled';
+    }
+
+    /** "Cancelled" / "Postponed", or '' for scheduled events. */
+    public function status_label(): string
+    {
+        if ($this->status === 'cancelled') {
+            return __('Cancelled', 'event-toolkit-for-custom-fields');
+        }
+        if ($this->status === 'postponed') {
+            return __('Postponed', 'event-toolkit-for-custom-fields');
+        }
+        return '';
     }
 
     /** @return mixed */

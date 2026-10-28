@@ -13,7 +13,7 @@ class IMM_TK_ICS
         $lines = [
             'BEGIN:VCALENDAR',
             'VERSION:2.0',
-            'PRODID:-//i-make.media//Add to Calendar from Custom Fields ' . IMM_TK_VERSION . '//EN',
+            'PRODID:-//i-make.media//Event Toolkit for Custom Fields ' . IMM_TK_VERSION . '//EN',
             'CALSCALE:GREGORIAN',
             'METHOD:PUBLISH',
         ];
@@ -41,7 +41,9 @@ class IMM_TK_ICS
                 $lines[] = 'DTSTART:' . self::utc($event->start);
                 $lines[] = 'DTEND:' . self::utc($event->end);
             }
-            $lines[] = 'SUMMARY:' . self::escape($event->title);
+            // SEQUENCE grows with every change, so calendars take over updates such as a cancellation.
+            $lines[] = 'SEQUENCE:' . max(0, (int) floor(($event->modified->getTimestamp() - 1704067200) / 60));
+            $lines[] = 'SUMMARY:' . self::escape(IMM_TK_Digest::title($event));
             if ($event->description !== '') {
                 $lines[] = 'DESCRIPTION:' . self::escape($event->description);
             }
@@ -49,7 +51,8 @@ class IMM_TK_ICS
                 $lines[] = 'LOCATION:' . self::escape($event->location);
             }
             $lines[] = 'URL:' . $event->url;
-            $lines[] = 'STATUS:CONFIRMED';
+            // Many calendar apps do not show STATUS, hence also the prefix in the title.
+            $lines[] = 'STATUS:' . (['cancelled' => 'CANCELLED', 'postponed' => 'TENTATIVE'][$event->status] ?? 'CONFIRMED');
             $lines[] = 'TRANSP:OPAQUE';
             $lines[] = 'END:VEVENT';
         }
