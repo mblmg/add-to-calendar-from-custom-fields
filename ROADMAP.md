@@ -33,7 +33,15 @@ Where the plugin stands and what comes next. Keep this file up to date when a fe
 
 - **Instagram with a real account.** The API client is tested against a mocked API only. Needs a business account and a Meta app (development mode) with a long-lived token. Check: container creation with `media_type=STORIES`, status polling, publishing, token refresh after 7 days, behaviour when Instagram cannot fetch the image.
 
-## Next
+## In progress (2.2.0)
+
+Cancelled/postponed events, Mastodon and Bluesky, QR codes (see "Next" below), and a page "Newsletter":
+- Guides for RSS-to-email: Brevo (Integrations → RSS campaign; use `{{ item.CONTENT_ENCODED }}` for the whole preview, the default template only shows title, description and image; checks daily/weekly/monthly and creates no campaign when nothing is new), Mailchimp (RSS campaign, `*|RSSITEM:CONTENT_FULL|*`), MailerLite (RSS campaigns, paid feature).
+- Direct sending through the API for services without RSS-to-email:
+  - Emailit (EU, Prague): `POST https://api.emailit.com/v2/campaigns` (`name`, `subject`, `from_email`, `from_name`, `html`, `text`), then `POST /v2/campaigns/{id}` with `recipients: [{audience_id}]`, then `POST /v2/campaigns/{id}/send`. Bearer key with scope `full`. Unsubscribe merge tag `{{unsubscribe_url}}`. Costs 2 credits per recipient; no free plan for campaigns.
+  - Brevo: `POST https://api.brevo.com/v3/emailCampaigns` (`name`, `subject`, `sender{name,email}`, `htmlContent`, `recipients{listIds}`), then `POST /v3/emailCampaigns/{id}/sendNow`; header `api-key`. Custom HTML must contain `<a href="{{ unsubscribe }}">`, otherwise Brevo refuses the campaign. Free plan: 300 mails a day.
+  - Sent at the issue time of the weekly preview, honouring "only with news" and skipping empty weeks.
+
 
 ### 1. Cancelled and postponed events (small)
 One status field per event (setting: which meta field, and which values mean "cancelled" / "postponed").
