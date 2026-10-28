@@ -51,6 +51,7 @@ require_once IMM_TK_DIR . 'includes/telegram/class-telegram.php';
 require_once IMM_TK_DIR . 'includes/telegram/class-telegram-scheduler.php';
 require_once IMM_TK_DIR . 'includes/instagram/class-instagram.php';
 require_once IMM_TK_DIR . 'includes/instagram/class-instagram-scheduler.php';
+require_once IMM_TK_DIR . 'includes/social/class-social.php';
 require_once IMM_TK_DIR . 'includes/class-admin.php';
 require_once IMM_TK_DIR . 'includes/class-abilities.php';
 require_once IMM_TK_DIR . 'includes/shortcode.php';
@@ -65,6 +66,7 @@ IMM_TK_Endpoints::init();
 IMM_TK_Schema::init();
 IMM_TG_Scheduler::init();
 IMM_IG_Scheduler::init();
+IMM_SO_Social::init();
 IMM_TK_Share::init();
 IMM_TK_Status::init();
 IMM_TK_Admin::init();
@@ -80,6 +82,7 @@ register_activation_hook(__FILE__, function () {
 register_deactivation_hook(__FILE__, function () {
     IMM_TG_Scheduler::unschedule();
     IMM_IG_Scheduler::unschedule();
+    IMM_SO_Social::unschedule();
     IMM_TK_Share::unschedule();
     flush_rewrite_rules();
 });

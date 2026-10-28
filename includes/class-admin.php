@@ -26,6 +26,11 @@ class IMM_TK_Admin
                 'sanitize_callback' => [IMM_IG_Instagram::class, 'sanitize'],
                 'default'           => IMM_IG_Instagram::defaults(),
             ]);
+            register_setting('imm_so', IMM_SO_Social::OPTION, [
+                'type'              => 'array',
+                'sanitize_callback' => [IMM_SO_Social::class, 'sanitize'],
+                'default'           => IMM_SO_Social::defaults(),
+            ]);
             register_setting('imm_tg', IMM_TG_Settings::OPTION, [
                 'type'              => 'array',
                 'sanitize_callback' => [IMM_TG_Settings::class, 'sanitize'],
@@ -42,6 +47,8 @@ class IMM_TK_Admin
         add_action('admin_post_imm_tg_send_test', [self::class, 'handle_send_test']);
         add_action('admin_post_imm_ig_check', [self::class, 'handle_ig_check']);
         add_action('admin_post_imm_ig_post_now', [self::class, 'handle_ig_post_now']);
+        add_action('admin_post_imm_so_check', [self::class, 'handle_so_check']);
+        add_action('admin_post_imm_so_post_now', [self::class, 'handle_so_post_now']);
         add_action('admin_enqueue_scripts', function () {
             if (self::current_tab() === '') {
                 return;
@@ -126,6 +133,7 @@ class IMM_TK_Admin
             'share'     => __('Share', 'event-toolkit-for-custom-fields'),
             'telegram'  => 'Telegram',
             'instagram' => 'Instagram',
+            'social'    => 'Mastodon & Bluesky',
         ];
     }
 
@@ -141,6 +149,7 @@ class IMM_TK_Admin
             'share'     => __('Texts and story images for channels you post to by hand, like WhatsApp and Signal.', 'event-toolkit-for-custom-fields'),
             'telegram'  => __('A bot posts the weekly preview to your group, topic or channel.', 'event-toolkit-for-custom-fields'),
             'instagram' => __('Stories through the official Instagram API, free of charge: the week, the day before and the day itself.', 'event-toolkit-for-custom-fields'),
+            'social'    => __('The weekly preview on Mastodon and Bluesky, through their free, official interfaces.', 'event-toolkit-for-custom-fields'),
         ];
     }
 
@@ -266,6 +275,9 @@ class IMM_TK_Admin
                     break;
                 case 'instagram':
                     self::render_instagram();
+                    break;
+                case 'social':
+                    self::render_social();
                     break;
                 case 'share':
                     self::render_share();
@@ -1297,5 +1309,160 @@ class IMM_TK_Admin
         wp_safe_redirect(self::url('instagram', ['imm_ig' => 'notice']));
         exit;
     }
-}
+    /* ------------------------------------------------------------------ Mastodon & Bluesky */
 
+    private static function render_social(): void
+    {
+        $s     = IMM_SO_Social::all();
+        $name  = IMM_SO_Social::OPTION;
+        $field = function (string $key) use ($name): string {
+            return $name . '[' . $key . ']';
+        };
+        self::render_transient_notice('imm_so');
+        $secret = function (string $key, string $delete, string $placeholder) use ($s, $field) {
+            echo '<input type="password" class="regular-text" id="imm-so-' . esc_attr($key) . '" name="' . esc_attr($field($key)) . '" value="" autocomplete="off" placeholder="' . esc_attr($s[$key] !== '' ? __('Saved. Leave empty to keep it.', 'event-toolkit-for-custom-fields') : $placeholder) . '">';
+            if ($s[$key] !== '') {
+                echo ' <label><input type="checkbox" name="' . esc_attr($field($delete)) . '" value="1"> ' . esc_html__('Delete', 'event-toolkit-for-custom-fields') . '</label>';
+            }
+        };
+
+        echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
+        echo '<form method="post" action="options.php">';
+        settings_fields('imm_so');
+
+        echo '<section class="imm-tk-panel"><h2>Mastodon</h2><table class="form-table" role="presentation">';
+        echo '<tr><th scope="row">' . esc_html__('Post', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('mastodon_enabled')) . '" value="1" ' . checked(!empty($s['mastodon_enabled']), true, false) . '> ' . esc_html__('Post to Mastodon', 'event-toolkit-for-custom-fields') . '</label></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-so-instance">' . esc_html__('Server', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="url" class="regular-text" id="imm-so-instance" name="' . esc_attr($field('mastodon_instance')) . '" value="' . esc_attr($s['mastodon_instance']) . '" placeholder="https://mastodon.social"></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-so-mastodon_token">' . esc_html__('Access token', 'event-toolkit-for-custom-fields') . '</label></th><td>';
+        $secret('mastodon_token', 'delete_mastodon_token', '');
+        echo '<p class="description">' . esc_html__('In Mastodon: Preferences → Development → New application. Allow "write:statuses" and "write:media", save, and copy "Your access token".', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '</table></section>';
+
+        echo '<section class="imm-tk-panel"><h2>Bluesky</h2><table class="form-table" role="presentation">';
+        echo '<tr><th scope="row">' . esc_html__('Post', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('bluesky_enabled')) . '" value="1" ' . checked(!empty($s['bluesky_enabled']), true, false) . '> ' . esc_html__('Post to Bluesky', 'event-toolkit-for-custom-fields') . '</label></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-so-handle">' . esc_html__('Handle', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="imm-so-handle" name="' . esc_attr($field('bluesky_handle')) . '" value="' . esc_attr($s['bluesky_handle']) . '" placeholder="name.bsky.social"></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-so-bluesky_password">' . esc_html__('App password', 'event-toolkit-for-custom-fields') . '</label></th><td>';
+        $secret('bluesky_password', 'delete_bluesky_password', 'xxxx-xxxx-xxxx-xxxx');
+        echo '<p class="description">' . esc_html__('In Bluesky: Settings → Privacy and security → App passwords → Add. Not your normal password.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-so-service">' . esc_html__('Server', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="url" class="regular-text" id="imm-so-service" name="' . esc_attr($field('bluesky_service')) . '" value="' . esc_attr($s['bluesky_service']) . '"><p class="description">' . esc_html__('Only change this if your account is on its own server.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '</table></section>';
+
+        echo '<section class="imm-tk-panel"><h2>' . esc_html__('What is posted', 'event-toolkit-for-custom-fields') . '</h2><table class="form-table" role="presentation">';
+        echo '<tr><th scope="row">' . esc_html__('Weekly preview', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('weekly')) . '" value="1" ' . checked(!empty($s['weekly']), true, false) . '> ' . esc_html__('At the time of the weekly preview', 'event-toolkit-for-custom-fields') . '</label></td></tr>';
+        echo '<tr><th scope="row">' . esc_html__('On event days', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('today')) . '" value="1" ' . checked(!empty($s['today']), true, false) . '> ' . esc_html__('Short "Today" post at', 'event-toolkit-for-custom-fields') . '</label> <input type="time" name="' . esc_attr($field('today_time')) . '" value="' . esc_attr($s['today_time']) . '"><p class="description">' . esc_html__('Not on the day of the weekly preview, which already lists the events.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '<tr><th scope="row">' . esc_html__('Cancellations', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('notify_status')) . '" value="1" ' . checked(!empty($s['notify_status']), true, false) . '> ' . esc_html__('Post a short notice when an upcoming event is cancelled or postponed', 'event-toolkit-for-custom-fields') . '</label></td></tr>';
+        echo '<tr><th scope="row">' . esc_html__('Images', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('images')) . '" value="1" ' . checked(!empty($s['images']), true, false) . '> ' . esc_html__('Attach the story images (up to four, with the text as image description)', 'event-toolkit-for-custom-fields') . '</label></td></tr>';
+        echo '</table></section>';
+        submit_button(__('Save settings', 'event-toolkit-for-custom-fields'));
+        echo '</form>';
+
+        if (IMM_SO_Social::mastodon_ready() || IMM_SO_Social::bluesky_ready()) {
+            echo '<div class="imm-tk-actions">';
+            echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="imm_so_check">';
+            wp_nonce_field('imm_so_check');
+            submit_button(__('Check connection', 'event-toolkit-for-custom-fields'), 'secondary', 'submit', false);
+            echo '</form>';
+            if (IMM_SO_Social::active_networks()) {
+                echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="imm_so_post_now">';
+                wp_nonce_field('imm_so_post_now');
+                submit_button(__('Post the weekly preview now', 'event-toolkit-for-custom-fields'), 'secondary', 'submit', false);
+                echo '</form>';
+            }
+            echo '</div>';
+        }
+
+        echo '</div><aside class="imm-tk-aside">';
+        self::panel([self::class, 'render_social_preview']);
+        $log = IMM_SO_Social::state()['log'];
+        if ($log) {
+            self::panel(function () use ($log) {
+                $format = get_option('date_format') . ' ' . get_option('time_format');
+                echo '<h2>' . esc_html__('Recent activity', 'event-toolkit-for-custom-fields') . '</h2><ul class="imm-tk-log">';
+                foreach (array_slice($log, 0, 15) as $entry) {
+                    echo '<li' . (empty($entry[2]) ? ' class="is-error"' : '') . '><time>' . esc_html(wp_date($format, (int) $entry[0])) . '</time> ' . esc_html((string) $entry[1]) . '</li>';
+                }
+                echo '</ul>';
+            });
+        }
+        echo '</aside></div>';
+    }
+
+    private static function render_social_preview(): void
+    {
+        if (!IMM_TK_Settings::is_configured()) {
+            return;
+        }
+        $selection = self::live_selection();
+        echo '<h2>' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<p class="imm-tk-panel-note">' . esc_html(self::preview_note()) . '</p>';
+        if (IMM_TK_Digest::is_empty($selection)) {
+            echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
+            return;
+        }
+        foreach (['mastodon' => ['Mastodon', IMM_SO_Social::MASTODON_LIMIT], 'bluesky' => ['Bluesky', IMM_SO_Social::BLUESKY_LIMIT]] as $network => [$label, $limit]) {
+            $text = IMM_SO_Social::week_text($selection, $limit, $network);
+            /* translators: 1: network name, 2: length of the text, 3: maximum length */
+            echo '<h3>' . esc_html(sprintf(__('%1$s (%2$d of %3$d characters)', 'event-toolkit-for-custom-fields'), $label, IMM_SO_Social::length($text), $limit)) . '</h3>';
+            echo '<div class="imm-tk-bubble">' . nl2br(esc_html($text)) . '</div>';
+        }
+    }
+
+    /** Shows and clears a notice stored by an admin-post handler. */
+    private static function render_transient_notice(string $prefix): void
+    {
+        $key     = $prefix . '_notice_' . get_current_user_id();
+        $message = get_transient($key);
+        if (is_array($message)) {
+            delete_transient($key);
+            printf('<div class="notice notice-%s"><p>%s</p></div>', esc_attr($message[0]), esc_html($message[1]));
+        }
+    }
+
+    public static function handle_so_check(): void
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
+        }
+        check_admin_referer('imm_so_check');
+        $lines = [];
+        $ok    = true;
+        if (IMM_SO_Social::mastodon_ready()) {
+            $account = IMM_SO_Social::mastodon_check();
+            $ok      = $ok && !is_wp_error($account);
+            $lines[] = 'Mastodon: ' . (is_wp_error($account) ? $account->get_error_message() : '@' . ($account['acct'] ?? '') . ' ✓');
+        }
+        if (IMM_SO_Social::bluesky_ready()) {
+            $session = IMM_SO_Social::bluesky_session();
+            $ok      = $ok && !is_wp_error($session);
+            $lines[] = 'Bluesky: ' . (is_wp_error($session) ? $session->get_error_message() : '@' . ($session['handle'] ?? IMM_SO_Social::get('bluesky_handle')) . ' ✓');
+        }
+        set_transient('imm_so_notice_' . get_current_user_id(), [$ok ? 'success' : 'error', implode(' – ', $lines)], 5 * MINUTE_IN_SECONDS);
+        wp_safe_redirect(self::url('social'));
+        exit;
+    }
+
+    public static function handle_so_post_now(): void
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
+        }
+        check_admin_referer('imm_so_post_now');
+        $results = IMM_SO_Social::post_weekly(self::live_selection());
+        $lines   = [];
+        $ok      = true;
+        foreach ($results as $network => $result) {
+            $name = $network === 'bluesky' ? 'Bluesky' : 'Mastodon';
+            if ($result === null) {
+                $lines[] = $name . ': ' . __('nothing to post', 'event-toolkit-for-custom-fields');
+            } elseif (is_wp_error($result)) {
+                $ok      = false;
+                $lines[] = $name . ': ' . $result->get_error_message();
+            } else {
+                $lines[] = $name . ': ' . __('posted', 'event-toolkit-for-custom-fields');
+            }
+        }
+        set_transient('imm_so_notice_' . get_current_user_id(), [$ok ? 'success' : 'error', implode(' – ', $lines)], 5 * MINUTE_IN_SECONDS);
+        wp_safe_redirect(self::url('social'));
+        exit;
+    }
+}
