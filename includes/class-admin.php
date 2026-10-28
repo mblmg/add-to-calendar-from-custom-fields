@@ -1,25 +1,20 @@
 <?php
 /**
- * Settings page under Settings → Event Toolkit, with one tab per area.
+ * Admin pages: an own menu "Event Toolkit" with an overview and one page per area.
  */
 
 defined('ABSPATH') || exit;
 
 class IMM_TK_Admin
 {
-    const PAGE = 'event-toolkit-for-custom-fields';
+    /** Slug of the main page (overview); the other pages are PAGE . '-' . area. */
+    const PAGE = 'event-toolkit';
+    /** Slug of the former page under Settings, redirected to the new menu. */
+    const OLD_PAGE = 'event-toolkit-for-custom-fields';
 
     public static function init(): void
     {
-        add_action('admin_menu', function () {
-            add_options_page(
-                __('Event Toolkit for Custom Fields', 'event-toolkit-for-custom-fields'),
-                __('Event Toolkit', 'event-toolkit-for-custom-fields'),
-                'manage_options',
-                self::PAGE,
-                [self::class, 'render']
-            );
-        });
+        add_action('admin_menu', [self::class, 'menu']);
         add_action('admin_init', function () {
             register_setting('imm_tk', IMM_TK_Settings::OPTION, [
                 'type'              => 'array',
@@ -37,6 +32,7 @@ class IMM_TK_Admin
                 'default'           => IMM_TG_Settings::defaults(),
             ]);
         });
+
         // Rebuild the rewrite rules after saving (base path and file names may have changed).
         add_action('update_option_' . IMM_TK_Settings::OPTION, function () {
             IMM_TK_Endpoints::add_rewrite_rules();
@@ -46,35 +42,127 @@ class IMM_TK_Admin
         add_action('admin_post_imm_tg_send_test', [self::class, 'handle_send_test']);
         add_action('admin_post_imm_ig_check', [self::class, 'handle_ig_check']);
         add_action('admin_post_imm_ig_post_now', [self::class, 'handle_ig_post_now']);
-        add_action('admin_enqueue_scripts', function ($hook) {
-            if ($hook !== 'settings_page_' . self::PAGE) {
+        add_action('admin_enqueue_scripts', function () {
+            if (self::current_tab() === '') {
                 return;
             }
             wp_enqueue_script('imm-tk-share', plugins_url('assets/admin-share.js', IMM_TK_FILE), [], IMM_TK_VERSION, true);
             wp_enqueue_style('imm-tk-admin', plugins_url('assets/admin.css', IMM_TK_FILE), [], IMM_TK_VERSION);
         });
         add_filter('plugin_action_links_' . plugin_basename(IMM_TK_FILE), function ($links) {
-            array_unshift($links, '<a href="' . esc_url(self::url()) . '">' . esc_html__('Settings', 'event-toolkit-for-custom-fields') . '</a>');
+            array_unshift($links, '<a href="' . esc_url(self::url('events')) . '">' . esc_html__('Settings', 'event-toolkit-for-custom-fields') . '</a>');
             return $links;
         });
     }
 
-    private static function url(string $tab = '', array $args = []): string
+    public static function menu(): void
     {
-        $args = array_merge(['page' => self::PAGE], $tab !== '' ? ['tab' => $tab] : [], $args);
-        return add_query_arg($args, admin_url('options-general.php'));
+        add_menu_page(
+            __('Event Toolkit', 'event-toolkit-for-custom-fields'),
+            __('Event Toolkit', 'event-toolkit-for-custom-fields'),
+            'manage_options',
+            self::PAGE,
+            [self::class, 'render'],
+            'dashicons-megaphone',
+            26
+        );
+        foreach (self::tabs() as $tab => $label) {
+            add_submenu_page(self::PAGE, $label . ' ‹ ' . __('Event Toolkit', 'event-toolkit-for-custom-fields'), $label, 'manage_options', self::slug($tab), [self::class, 'render']);
+        }
+        // The former page under Settings stays registered, but hidden, and only redirects.
+        $old = add_options_page(__('Event Toolkit', 'event-toolkit-for-custom-fields'), __('Event Toolkit', 'event-toolkit-for-custom-fields'), 'manage_options', self::OLD_PAGE, '__return_null');
+        remove_submenu_page('options-general.php', self::OLD_PAGE);
+        if ($old) {
+            add_action('load-' . $old, [self::class, 'redirect_old_page']);
+        }
+    }
+
+    /** Bookmarks and links to the former page under Settings keep working. */
+    public static function redirect_old_page(): void
+    {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only redirect.
+        $tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'events';
+        wp_safe_redirect(self::url(isset(self::tabs()[$tab]) ? $tab : 'events'));
+        exit;
+    }
+
+    private static function slug(string $tab): string
+    {
+        return $tab === 'overview' ? self::PAGE : self::PAGE . '-' . $tab;
+    }
+
+    /** Address of an admin page of the plugin. */
+    public static function url(string $tab = 'overview', array $args = []): string
+    {
+        return add_query_arg(array_merge(['page' => self::slug($tab)], $args), admin_url('admin.php'));
+    }
+
+    /** The plugin page that is open, or '' on other admin pages. */
+    private static function current_tab(): string
+    {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only selects the page.
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+        foreach (array_keys(self::tabs()) as $tab) {
+            if ($page === self::slug($tab)) {
+                return $tab;
+            }
+        }
+        return '';
     }
 
     private static function tabs(): array
     {
         return [
-            'events'   => __('Events', 'event-toolkit-for-custom-fields'),
-            'calendar' => __('Calendar', 'event-toolkit-for-custom-fields'),
-            'search'   => __('Search engines', 'event-toolkit-for-custom-fields'),
+            'overview'  => __('Overview', 'event-toolkit-for-custom-fields'),
+            'events'    => __('Events', 'event-toolkit-for-custom-fields'),
+            'calendar'  => __('Calendar', 'event-toolkit-for-custom-fields'),
+            'search'    => __('Search engines', 'event-toolkit-for-custom-fields'),
             'digest'    => __('Weekly preview', 'event-toolkit-for-custom-fields'),
             'share'     => __('Share', 'event-toolkit-for-custom-fields'),
             'telegram'  => 'Telegram',
             'instagram' => 'Instagram',
+        ];
+    }
+
+    /** One sentence per page: what it is for. */
+    private static function intros(): array
+    {
+        return [
+            'overview'  => __('What goes out in the coming days, and which channels are switched on.', 'event-toolkit-for-custom-fields'),
+            'events'    => __('Where your events keep date, time and place. Everything else is built from these fields.', 'event-toolkit-for-custom-fields'),
+            'calendar'  => __('Calendar files for single events and a calendar people can subscribe to.', 'event-toolkit-for-custom-fields'),
+            'search'    => __('Event markup on every event page, so search engines can list date and place.', 'event-toolkit-for-custom-fields'),
+            'digest'    => __('Once a week: the events of the coming days and what is new in the programme. Telegram, newsletter and Instagram use this schedule.', 'event-toolkit-for-custom-fields'),
+            'share'     => __('Texts and story images for channels you post to by hand, like WhatsApp and Signal.', 'event-toolkit-for-custom-fields'),
+            'telegram'  => __('A bot posts the weekly preview to your group, topic or channel.', 'event-toolkit-for-custom-fields'),
+            'instagram' => __('Stories through the official Instagram API, free of charge: the week, the day before and the day itself.', 'event-toolkit-for-custom-fields'),
+        ];
+    }
+
+    /** Settings of each page in sections: [title, description, keys]. */
+    private static function groups(): array
+    {
+        return [
+            'events'   => [
+                [__('Where the events are', 'event-toolkit-for-custom-fields'), '', ['post_type', 'date_key', 'end_date_key']],
+                [__('Times', 'event-toolkit-for-custom-fields'), '', ['start_keys', 'doors_key', 'end_time_key', 'default_duration']],
+                [__('Place and details', 'event-toolkit-for-custom-fields'), '', ['location_keys', 'description_key', 'ticket_url_key', 'price_key']],
+            ],
+            'calendar' => [
+                [__('Addresses and subscription', 'event-toolkit-for-custom-fields'), '', ['base_path', 'feed_slug', 'feed_title', 'feed_past_days']],
+            ],
+            'search'   => [
+                [__('Markup', 'event-toolkit-for-custom-fields'), '', ['schema_enabled', 'currency', 'country']],
+                [__('Default venue and organizer', 'event-toolkit-for-custom-fields'), __('Used for events without own location fields.', 'event-toolkit-for-custom-fields'), ['venue_name', 'venue_address', 'organizer_name', 'organizer_url']],
+            ],
+            'digest'   => [
+                [__('Schedule and content', 'event-toolkit-for-custom-fields'), '', ['digest_weekday', 'digest_days_ahead', 'digest_include_new', 'digest_intro', 'digest_heading_week', 'digest_heading_new', 'digest_program_url']],
+                [__('Newsletter feed', 'event-toolkit-for-custom-fields'), '', ['digest_feed_enabled', 'digest_feed_slug', 'digest_feed_only_new']],
+            ],
+            'share'    => [
+                [__('Story images', 'event-toolkit-for-custom-fields'), '', ['sharepic_paper', 'sharepic_ink', 'sharepic_accent', 'sharepic_footer', 'sharepic_fonts', 'sharepic_heading_font', 'sharepic_heading_weight', 'sharepic_text_font']],
+                [__('Reminder mail', 'event-toolkit-for-custom-fields'), '', ['share_reminder', 'share_reminder_to']],
+            ],
         ];
     }
 
@@ -138,126 +226,347 @@ class IMM_TK_Admin
             return;
         }
         $tabs = self::tabs();
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only selects the visible tab.
-        $tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'events';
-        $tab = isset($tabs[$tab]) ? $tab : 'events';
+        $tab  = self::current_tab() ?: 'overview';
         ?>
-        <div class="wrap">
-            <h1><?php esc_html_e('Event Toolkit for Custom Fields', 'event-toolkit-for-custom-fields'); ?></h1>
-            <p><?php esc_html_e('Reads your events from existing fields (ACF, ACPT or plain post meta) and spreads them: calendar links, search engines, Telegram and newsletters. Nothing has to be entered twice.', 'event-toolkit-for-custom-fields'); ?></p>
-
-            <nav class="nav-tab-wrapper">
+        <div class="wrap imm-tk">
+            <header class="imm-tk-head">
+                <h1><?php echo esc_html($tab === 'overview' ? __('Event Toolkit', 'event-toolkit-for-custom-fields') : $tabs[$tab]); ?></h1>
+                <p class="imm-tk-intro"><?php echo esc_html(self::intros()[$tab]); ?></p>
+            </header>
+            <nav class="imm-tk-nav" aria-label="<?php esc_attr_e('Event Toolkit', 'event-toolkit-for-custom-fields'); ?>">
                 <?php foreach ($tabs as $id => $label) : ?>
-                    <a href="<?php echo esc_url(self::url($id)); ?>" class="nav-tab <?php echo $id === $tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html($label); ?></a>
+                    <a href="<?php echo esc_url(self::url($id)); ?>"<?php echo $id === $tab ? ' aria-current="page"' : ''; ?>><?php echo esc_html($label); ?></a>
                 <?php endforeach; ?>
             </nav>
-
-            <?php settings_errors(); ?>
+            <hr class="wp-header-end">
             <?php
-            if ($tab === 'telegram') {
-                self::render_telegram();
-            } elseif ($tab === 'instagram') {
-                self::render_instagram();
-            } elseif ($tab === 'share') {
-                self::render_share();
-                echo '<h2 id="imm-tk-share-settings">' . esc_html__('Design and reminder', 'event-toolkit-for-custom-fields') . '</h2>';
-                self::render_core_form('share');
-            } else {
-                self::render_core_form($tab);
-                switch ($tab) {
-                    case 'events':
-                        self::render_field_finder((string) IMM_TK_Settings::get('post_type'));
-                        self::render_event_preview();
-                        break;
-                    case 'calendar':
-                        self::render_usage();
-                        break;
-                    case 'search':
-                        self::render_schema_preview();
-                        break;
-                    case 'digest':
-                        self::render_digest_info();
-                        break;
-                }
+            settings_errors();
+            if ($tab !== 'overview' && $tab !== 'events' && !IMM_TK_Settings::is_configured()) {
+                echo '<div class="notice notice-info inline"><p>' . wp_kses(sprintf(
+                    /* translators: %s: link to the page "Events" */
+                    __('First tell the plugin where your events are: post type and date field on the page %s.', 'event-toolkit-for-custom-fields'),
+                    '<a href="' . esc_url(self::url('events')) . '">' . esc_html__('Events', 'event-toolkit-for-custom-fields') . '</a>'
+                ), ['a' => ['href' => []]]) . '</p></div>';
+            }
+            switch ($tab) {
+                case 'overview':
+                    self::render_overview();
+                    break;
+                case 'telegram':
+                    self::render_telegram();
+                    break;
+                case 'instagram':
+                    self::render_instagram();
+                    break;
+                case 'share':
+                    self::render_share();
+                    echo '<h2 class="imm-tk-section-title" id="imm-tk-share-settings">' . esc_html__('Design and reminder', 'event-toolkit-for-custom-fields') . '</h2>';
+                    echo '<div class="imm-tk-narrow">';
+                    self::render_core_form('share');
+                    echo '</div>';
+                    break;
+                default:
+                    echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
+                    self::render_core_form($tab);
+                    echo '</div><aside class="imm-tk-aside">';
+                    switch ($tab) {
+                        case 'events':
+                            self::panel([self::class, 'render_event_preview']);
+                            self::panel(function () {
+                                self::render_field_finder((string) IMM_TK_Settings::get('post_type'));
+                            }, 'imm-tk-panel--scroll');
+                            break;
+                        case 'calendar':
+                            self::panel([self::class, 'render_usage']);
+                            break;
+                        case 'search':
+                            self::panel([self::class, 'render_schema_preview']);
+                            break;
+                        case 'digest':
+                            self::render_digest_info();
+                            break;
+                    }
+                    echo '</aside></div>';
             }
             ?>
         </div>
         <?php
     }
 
+    /* ------------------------------------------------------------------ Overview */
+
+    private static function render_overview(): void
+    {
+        if (!IMM_TK_Settings::is_configured()) {
+            echo '<section class="imm-tk-panel imm-tk-empty">';
+            echo '<h2>' . esc_html__('Start with your events', 'event-toolkit-for-custom-fields') . '</h2>';
+            echo '<p>' . esc_html__('Tell the plugin which post type holds your events and which field has the date. Everything else (calendar, search engines, Telegram, Instagram, newsletter) builds on that.', 'event-toolkit-for-custom-fields') . '</p>';
+            echo '<p><a class="button button-primary" href="' . esc_url(self::url('events')) . '">' . esc_html__('Set up events', 'event-toolkit-for-custom-fields') . '</a></p>';
+            echo '</section>';
+            return;
+        }
+        $tz  = wp_timezone();
+        $now = new DateTimeImmutable('now', $tz);
+
+        echo '<div class="imm-tk-layout imm-tk-layout--overview"><div class="imm-tk-main">';
+        echo '<h2 class="imm-tk-section-title">' . esc_html__('The next 7 days', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<ol class="imm-tk-week">';
+        for ($i = 0; $i < 7; $i++) {
+            $day    = $now->setTime(0, 0)->modify('+' . $i . ' days');
+            $events = array_values(array_filter(IMM_TK_Share::events_on($day), function (IMM_TK_Event $e) use ($now) {
+                return $e->end > $now;
+            }));
+            $out    = self::outgoing($day, $events, $now);
+            echo '<li class="imm-tk-week-day' . ($events || $out ? '' : ' is-quiet') . '">';
+            self::date_badge($day, $i === 0);
+            echo '<div class="imm-tk-week-body">';
+            if ($events) {
+                echo '<ul class="imm-tk-week-events">';
+                foreach ($events as $e) {
+                    $edit = get_edit_post_link($e->id);
+                    $name = esc_html(IMM_TK_Digest::title($e));
+                    echo '<li><span class="imm-tk-week-time">' . esc_html(IMM_TK_Sharepic::start_time($e)) . '</span> '
+                        . ($edit ? '<a href="' . esc_url($edit) . '">' . $name . '</a>' : $name) . '</li>'; // phpcs:ignore WordPress.Security.EscapeOutput -- $name is escaped above.
+                }
+                echo '</ul>';
+            }
+            if ($out) {
+                echo '<ul class="imm-tk-week-out">';
+                foreach ($out as $item) {
+                    echo '<li><span class="imm-tk-week-time">' . esc_html($item['time']) . '</span> <strong>' . esc_html($item['channel']) . '</strong> ' . esc_html($item['label']);
+                    if (!empty($item['spec']) && IMM_TK_Sharepic::available()) {
+                        $url = IMM_TK_Share::image_url($item['spec']);
+                        echo ' <a class="imm-tk-thumb" href="' . esc_url($url) . '" target="_blank" rel="noopener"><img src="' . esc_url($url) . '" alt="" width="27" height="48" loading="lazy"></a>';
+                    }
+                    echo '</li>';
+                }
+                echo '</ul>';
+            }
+            if (!$events && !$out) {
+                echo '<p class="imm-tk-week-none">' . esc_html__('No events, nothing goes out.', 'event-toolkit-for-custom-fields') . '</p>';
+            }
+            echo '</div></li>';
+        }
+        echo '</ol>';
+        echo '</div><aside class="imm-tk-aside">';
+        self::panel([self::class, 'render_channels']);
+        echo '</aside></div>';
+    }
+
+    /**
+     * What the plugin sends out on a day, sorted by time.
+     *
+     * @return array<int, array{time: string, channel: string, label: string, spec?: array}>
+     */
+    private static function outgoing(DateTimeImmutable $day, array $events, DateTimeImmutable $now): array
+    {
+        $tf    = get_option('time_format') ?: 'H:i';
+        $tz    = $day->getTimezone();
+        $items = [];
+        $at    = function (string $hm) use ($day): DateTimeImmutable {
+            [$h, $m] = array_map('intval', explode(':', $hm));
+            return $day->setTime($h, $m);
+        };
+        $issue_day = (int) $day->format('N') === (int) IMM_TK_Settings::get('digest_weekday');
+
+        if ($issue_day) {
+            $issue = $at((string) IMM_TK_Settings::get('digest_time'));
+            if ($issue > $now) {
+                $empty = IMM_TK_Digest::is_empty(IMM_TK_Digest::select($issue, $issue));
+                $label = $empty ? __('Weekly preview (skipped: nothing in it)', 'event-toolkit-for-custom-fields') : __('Weekly preview', 'event-toolkit-for-custom-fields');
+                if (IMM_TG_Settings::get('enabled') && IMM_TG_Settings::is_ready()) {
+                    $items[] = ['sort' => $issue, 'channel' => 'Telegram', 'label' => $label];
+                }
+                if (IMM_TK_Settings::get('digest_feed_enabled')) {
+                    $items[] = ['sort' => $issue, 'channel' => __('Newsletter', 'event-toolkit-for-custom-fields'), 'label' => $label];
+                }
+                if (IMM_TK_Settings::get('share_reminder') && !$empty) {
+                    $items[] = ['sort' => $issue, 'channel' => __('Mail', 'event-toolkit-for-custom-fields'), 'label' => __('Reminder to share', 'event-toolkit-for-custom-fields')];
+                }
+            }
+        }
+        if ($events && !$issue_day && IMM_TG_Settings::get('today') && IMM_TG_Settings::is_ready()) {
+            $time = $at((string) IMM_TG_Settings::get('today_time'));
+            if ($time > $now) {
+                $items[] = ['sort' => $time, 'channel' => 'Telegram', 'label' => __('"Today" message, silent', 'event-toolkit-for-custom-fields')];
+            }
+        }
+        if (IMM_IG_Scheduler::active()) {
+            $time = $at((string) IMM_IG_Instagram::get('time'));
+            if ($time > $now) {
+                foreach (IMM_IG_Scheduler::plan($time) as $story) {
+                    $items[] = ['sort' => $time, 'channel' => 'Instagram', 'label' => $story['label'], 'spec' => $story['spec']];
+                }
+            }
+        }
+        usort($items, function ($a, $b) {
+            return $a['sort'] <=> $b['sort'];
+        });
+        foreach ($items as &$item) {
+            $item['time'] = wp_date($tf, $item['sort']->getTimestamp(), $tz);
+            unset($item['sort']);
+        }
+        return $items;
+    }
+
+    /** Channels and their state. */
+    private static function render_channels(): void
+    {
+        global $wp_locale;
+        $tf      = get_option('time_format') ?: 'H:i';
+        $weekday = $wp_locale->get_weekday((int) IMM_TK_Settings::get('digest_weekday') % 7);
+        $digest  = sprintf(
+            /* translators: 1: weekday, 2: time */
+            __('every %1$s at %2$s', 'event-toolkit-for-custom-fields'),
+            $weekday,
+            wp_date($tf, IMM_TK_Digest::next_issue()->getTimestamp())
+        );
+        $off  = __('off', 'event-toolkit-for-custom-fields');
+        $todo = __('not set up yet', 'event-toolkit-for-custom-fields');
+
+        $tg_state = !IMM_TG_Settings::is_ready() ? 'todo' : (IMM_TG_Settings::get('enabled') ? 'on' : 'off');
+        $ig_state = !IMM_IG_Instagram::is_ready() ? 'todo' : (IMM_IG_Instagram::get('enabled') ? 'on' : 'off');
+        $channels = [
+            ['calendar', __('Calendar', 'event-toolkit-for-custom-fields'), 'on', __('calendar files for every event and a subscription', 'event-toolkit-for-custom-fields')],
+            ['search', __('Search engines', 'event-toolkit-for-custom-fields'), IMM_TK_Settings::get('schema_enabled') ? 'on' : 'off', IMM_TK_Settings::get('schema_enabled') ? __('event markup on every event page', 'event-toolkit-for-custom-fields') : $off],
+            ['digest', __('Weekly preview', 'event-toolkit-for-custom-fields'), 'on', $digest],
+            ['digest', __('Newsletter feed', 'event-toolkit-for-custom-fields'), IMM_TK_Settings::get('digest_feed_enabled') ? 'on' : 'off', IMM_TK_Settings::get('digest_feed_enabled') ? (IMM_TK_Settings::get('digest_feed_only_new') ? __('only in weeks with new events', 'event-toolkit-for-custom-fields') : __('every week', 'event-toolkit-for-custom-fields')) : $off],
+            ['telegram', 'Telegram', $tg_state, $tg_state === 'on' ? $digest . (IMM_TG_Settings::get('today') ? ', ' . __('plus "Today" on event days', 'event-toolkit-for-custom-fields') : '') : ($tg_state === 'off' ? $off : $todo)],
+            ['instagram', 'Instagram', $ig_state, $ig_state === 'on' ? sprintf(
+                /* translators: 1: Instagram username, 2: time */
+                __('@%1$s, daily at %2$s', 'event-toolkit-for-custom-fields'),
+                (string) IMM_IG_Instagram::get('username'),
+                (string) IMM_IG_Instagram::get('time')
+            ) : ($ig_state === 'off' ? $off : $todo)],
+            ['share', __('Reminder to share', 'event-toolkit-for-custom-fields'), IMM_TK_Settings::get('share_reminder') ? 'on' : 'off', IMM_TK_Settings::get('share_reminder') ? (string) IMM_TK_Settings::get('share_reminder_to') : $off],
+        ];
+        $labels = ['on' => __('On', 'event-toolkit-for-custom-fields'), 'off' => __('Off', 'event-toolkit-for-custom-fields'), 'todo' => __('To do', 'event-toolkit-for-custom-fields')];
+
+        echo '<h2>' . esc_html__('Channels', 'event-toolkit-for-custom-fields') . '</h2><ul class="imm-tk-channels">';
+        foreach ($channels as [$tab, $name, $state, $detail]) {
+            echo '<li class="is-' . esc_attr($state) . '"><a href="' . esc_url(self::url($tab)) . '"><span class="imm-tk-channel-name">' . esc_html($name) . '</span>'
+                . '<span class="imm-tk-badge">' . esc_html($labels[$state]) . '</span>'
+                . '<span class="imm-tk-channel-detail">' . esc_html($detail) . '</span></a></li>';
+        }
+        echo '</ul>';
+        echo '<p class="imm-tk-feed"><label for="imm-tk-feed-url">' . esc_html__('Calendar subscription address', 'event-toolkit-for-custom-fields') . '</label>'
+            . '<input id="imm-tk-feed-url" type="text" class="large-text code" readonly value="' . esc_attr(IMM_TK_Links::get('webcal')) . '" data-imm-select></p>';
+    }
+
+    /** Runs a render function and wraps its output in a panel, unless it printed nothing. */
+    private static function panel(callable $render, string $class = ''): void
+    {
+        ob_start();
+        $render();
+        $html = trim((string) ob_get_clean());
+        if ($html !== '') {
+            echo '<section class="imm-tk-panel' . ($class !== '' ? ' ' . esc_attr($class) : '') . '">';
+            echo $html; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped by the render function.
+            echo '</section>';
+        }
+    }
+
+    /**
+     * Label/value rows as a definition list.
+     *
+     * @param array<string, string> $rows
+     */
+    private static function status_list(array $rows): void
+    {
+        echo '<dl class="imm-tk-status">';
+        foreach ($rows as $label => $value) {
+            echo '<div><dt>' . esc_html($label) . '</dt><dd>' . esc_html($value) . '</dd></div>';
+        }
+        echo '</dl>';
+    }
+
     /** Form with the core settings of one tab. */
     private static function render_core_form(string $tab): void
     {
         $s      = IMM_TK_Settings::all();
-        $fields = self::fields();
         $keys   = array_keys(IMM_TK_Settings::tabs()[$tab]);
         $name   = IMM_TK_Settings::OPTION;
 
-        if ($tab !== 'events' && !IMM_TK_Settings::is_configured()) {
-            echo '<div class="notice notice-info inline"><p>' . esc_html__('First enter the post type and the date field in the tab "Events".', 'event-toolkit-for-custom-fields') . '</p></div>';
-        }
         echo '<form method="post" action="options.php">';
         settings_fields('imm_tk');
         echo '<input type="hidden" name="' . esc_attr($name . '[_tab]') . '" value="' . esc_attr($tab) . '">';
-        echo '<table class="form-table" role="presentation">';
-        foreach ($keys as $key) {
-            if ($key === 'digest_time') {
-                continue; // Rendered together with the weekday.
+        $groups = self::groups()[$tab] ?? [['', '', $keys]];
+        foreach ($groups as [$title, $description, $group_keys]) {
+            echo '<section class="imm-tk-panel">';
+            if ($title !== '') {
+                echo '<h2>' . esc_html($title) . '</h2>';
             }
-            [$label, $help, $type] = $fields[$key];
-            $extra = $fields[$key][3] ?? '';
-            $id    = 'imm-tk-' . $key;
-            $field = $name . '[' . $key . ']';
-            echo '<tr><th scope="row"><label for="' . esc_attr($id) . '">' . esc_html($label) . '</label></th><td>';
-            switch ($type) {
-                case 'check':
-                    echo '<label><input type="checkbox" id="' . esc_attr($id) . '" name="' . esc_attr($field) . '" value="1" ' . checked(!empty($s[$key]), true, false) . '> ' . esc_html($extra) . '</label>';
-                    break;
-                case 'textarea':
-                    echo '<textarea class="large-text" rows="3" id="' . esc_attr($id) . '" name="' . esc_attr($field) . '">' . esc_textarea($s[$key]) . '</textarea>';
-                    break;
-                case 'weekday':
-                    global $wp_locale;
-                    echo '<select id="' . esc_attr($id) . '" name="' . esc_attr($field) . '">';
-                    for ($day = 1; $day <= 7; $day++) {
-                        echo '<option value="' . (int) $day . '" ' . selected((int) $s[$key], $day, false) . '>' . esc_html($wp_locale->get_weekday($day % 7)) . '</option>';
-                    }
-                    echo '</select> <input type="time" name="' . esc_attr($name . '[digest_time]') . '" value="' . esc_attr($s['digest_time']) . '">';
-                    break;
-                case 'choice':
-                    echo '<select id="' . esc_attr($id) . '" name="' . esc_attr($field) . '">';
-                    foreach (IMM_TK_Settings::choices()[$key] as $value => $choice) {
-                        echo '<option value="' . esc_attr($value) . '" ' . selected((string) $s[$key], (string) $value, false) . '>' . esc_html($choice) . '</option>';
-                    }
-                    echo '</select>';
-                    if ($key === 'sharepic_fonts') {
-                        $detected = IMM_TK_Fonts::detect();
-                        $names    = array_unique(array_filter([$detected['heading'], $detected['text']]));
-                        echo '<p class="description">' . esc_html($names
-                            /* translators: %s: font names */
-                            ? sprintf(__('Detected on the website: %s.', 'event-toolkit-for-custom-fields'), implode(', ', $names))
-                            : __('No fonts detected on the website. Enter them below, or the bundled fonts are used.', 'event-toolkit-for-custom-fields')) . '</p>';
-                    }
-                    break;
-                case 'font':
-                    $detected = IMM_TK_Fonts::detect()[$key === 'sharepic_heading_font' ? 'heading' : 'text'];
-                    echo '<input type="text" class="regular-text" id="' . esc_attr($id) . '" name="' . esc_attr($field) . '" value="' . esc_attr($s[$key]) . '" placeholder="' . esc_attr($detected) . '">';
-                    break;
-                case 'color':
-                    echo '<input type="color" id="' . esc_attr($id) . '" name="' . esc_attr($field) . '" value="' . esc_attr($s[$key]) . '">';
-                    break;
-                default:
-                    $input = ['number' => 'number', 'url' => 'url', 'email' => 'email'][$type] ?? 'text';
-                    echo '<input type="' . esc_attr($input) . '" class="' . ($input === 'number' ? 'small-text' : 'regular-text') . '" id="' . esc_attr($id) . '" name="' . esc_attr($field) . '" value="' . esc_attr($s[$key]) . '"' . ($extra !== '' ? ' placeholder="' . esc_attr($extra) . '"' : '') . '>';
+            if ($description !== '') {
+                echo '<p class="imm-tk-panel-note">' . esc_html($description) . '</p>';
             }
-            if ($help !== '') {
-                echo '<p class="description">' . wp_kses($help, ['code' => [], 'em' => []]) . '</p>';
+            echo '<table class="form-table" role="presentation">';
+            foreach (array_intersect($group_keys, $keys) as $key) {
+                self::render_field($key, $s);
             }
-            echo '</td></tr>';
+            echo '</table></section>';
         }
-        echo '</table>';
         submit_button(__('Save settings', 'event-toolkit-for-custom-fields'));
         echo '</form>';
+    }
+
+    /** One settings row. */
+    private static function render_field(string $key, array $s): void
+    {
+        $fields = self::fields();
+        $name   = IMM_TK_Settings::OPTION;
+        if ($key === 'digest_time') {
+            return; // Rendered together with the weekday.
+        }
+        [$label, $help, $type] = $fields[$key];
+        $extra = $fields[$key][3] ?? '';
+        $id    = 'imm-tk-' . $key;
+        $field = $name . '[' . $key . ']';
+        echo '<tr><th scope="row"><label for="' . esc_attr($id) . '">' . esc_html($label) . '</label></th><td>';
+        switch ($type) {
+            case 'check':
+                echo '<label><input type="checkbox" id="' . esc_attr($id) . '" name="' . esc_attr($field) . '" value="1" ' . checked(!empty($s[$key]), true, false) . '> ' . esc_html($extra) . '</label>';
+                break;
+            case 'textarea':
+                echo '<textarea class="large-text" rows="3" id="' . esc_attr($id) . '" name="' . esc_attr($field) . '">' . esc_textarea($s[$key]) . '</textarea>';
+                break;
+            case 'weekday':
+                global $wp_locale;
+                echo '<select id="' . esc_attr($id) . '" name="' . esc_attr($field) . '">';
+                for ($day = 1; $day <= 7; $day++) {
+                    echo '<option value="' . (int) $day . '" ' . selected((int) $s[$key], $day, false) . '>' . esc_html($wp_locale->get_weekday($day % 7)) . '</option>';
+                }
+                echo '</select> <input type="time" name="' . esc_attr($name . '[digest_time]') . '" value="' . esc_attr($s['digest_time']) . '">';
+                break;
+            case 'choice':
+                echo '<select id="' . esc_attr($id) . '" name="' . esc_attr($field) . '">';
+                foreach (IMM_TK_Settings::choices()[$key] as $value => $choice) {
+                    echo '<option value="' . esc_attr($value) . '" ' . selected((string) $s[$key], (string) $value, false) . '>' . esc_html($choice) . '</option>';
+                }
+                echo '</select>';
+                if ($key === 'sharepic_fonts') {
+                    $detected = IMM_TK_Fonts::detect();
+                    $names    = array_unique(array_filter([$detected['heading'], $detected['text']]));
+                    echo '<p class="description">' . esc_html($names
+                        /* translators: %s: font names */
+                        ? sprintf(__('Detected on the website: %s.', 'event-toolkit-for-custom-fields'), implode(', ', $names))
+                        : __('No fonts detected on the website. Enter them below, or the bundled fonts are used.', 'event-toolkit-for-custom-fields')) . '</p>';
+                }
+                break;
+            case 'font':
+                $detected = IMM_TK_Fonts::detect()[$key === 'sharepic_heading_font' ? 'heading' : 'text'];
+                echo '<input type="text" class="regular-text" id="' . esc_attr($id) . '" name="' . esc_attr($field) . '" value="' . esc_attr($s[$key]) . '" placeholder="' . esc_attr($detected) . '">';
+                break;
+            case 'color':
+                echo '<input type="color" id="' . esc_attr($id) . '" name="' . esc_attr($field) . '" value="' . esc_attr($s[$key]) . '">';
+                break;
+            default:
+                $input = ['number' => 'number', 'url' => 'url', 'email' => 'email'][$type] ?? 'text';
+                echo '<input type="' . esc_attr($input) . '" class="' . ($input === 'number' ? 'small-text' : 'regular-text') . '" id="' . esc_attr($id) . '" name="' . esc_attr($field) . '" value="' . esc_attr($s[$key]) . '"' . ($extra !== '' ? ' placeholder="' . esc_attr($extra) . '"' : '') . '>';
+        }
+        if ($help !== '') {
+            echo '<p class="description">' . wp_kses($help, ['code' => [], 'em' => []]) . '</p>';
+        }
+        echo '</td></tr>';
     }
 
     /** Lists the fields of a sample post so nobody has to hunt for field names. */
@@ -274,7 +583,7 @@ class IMM_TK_Admin
         echo '<h2>' . esc_html__('Available fields', 'event-toolkit-for-custom-fields') . '</h2>';
         /* translators: %s: title of a sample post */
         echo '<p>' . esc_html(sprintf(__('Field names and values of the sample post "%s":', 'event-toolkit-for-custom-fields'), get_the_title($posts[0]))) . '</p>';
-        echo '<table class="widefat striped" style="max-width:900px"><thead><tr><th>' . esc_html__('Field name', 'event-toolkit-for-custom-fields') . '</th><th>' . esc_html__('Value', 'event-toolkit-for-custom-fields') . '</th></tr></thead><tbody>';
+        echo '<table class="widefat striped"><thead><tr><th>' . esc_html__('Field name', 'event-toolkit-for-custom-fields') . '</th><th>' . esc_html__('Value', 'event-toolkit-for-custom-fields') . '</th></tr></thead><tbody>';
         foreach ($meta as $key => $values) {
             // Hide internal fields and ACF/ACPT helper fields.
             if ($key[0] === '_' || preg_match('/_(id|type|format|label)$/', $key)) {
@@ -299,34 +608,33 @@ class IMM_TK_Admin
         }
         $date_format = get_option('date_format');
         $time_format = get_option('time_format');
-        echo '<table class="widefat striped" style="max-width:900px"><thead><tr>'
-            . '<th>' . esc_html__('Event', 'event-toolkit-for-custom-fields') . '</th>'
-            . '<th>' . esc_html__('Start', 'event-toolkit-for-custom-fields') . '</th>'
-            . '<th>' . esc_html__('End', 'event-toolkit-for-custom-fields') . '</th>'
-            . '<th>' . esc_html__('Location', 'event-toolkit-for-custom-fields') . '</th>'
-            . '<th>' . esc_html__('File', 'event-toolkit-for-custom-fields') . '</th></tr></thead><tbody>';
+        echo '<p class="imm-tk-panel-note">' . esc_html__('How the plugin reads the next events. If something is off, check the field names.', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<ul class="imm-tk-check">';
         foreach ($events as $e) {
             if ($e->all_day) {
-                $start = wp_date($date_format, $e->start->getTimestamp(), $e->start->getTimezone());
-                $end   = wp_date($date_format, $e->end->modify('-1 day')->getTimestamp(), $e->end->getTimezone()) . ' ' . __('(all day)', 'event-toolkit-for-custom-fields');
+                $when = wp_date($date_format, $e->start->getTimestamp(), $e->start->getTimezone()) . ' ' . __('(all day)', 'event-toolkit-for-custom-fields');
             } else {
-                $start = wp_date($date_format . ' ' . $time_format, $e->start->getTimestamp(), $e->start->getTimezone());
-                $end   = wp_date($date_format . ' ' . $time_format, $e->end->getTimestamp(), $e->end->getTimezone());
+                $when = wp_date($date_format . ', ' . $time_format, $e->start->getTimestamp(), $e->start->getTimezone())
+                    . ' – ' . wp_date(($e->end->format('Y-m-d') === $e->start->format('Y-m-d') ? '' : $date_format . ', ') . $time_format, $e->end->getTimestamp(), $e->end->getTimezone());
             }
-            echo '<tr><td>' . esc_html(IMM_TK_Digest::title($e)) . '</td><td>' . esc_html($start) . '</td><td>' . esc_html($end) . '</td><td>' . esc_html($e->location) . '</td><td><a href="' . esc_url(IMM_TK_Links::event_ics_url($e->id)) . '">.ics</a></td></tr>';
+            echo '<li><strong>' . esc_html(IMM_TK_Digest::title($e)) . '</strong>'
+                . '<span>' . esc_html($when) . '</span>'
+                . ($e->location !== '' ? '<span>' . esc_html($e->location) . '</span>' : '')
+                . '<a href="' . esc_url(IMM_TK_Links::event_ics_url($e->id)) . '">' . esc_html__('Calendar file (.ics)', 'event-toolkit-for-custom-fields') . '</a></li>';
         }
-        echo '</tbody></table>';
+        echo '</ul>';
     }
 
     private static function render_usage(): void
     {
         if (IMM_TK_Settings::is_configured()) {
-            echo '<p>' . esc_html__('Subscription URL:', 'event-toolkit-for-custom-fields') . ' <code>' . esc_html(IMM_TK_Links::get('feed')) . '</code></p>';
+            echo '<h2>' . esc_html__('Subscription address', 'event-toolkit-for-custom-fields') . '</h2>';
+            echo '<p><input type="text" class="large-text code" readonly data-imm-select value="' . esc_attr(IMM_TK_Links::get('feed')) . '"></p>';
         }
         echo '<h2>' . esc_html__('Usage', 'event-toolkit-for-custom-fields') . '</h2>';
         echo '<p><strong>Breakdance:</strong> ' . esc_html__('In the link field of a button or text link, choose the dynamic data category "Add to Calendar".', 'event-toolkit-for-custom-fields') . '</p>';
         echo '<p><strong>' . esc_html__('Shortcode:', 'event-toolkit-for-custom-fields') . '</strong> <code>[imm_calendar_link type="ics" text="Add to calendar"]</code>. ' . esc_html__('Without "text" only the URL is returned.', 'event-toolkit-for-custom-fields') . '</p>';
-        echo '<table class="widefat striped" style="max-width:900px"><thead><tr><th>type</th><th>' . esc_html__('Link', 'event-toolkit-for-custom-fields') . '</th></tr></thead><tbody>';
+        echo '<table class="widefat striped"><thead><tr><th>type</th><th>' . esc_html__('Link', 'event-toolkit-for-custom-fields') . '</th></tr></thead><tbody>';
         foreach (IMM_TK_Links::types() as $type => $label) {
             echo '<tr><td><code>' . esc_html($type) . '</code></td><td>' . esc_html($label) . '</td></tr>';
         }
@@ -385,19 +693,22 @@ class IMM_TK_Admin
             return;
         }
         if (IMM_TK_Settings::get('digest_feed_enabled')) {
-            echo '<h2>' . esc_html__('Newsletter feed', 'event-toolkit-for-custom-fields') . '</h2>';
-            echo '<p><code>' . esc_html(IMM_TK_Digest_Feed::url()) . '</code></p>';
-            echo '<p>' . esc_html__('Enter this address in an RSS campaign of your newsletter service (e.g. Brevo, CleverReach or Mailchimp). The feed contains one entry per issue with the whole preview, so the service sends one mail per week. In weeks with no upcoming and no new events, the feed stays empty and no mail is sent.', 'event-toolkit-for-custom-fields') . '</p>';
+            self::panel(function () {
+                echo '<h2>' . esc_html__('Newsletter feed', 'event-toolkit-for-custom-fields') . '</h2>';
+                echo '<p><input type="text" class="large-text code" readonly value="' . esc_attr(IMM_TK_Digest_Feed::url()) . '" data-imm-select></p>';
+                echo '<p>' . esc_html__('Enter this address in an RSS campaign of your newsletter service (e.g. Brevo, CleverReach or Mailchimp). The feed contains one entry per issue with the whole preview, so the service sends one mail per week. In weeks with no upcoming and no new events, the feed stays empty and no mail is sent.', 'event-toolkit-for-custom-fields') . '</p>';
+            });
         }
-
-        $selection = self::live_selection();
-        echo '<h2>' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
-        echo '<p>' . esc_html(self::preview_note()) . '</p>';
-        if (IMM_TK_Digest::is_empty($selection)) {
-            echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
-            return;
-        }
-        echo '<div style="max-width:640px;background:#fff;border:1px solid #c3c4c7;padding:8px 24px">' . wp_kses_post(IMM_TK_Digest::email_html($selection)) . '</div>';
+        self::panel(function () {
+            $selection = self::live_selection();
+            echo '<h2>' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
+            echo '<p class="imm-tk-panel-note">' . esc_html(self::preview_note()) . '</p>';
+            if (IMM_TK_Digest::is_empty($selection)) {
+                echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
+                return;
+            }
+            echo '<div class="imm-tk-mail">' . wp_kses_post(IMM_TK_Digest::email_html($selection)) . '</div>';
+        });
     }
 
     /* ------------------------------------------------------------------ Telegram */
@@ -413,15 +724,18 @@ class IMM_TK_Admin
         $notice = isset($_GET['imm_tg']) ? sanitize_key(wp_unslash($_GET['imm_tg'])) : '';
 
         self::render_telegram_notice($notice);
+        echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
         echo '<p>' . wp_kses(sprintf(
-            /* translators: %s: link to the tab "Weekly preview" */
-            __('Posts the weekly preview to a Telegram group, topic or channel. Schedule and content are set in the tab %s.', 'event-toolkit-for-custom-fields'),
+            /* translators: %s: link to the page "Weekly preview" */
+            __('Schedule and content of the posts come from the page %s.', 'event-toolkit-for-custom-fields'),
             '<a href="' . esc_url(self::url('digest')) . '">' . esc_html__('Weekly preview', 'event-toolkit-for-custom-fields') . '</a>'
         ), ['a' => ['href' => []]]) . '</p>';
         self::render_telegram_status();
         ?>
         <form method="post" action="options.php">
             <?php settings_fields('imm_tg'); ?>
+            <section class="imm-tk-panel">
+            <h2><?php esc_html_e('Bot and posts', 'event-toolkit-for-custom-fields'); ?></h2>
             <table class="form-table" role="presentation">
                 <tr>
                     <th scope="row"><?php esc_html_e('Weekly digest', 'event-toolkit-for-custom-fields'); ?></th>
@@ -472,11 +786,16 @@ class IMM_TK_Admin
                     </td>
                 </tr>
             </table>
+            </section>
             <?php submit_button(__('Save settings', 'event-toolkit-for-custom-fields')); ?>
         </form>
         <?php
-        self::render_chat_finder($notice === 'chats');
-        self::render_telegram_preview();
+        self::panel(function () use ($notice) {
+            self::render_chat_finder($notice === 'chats');
+        });
+        echo '</div><aside class="imm-tk-aside">';
+        self::panel([self::class, 'render_telegram_preview']);
+        echo '</aside></div>';
     }
 
     private static function render_telegram_notice(string $notice): void
@@ -507,11 +826,7 @@ class IMM_TK_Admin
         if ($state['last_run']) {
             $rows[__('Last run', 'event-toolkit-for-custom-fields')] = wp_date($format, $state['last_run']) . ': ' . $state['last_result'];
         }
-        echo '<table class="widefat striped" style="max-width:900px;margin:1em 0"><tbody>';
-        foreach ($rows as $label => $value) {
-            echo '<tr><th style="width:12em">' . esc_html($label) . '</th><td>' . esc_html($value) . '</td></tr>';
-        }
-        echo '</tbody></table>';
+        self::status_list($rows);
     }
 
     private static function render_chat_finder(bool $show_result): void
@@ -552,7 +867,7 @@ class IMM_TK_Admin
             echo '<p>' . esc_html__('The bot has not seen any chat yet. Follow the steps above and try again.', 'event-toolkit-for-custom-fields') . '</p>';
             return;
         }
-        echo '<table class="widefat striped" style="max-width:900px"><thead><tr><th>' . esc_html__('Chat', 'event-toolkit-for-custom-fields') . '</th><th>' . esc_html__('Type', 'event-toolkit-for-custom-fields') . '</th><th>' . esc_html__('Chat ID', 'event-toolkit-for-custom-fields') . '</th><th>' . esc_html__('Topics (ID: name)', 'event-toolkit-for-custom-fields') . '</th></tr></thead><tbody>';
+        echo '<table class="widefat striped"><thead><tr><th>' . esc_html__('Chat', 'event-toolkit-for-custom-fields') . '</th><th>' . esc_html__('Type', 'event-toolkit-for-custom-fields') . '</th><th>' . esc_html__('Chat ID', 'event-toolkit-for-custom-fields') . '</th><th>' . esc_html__('Topics (ID: name)', 'event-toolkit-for-custom-fields') . '</th></tr></thead><tbody>';
         foreach ($data['chats'] as $chat) {
             $topics = [];
             foreach ($chat['topics'] as $id => $topic) {
@@ -565,13 +880,13 @@ class IMM_TK_Admin
 
     private static function render_telegram_preview(): void
     {
-        echo '<h2 id="imm-tg-preview">' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
         if (!IMM_TK_Settings::is_configured()) {
             return;
         }
+        echo '<h2 id="imm-tg-preview">' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
         $selection = self::live_selection();
         $message   = IMM_TG_Telegram::message($selection);
-        echo '<p>' . esc_html(self::preview_note()) . '</p>';
+        echo '<p class="imm-tk-panel-note">' . esc_html(self::preview_note()) . '</p>';
         if ($message === '') {
             echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
             return;
@@ -582,13 +897,13 @@ class IMM_TK_Admin
         $event    = IMM_TK_Digest::lead_event($selection);
         $image    = ($event && $position !== 'none') ? get_the_post_thumbnail_url($event->id, 'medium_large') : '';
         $figure   = $image ? '<img src="' . esc_url($image) . '" alt="" style="display:block;width:100%;height:auto;border-radius:6px;margin:8px 0">' : '';
-        $html     = '<div style="max-width:480px;background:#fff;border:1px solid #c3c4c7;border-radius:8px;padding:12px 16px;line-height:1.5">'
+        $html     = '<div class="imm-tk-bubble">'
             . ($position === 'above' ? $figure : '')
             . nl2br($message)
             . ($position === 'below' ? $figure : '')
             . '</div>';
         echo wp_kses($html, [
-            'div' => ['style' => []],
+            'div' => ['class' => []],
             'img' => ['src' => [], 'alt' => [], 'style' => []],
             'a'   => ['href' => []],
             'b'   => [],
@@ -650,33 +965,34 @@ class IMM_TK_Admin
 
     private static function render_share(): void
     {
-        echo '<p>' . esc_html__('WhatsApp channels and Signal groups cannot be posted to automatically without costs or breaking their rules. Here you find everything ready to post by hand: the text (with WhatsApp formatting) and story images for status updates, Signal stories and Instagram.', 'event-toolkit-for-custom-fields') . '</p>';
         if (!IMM_TK_Settings::is_configured()) {
             return;
         }
+        echo '<p>' . esc_html__('WhatsApp channels and Signal groups cannot be posted to automatically without costs or breaking their rules. Everything here is ready to post by hand: the text with WhatsApp formatting, and story images for status updates, Signal stories and Instagram.', 'event-toolkit-for-custom-fields') . '</p>';
         if (!IMM_TK_Sharepic::available()) {
             echo '<div class="notice notice-warning inline"><p>' . esc_html__('Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it. The texts work without it.', 'event-toolkit-for-custom-fields') . '</p></div>';
         }
         echo '<p class="imm-tk-share-hint" data-imm-share-hint hidden>' . esc_html__('On your phone, "Share" hands the images and the text directly to WhatsApp, Signal or Instagram.', 'event-toolkit-for-custom-fields') . '</p>';
 
         $selection = self::live_selection();
-        echo '<h2>' . esc_html__('Weekly preview', 'event-toolkit-for-custom-fields') . '</h2>';
-        echo '<p>' . esc_html(self::preview_note()) . '</p>';
+        echo '<h2 class="imm-tk-section-title">' . esc_html__('Weekly preview', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<p class="imm-tk-panel-note">' . esc_html(self::preview_note()) . '</p>';
         if (IMM_TK_Digest::is_empty($selection)) {
             echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
         } else {
             self::share_card(IMM_TK_Sharepic::week_frames($selection), IMM_TK_Share::week_text($selection), IMM_TK_Share::week_text($selection, true));
         }
 
-        echo '<h2>' . esc_html__('Single events', 'event-toolkit-for-custom-fields') . '</h2>';
-        echo '<p>' . esc_html__('One announcement the day before and one on the day. Share the one that fits today.', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<h2 class="imm-tk-section-title">' . esc_html__('Single events', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<p class="imm-tk-panel-note">' . esc_html__('One announcement the day before and one on the day. Share the one that fits today.', 'event-toolkit-for-custom-fields') . '</p>';
         $days = IMM_TK_Share::upcoming_days(14);
         if (!$days) {
             echo '<p>' . esc_html__('No events in the next 14 days.', 'event-toolkit-for-custom-fields') . '</p>';
             return;
         }
         foreach ($days as $date => $events) {
-            echo '<h3>' . esc_html(IMM_TK_Sharepic::long_date($events[0])) . '</h3>';
+            echo '<section class="imm-tk-day">';
+            self::date_badge($events[0]->start);
             echo '<div class="imm-tk-share-pair">';
             foreach (['tomorrow' => __('The day before', 'event-toolkit-for-custom-fields'), 'today' => __('On the day', 'event-toolkit-for-custom-fields')] as $variant => $label) {
                 $text  = [];
@@ -685,12 +1001,23 @@ class IMM_TK_Admin
                     $text[]  = IMM_TK_Share::event_text($e, $variant);
                     $plain[] = IMM_TK_Share::event_text($e, $variant, true);
                 }
-                echo '<div class="imm-tk-share-col"><h4>' . esc_html($label) . '</h4>';
+                echo '<div class="imm-tk-share-col"><h3>' . esc_html($label) . '</h3>';
                 self::share_card(IMM_TK_Sharepic::day_frames($events, $variant), implode("\n\n", $text), implode("\n\n", $plain));
                 echo '</div>';
             }
-            echo '</div>';
+            echo '</div></section>';
         }
+    }
+
+    /** Day of the month, large, with weekday and month: a page of a tear-off calendar. */
+    private static function date_badge(DateTimeImmutable $day, bool $today = false): void
+    {
+        $ts = $day->getTimestamp();
+        $tz = $day->getTimezone();
+        echo '<div class="imm-tk-date' . ($today ? ' is-today' : '') . '">';
+        echo '<span class="imm-tk-date-day">' . esc_html(wp_date('j', $ts, $tz)) . '</span>';
+        echo '<span class="imm-tk-date-rest">' . esc_html(wp_date('l', $ts, $tz)) . '<br>' . esc_html(wp_date('F', $ts, $tz)) . '</span>';
+        echo '</div>';
     }
 
     /** Images, text and buttons for one thing to share. */
@@ -708,11 +1035,11 @@ class IMM_TK_Admin
             echo '</div>';
         }
         echo '<div class="imm-tk-share-body">';
-        echo '<textarea class="large-text code" rows="8" readonly>' . esc_textarea($text) . '</textarea>';
+        echo '<textarea class="large-text" rows="8" readonly aria-label="' . esc_attr__('Text to share', 'event-toolkit-for-custom-fields') . '">' . esc_textarea($text) . '</textarea>';
         echo '<p class="imm-tk-share-buttons">';
         echo '<button type="button" class="button button-primary" data-imm-share hidden>' . esc_html__('Share …', 'event-toolkit-for-custom-fields') . '</button> ';
         echo '<button type="button" class="button" data-imm-copy="formatted">' . esc_html__('Copy text', 'event-toolkit-for-custom-fields') . '</button> ';
-        echo '<button type="button" class="button" data-imm-copy="plain">' . esc_html__('Copy without formatting (Signal)', 'event-toolkit-for-custom-fields') . '</button> ';
+        echo '<button type="button" class="button" data-imm-copy="plain">' . esc_html__('Copy for Signal', 'event-toolkit-for-custom-fields') . '</button> ';
         echo '<a class="button" href="' . esc_url(IMM_TK_Share::whatsapp_url($text)) . '" target="_blank" rel="noopener">' . esc_html__('Open in WhatsApp', 'event-toolkit-for-custom-fields') . '</a>';
         echo '</p></div></div>';
     }
@@ -737,7 +1064,7 @@ class IMM_TK_Admin
             }
         }
 
-        echo '<p>' . esc_html__('Posts stories to your Instagram account through the official Instagram API, free of charge: the weekly overview on the day of the weekly preview, and for every event one story the day before and one on the day.', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
         echo '<p>' . esc_html__('Stories posted through the API cannot contain link stickers. The images show your web address instead.', 'event-toolkit-for-custom-fields') . '</p>';
         if (!IMM_TK_Sharepic::available()) {
             echo '<div class="notice notice-warning inline"><p>' . esc_html__('Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it.', 'event-toolkit-for-custom-fields') . '</p></div>';
@@ -760,14 +1087,16 @@ class IMM_TK_Admin
         if ($state['account_type'] !== '' && $state['account_type'] !== 'BUSINESS') {
             $rows[__('Note', 'event-toolkit-for-custom-fields')] = __('Instagram allows stories through the API only for business accounts. Switch the account type in the Instagram app (free of charge).', 'event-toolkit-for-custom-fields');
         }
-        echo '<table class="widefat striped" style="max-width:900px;margin:1em 0"><tbody>';
-        foreach ($rows as $label => $value) {
-            echo '<tr><th style="width:12em">' . esc_html($label) . '</th><td>' . esc_html($value) . '</td></tr>';
+        self::status_list($rows);
+        $connected = IMM_IG_Instagram::is_ready();
+        if (!$connected) {
+            self::panel([self::class, 'render_instagram_setup']);
         }
-        echo '</tbody></table>';
         ?>
         <form method="post" action="options.php">
             <?php settings_fields('imm_ig'); ?>
+            <section class="imm-tk-panel">
+            <h2><?php esc_html_e('Connection and schedule', 'event-toolkit-for-custom-fields'); ?></h2>
             <table class="form-table" role="presentation">
                 <tr>
                     <th scope="row"><?php esc_html_e('Automatic stories', 'event-toolkit-for-custom-fields'); ?></th>
@@ -801,42 +1130,57 @@ class IMM_TK_Admin
                     </td>
                 </tr>
             </table>
+            </section>
             <?php submit_button(__('Save settings', 'event-toolkit-for-custom-fields')); ?>
         </form>
         <?php
-        if (IMM_IG_Instagram::is_ready()) {
-            echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="display:inline-block;margin-right:8px">';
+        if ($connected) {
+            echo '<div class="imm-tk-actions">';
+            echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
             echo '<input type="hidden" name="action" value="imm_ig_check">';
             wp_nonce_field('imm_ig_check');
             submit_button(__('Check connection', 'event-toolkit-for-custom-fields'), 'secondary', 'submit', false);
             echo '</form>';
             if (IMM_IG_Instagram::get('enabled')) {
-                echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="display:inline-block">';
+                echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
                 echo '<input type="hidden" name="action" value="imm_ig_post_now">';
                 wp_nonce_field('imm_ig_post_now');
                 submit_button(__('Post today\'s stories now', 'event-toolkit-for-custom-fields'), 'secondary', 'submit', false);
                 echo '</form>';
+            }
+            echo '</div>';
+            if (IMM_IG_Instagram::get('enabled')) {
                 echo '<p class="description">' . esc_html__('Posts the stories planned for today that are not online yet. Stories already posted are not posted twice.', 'event-toolkit-for-custom-fields') . '</p>';
             }
+            echo '<details class="imm-tk-details"><summary>' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</summary>';
+            self::render_instagram_setup();
+            echo '</details>';
         }
 
-        self::render_instagram_plan();
-
+        echo '</div><aside class="imm-tk-aside">';
+        self::panel([self::class, 'render_instagram_plan']);
         if ($state['log']) {
-            echo '<h2>' . esc_html__('Recent activity', 'event-toolkit-for-custom-fields') . '</h2><table class="widefat striped" style="max-width:900px"><tbody>';
-            foreach (array_slice($state['log'], 0, 15) as $entry) {
-                echo '<tr><td style="width:12em">' . esc_html(wp_date($format, (int) $entry[0])) . '</td><td' . (empty($entry[2]) ? ' style="color:#b32d2e"' : '') . '>' . esc_html((string) $entry[1]) . '</td></tr>';
-            }
-            echo '</tbody></table>';
+            self::panel(function () use ($state, $format) {
+                echo '<h2>' . esc_html__('Recent activity', 'event-toolkit-for-custom-fields') . '</h2><ul class="imm-tk-log">';
+                foreach (array_slice($state['log'], 0, 15) as $entry) {
+                    echo '<li' . (empty($entry[2]) ? ' class="is-error"' : '') . '><time>' . esc_html(wp_date($format, (int) $entry[0])) . '</time> ' . esc_html((string) $entry[1]) . '</li>';
+                }
+                echo '</ul>';
+            });
         }
+        echo '</aside></div>';
+    }
 
-        echo '<h2>' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</h2><ol>';
+    /** Steps to connect an Instagram account. */
+    private static function render_instagram_setup(): void
+    {
+        echo '<h2>' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</h2><ol class="imm-tk-steps">';
         echo '<li>' . esc_html__('In the Instagram app, switch the account to a business account (Settings → Account type and tools). This is free.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '<li>' . wp_kses(__('On <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">developers.facebook.com</a>, create an app of the type "Business" and add the product "Instagram" with "API setup with Instagram login".', 'event-toolkit-for-custom-fields'), ['a' => ['href' => [], 'target' => [], 'rel' => []]]) . '</li>';
         echo '<li>' . esc_html__('Under "Generate access tokens", add your Instagram account and generate a token. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '<li>' . esc_html__('Paste the token above and save. The plugin reads the account and renews the token every week. If the site is unreachable for more than 60 days, generate a new token.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '</ol>';
-        echo '<p>' . esc_html__('Instagram downloads the story images from your site, so the uploads folder must be publicly reachable (no maintenance mode or password protection).', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<p class="imm-tk-panel-note">' . esc_html__('Instagram downloads the story images from your site, so the uploads folder must be publicly reachable (no maintenance mode or password protection).', 'event-toolkit-for-custom-fields') . '</p>';
     }
 
     /** The stories of the next seven days, with images. */
@@ -846,11 +1190,14 @@ class IMM_TK_Admin
             return;
         }
         echo '<h2>' . esc_html__('Plan for the next 7 days', 'event-toolkit-for-custom-fields') . '</h2>';
+        if (!IMM_IG_Scheduler::active()) {
+            echo '<p class="imm-tk-panel-note">' . esc_html__('This is what would go out once the stories are switched on.', 'event-toolkit-for-custom-fields') . '</p>';
+        }
         $tz     = wp_timezone();
         $run    = IMM_IG_Scheduler::next_run(new DateTimeImmutable('today', $tz));
         $posted = (array) IMM_IG_Instagram::state()['posted'];
         $any    = false;
-        echo '<table class="widefat striped imm-tk-plan" style="max-width:900px"><tbody>';
+        echo '<ol class="imm-tk-plan">';
         for ($i = 0; $i < 7; $i++) {
             $day   = $run->modify('+' . $i . ' days');
             $items = IMM_IG_Scheduler::plan($day);
@@ -858,18 +1205,31 @@ class IMM_TK_Admin
                 continue;
             }
             $any = true;
-            echo '<tr><th style="width:12em">' . esc_html(wp_date('D, ' . get_option('date_format'), $day->getTimestamp(), $tz)) . '</th><td>';
+            echo '<li><h3>' . esc_html(wp_date('l, ' . get_option('date_format') . ', ' . get_option('time_format'), $day->getTimestamp(), $tz)) . '</h3><ul>';
             foreach ($items as $item) {
-                $done = isset($posted[$item['key']]) ? ' ✓' : '';
-                $img  = IMM_TK_Sharepic::available() ? '<img src="' . esc_url(IMM_TK_Share::image_url($item['spec'])) . '" alt="" width="54" height="96" loading="lazy">' : '';
-                echo '<span class="imm-tk-plan-item">' . wp_kses($img, ['img' => ['src' => [], 'alt' => [], 'width' => [], 'height' => [], 'loading' => []]]) . '<span>' . esc_html($item['label'] . $done) . '</span></span>';
+                self::story_chip($item['spec'], $item['label'], isset($posted[$item['key']]));
             }
-            echo '</td></tr>';
+            echo '</ul></li>';
         }
-        echo '</tbody></table>';
+        echo '</ol>';
         if (!$any) {
             echo '<p>' . esc_html__('No stories in the next 7 days.', 'event-toolkit-for-custom-fields') . '</p>';
         }
+    }
+
+    /** A story thumbnail with its label. */
+    private static function story_chip(array $spec, string $label, bool $done = false): void
+    {
+        echo '<li class="imm-tk-story">';
+        if (IMM_TK_Sharepic::available()) {
+            $url = IMM_TK_Share::image_url($spec);
+            echo '<a href="' . esc_url($url) . '" target="_blank" rel="noopener"><img src="' . esc_url($url) . '" alt="" width="45" height="80" loading="lazy"></a>';
+        }
+        echo '<span>' . esc_html($label);
+        if ($done) {
+            echo ' <em class="imm-tk-done">' . esc_html__('posted', 'event-toolkit-for-custom-fields') . '</em>';
+        }
+        echo '</span></li>';
     }
 
     public static function handle_ig_check(): void

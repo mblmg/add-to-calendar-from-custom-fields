@@ -37,6 +37,13 @@
 		return Promise.resolve();
 	}
 
+	// Read-only address fields: select everything on focus, ready to copy.
+	document.addEventListener('focusin', function (event) {
+		if (event.target.matches && event.target.matches('[data-imm-select]')) {
+			event.target.select();
+		}
+	});
+
 	document.addEventListener('click', function (event) {
 		var button = event.target.closest('[data-imm-copy], [data-imm-share]');
 		if (!button) {

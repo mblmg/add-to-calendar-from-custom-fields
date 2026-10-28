@@ -32,7 +32,7 @@ includes/class-share.php                   share texts for messengers, image end
 includes/telegram/                         Telegram: settings (imm_tg_settings), Bot API, weekly and "Today" schedule
 includes/instagram/                        Instagram: settings and API (imm_ig_settings), daily story schedule
 assets/                                    admin script and styles, bundled fonts (SIL OFL 1.1)
-includes/class-admin.php                   settings page with tabs
+includes/class-admin.php                   admin menu "Event Toolkit": overview and one page per area
 includes/class-abilities.php               abilities (WordPress Abilities API) for AI agents / MCP
 includes/shortcode.php                     [imm_calendar_link]
 includes/breakdance*.php                   Breakdance dynamic data fields

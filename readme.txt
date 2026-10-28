@@ -40,7 +40,7 @@ Once a week, a preview of what is coming up: the events of the next days, plus t
 
 **Share by hand**
 
-* WhatsApp channels and Signal groups cannot be automated without costs or breaking their rules. The tab "Share" has everything ready: the text with WhatsApp formatting, a plain version for Signal, the story images, and a "Share" button that hands both to the apps on your phone.
+* WhatsApp channels and Signal groups cannot be automated without costs or breaking their rules. The page "Share" has everything ready: the text with WhatsApp formatting, a plain version for Signal, the story images, and a "Share" button that hands both to the apps on your phone.
 * Optional reminder mail at the time of the weekly preview.
 
 **Page builders**
@@ -72,8 +72,8 @@ Base path and file names can be changed in the settings.
 == Installation ==
 
 1. Install and activate the plugin.
-2. Go to Settings → Event Toolkit.
-3. In the tab "Events", enter the post type of your events and the names of your date, time and location fields. The tab lists the field names of a sample event and shows a preview of the next events, so you can check the result right away.
+2. Open "Event Toolkit" in the admin menu. The overview shows what goes out in the coming days and which channels are on.
+3. On the page "Events", enter the post type of your events and the names of your date, time and location fields. The page lists the field names of a sample event and shows a preview of the next events, so you can check the result right away.
 4. Add the calendar links to your event template:
    * Breakdance: choose the dynamic data category "Add to Calendar" in the link field of a button or text link.
    * Any other theme or builder: use the shortcode, e.g. `[imm_calendar_link type="ics" text="Add to calendar"]`.
@@ -101,7 +101,7 @@ If another plugin already outputs event markup for the same posts, turn the opti
 
 = How do I connect Telegram? =
 
-1. In Telegram, create a bot with @BotFather (`/newbot`) and paste the token in the tab "Telegram".
+1. In Telegram, create a bot with @BotFather (`/newbot`) and paste the token on the page "Telegram".
 2. Add the bot to your group (or as administrator to your channel). In a group with topics, send `/start@YourBotName` in the topic the preview should go to. The bot does not answer; it only reads the chat ID.
 3. Click "Find chats", copy the chat ID (and topic ID) into the settings and save.
 4. Check the preview, post it once to test, then turn on "Post automatically every week".
@@ -111,25 +111,25 @@ If another plugin already outputs event markup for the same posts, turn the opti
 1. Switch your Instagram account to a business account (free, in the Instagram app). Instagram only allows stories through the API for business accounts.
 2. On developers.facebook.com, create an app of the type "Business" and add the product "Instagram" with "API setup with Instagram login".
 3. Under "Generate access tokens", add your account and generate a token. The app can stay in development mode, because it only posts to your own account.
-4. Paste the token in the tab "Instagram", check the plan for the next days and turn on automatic stories.
+4. Paste the token on the page "Instagram", check the plan for the next days and turn on automatic stories.
 
 The plugin renews the token every week. Instagram downloads the images from your site, so the uploads folder must be publicly reachable.
 
 = Can the stories contain a link? =
 
-No. Instagram does not allow link stickers in stories posted through the API. The images show your web address instead (bottom line in the tab "Share").
+No. Instagram does not allow link stickers in stories posted through the API. The images show your web address instead (bottom line on the page "Share").
 
 = Which fonts do the story images use? =
 
-The main fonts of your website: the plugin reads them from Breakdance or from the theme (theme.json). Image rendering needs TrueType or OpenType files, while websites usually load WOFF2. If the theme does not ship a .ttf or .otf, the plugin downloads the font once from Google Fonts. Fonts that are not available there fall back to the bundled fonts Syne and Atkinson Hyperlegible Mono. You can also enter other fonts in the tab "Share".
+The main fonts of your website: the plugin reads them from Breakdance or from the theme (theme.json). Image rendering needs TrueType or OpenType files, while websites usually load WOFF2. If the theme does not ship a .ttf or .otf, the plugin downloads the font once from Google Fonts. Fonts that are not available there fall back to the bundled fonts Syne and Atkinson Hyperlegible Mono. You can also enter other fonts on the page "Share".
 
 = Why can't the plugin post to WhatsApp or Signal? =
 
-WhatsApp has no interface for channels, and its business API charges per message and recipient in groups. Signal has no bot interface, and its terms forbid automated messages. Services that work around this break those rules and risk your number being blocked. The tab "Share" makes posting by hand quick instead.
+WhatsApp has no interface for channels, and its business API charges per message and recipient in groups. Signal has no bot interface, and its terms forbid automated messages. Services that work around this break those rules and risk your number being blocked. The page "Share" makes posting by hand quick instead.
 
 = How do I use the newsletter feed? =
 
-Create an RSS campaign in your newsletter service and enter the feed address shown in the tab "Weekly preview". The feed has one entry per week with the whole preview as HTML, so the service sends one mail per week. In weeks without upcoming or new events the feed stays empty, and no mail is sent.
+Create an RSS campaign in your newsletter service and enter the feed address shown on the page "Weekly preview". The feed has one entry per week with the whole preview as HTML, so the service sends one mail per week. In weeks without upcoming or new events the feed stays empty, and no mail is sent.
 
 = The Telegram post came late. =
 
@@ -157,7 +157,7 @@ The first three only return what visitors can see on the website anyway. Posting
 * Filter `imm_tk_digest_email_html` ($html, $selection): change the newsletter HTML.
 * Filter `imm_tg_message` ($message, $selection): change the Telegram message (Telegram HTML).
 * Filter `imm_tg_today_message` ($message, $events): change the silent "Today" message.
-* Filter `imm_tk_share_text` ($text): change the texts in the tab "Share".
+* Filter `imm_tk_share_text` ($text): change the texts on the page "Share".
 * Filter `imm_tk_sharepic_fonts` ($files): font files of the story images (`display`, `text`, `bold`).
 * Filter `imm_tk_site_fonts` ($fonts): the detected fonts of the website (`heading`, `text`).
 * Filter `imm_ig_plan` ($items, $now): change the stories planned for a day.
@@ -188,9 +188,9 @@ No data about visitors of your site is sent. [Terms of Service](https://telegram
 
 No data about visitors of your site is sent. [Terms of Use](https://help.instagram.com/581066165581870), [Platform Terms](https://developers.facebook.com/terms/), [Privacy Policy](https://privacycenter.instagram.com/policy)
 
-**Google Fonts (optional).** Only when the story images use the fonts of your website and the theme does not ship them as .ttf or .otf file, the plugin downloads these font files once from Google Fonts (fonts.googleapis.com, fonts.gstatic.com), provided by Google LLC, and keeps them in the uploads folder. Only the font name and weight are sent. Choose "Bundled fonts" in the tab "Share" to avoid this. [Privacy Policy](https://policies.google.com/privacy), [Google Fonts FAQ](https://developers.google.com/fonts/faq/privacy)
+**Google Fonts (optional).** Only when the story images use the fonts of your website and the theme does not ship them as .ttf or .otf file, the plugin downloads these font files once from Google Fonts (fonts.googleapis.com, fonts.gstatic.com), provided by Google LLC, and keeps them in the uploads folder. Only the font name and weight are sent. Choose "Bundled fonts" on the page "Share" to avoid this. [Privacy Policy](https://policies.google.com/privacy), [Google Fonts FAQ](https://developers.google.com/fonts/faq/privacy)
 
-**WhatsApp (optional).** The button "Open in WhatsApp" in the tab "Share" opens wa.me with the text filled in. This only happens when an administrator clicks it. [Privacy Policy](https://www.whatsapp.com/legal/privacy-policy)
+**WhatsApp (optional).** The button "Open in WhatsApp" on the page "Share" opens wa.me with the text filled in. This only happens when an administrator clicks it. [Privacy Policy](https://www.whatsapp.com/legal/privacy-policy)
 
 **Google Rich Results Test.** The settings page contains a link to this Google tool. Clicking it opens the tool with the address of one of your event pages. Nothing is sent unless an administrator clicks the link.
 
@@ -203,7 +203,8 @@ The bundled fonts Syne (by Bonjour Monde) and Atkinson Hyperlegible Mono (by Bra
 = 2.1.0 =
 * New: story images (1080 × 1920) for the weekly preview and every event, in the fonts (including the heading weight) and colours of your website.
 * New: Instagram stories through the official API: the weekly overview, and every event the day before and on the day.
-* New: tab "Share" with ready texts and images for WhatsApp, Signal and Instagram, and an optional reminder mail.
+* New: own admin menu "Event Toolkit" with an overview of the coming days and all channels.
+* New: page "Share" with ready texts and images for WhatsApp, Signal and Instagram, and an optional reminder mail.
 * New: optional silent "Today" message in Telegram on event days.
 * New: newsletter feed optionally only in weeks in which an event was added.
 

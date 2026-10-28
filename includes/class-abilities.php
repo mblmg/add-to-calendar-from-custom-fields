@@ -227,7 +227,7 @@ class IMM_TK_Abilities
     public static function post_to_telegram($input = null)
     {
         if (!IMM_TG_Settings::is_ready()) {
-            return new WP_Error('imm_tg_not_ready', __('Telegram is not set up: enter bot token and chat ID in the tab "Telegram".', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('imm_tg_not_ready', __('Telegram is not set up: enter bot token and chat ID on the page "Telegram".', 'event-toolkit-for-custom-fields'));
         }
         $now       = new DateTimeImmutable('now', wp_timezone());
         $selection = IMM_TK_Digest::select($now, $now);

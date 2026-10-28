@@ -196,7 +196,7 @@ class IMM_TK_Share
         if (IMM_TK_Digest::is_empty($selection)) {
             return;
         }
-        $link    = add_query_arg(['page' => IMM_TK_Admin::PAGE, 'tab' => 'share'], admin_url('options-general.php'));
+        $link    = IMM_TK_Admin::url('share');
         $body    = [
             __('The weekly preview is out. To share it in WhatsApp or Signal, copy the text below, or open the share page for the story images and the announcements of the single events:', 'event-toolkit-for-custom-fields'),
             $link,
