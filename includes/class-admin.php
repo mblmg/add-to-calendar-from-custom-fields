@@ -1040,11 +1040,11 @@ class IMM_TK_Admin
         if (!IMM_TK_Settings::is_configured()) {
             return;
         }
-        echo '<p>' . esc_html__('WhatsApp channels and Signal groups cannot be posted to automatically without costs or breaking their rules. Everything here is ready to post by hand: the text with WhatsApp formatting, and story images for status updates, Signal stories and Instagram.', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<p>' . esc_html__('WhatsApp channels and Signal groups cannot be posted to automatically without costs or breaking their rules. Everything here is ready to post by hand: the text, and story images for status updates, Signal stories and Instagram.', 'event-toolkit-for-custom-fields') . '</p>';
         if (!IMM_TK_Sharepic::available()) {
             echo '<div class="notice notice-warning inline"><p>' . esc_html__('Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it. The texts work without it.', 'event-toolkit-for-custom-fields') . '</p></div>';
         }
-        echo '<p class="imm-tk-share-hint" data-imm-share-hint hidden>' . esc_html__('On your phone, "Share" hands the images and the text directly to WhatsApp, Signal or Instagram.', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<p class="imm-tk-share-hint" data-imm-share-hint hidden>' . esc_html__('"Share images and text" hands both to WhatsApp, Signal, Instagram or another app on this phone. On a computer, download the images and copy the text.', 'event-toolkit-for-custom-fields') . '</p>';
 
         $selection = self::live_selection();
         echo '<h2 class="imm-tk-section-title">' . esc_html__('Weekly preview', 'event-toolkit-for-custom-fields') . '</h2>';
@@ -1052,7 +1052,7 @@ class IMM_TK_Admin
         if (IMM_TK_Digest::is_empty($selection)) {
             echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
         } else {
-            self::share_card(IMM_TK_Sharepic::week_frames($selection), IMM_TK_Share::week_text($selection), IMM_TK_Share::week_text($selection, true));
+            self::share_card(IMM_TK_Sharepic::week_frames($selection), IMM_TK_Share::week_text($selection, true));
         }
 
         echo '<h2 class="imm-tk-section-title">' . esc_html__('Single events', 'event-toolkit-for-custom-fields') . '</h2>';
@@ -1067,14 +1067,12 @@ class IMM_TK_Admin
             self::date_badge($events[0]->start);
             echo '<div class="imm-tk-share-pair">';
             foreach (['tomorrow' => __('The day before', 'event-toolkit-for-custom-fields'), 'today' => __('On the day', 'event-toolkit-for-custom-fields')] as $variant => $label) {
-                $text  = [];
-                $plain = [];
+                $text = [];
                 foreach ($events as $e) {
-                    $text[]  = IMM_TK_Share::event_text($e, $variant);
-                    $plain[] = IMM_TK_Share::event_text($e, $variant, true);
+                    $text[] = IMM_TK_Share::event_text($e, $variant, true);
                 }
                 echo '<div class="imm-tk-share-col"><h3>' . esc_html($label) . '</h3>';
-                self::share_card(IMM_TK_Sharepic::day_frames($events, $variant), implode("\n\n", $text), implode("\n\n", $plain));
+                self::share_card(IMM_TK_Sharepic::day_frames($events, $variant), implode("\n\n", $text));
                 echo '</div>';
             }
             echo '</div>';
@@ -1118,11 +1116,14 @@ class IMM_TK_Admin
         echo '</div>';
     }
 
-    /** Images, text and buttons for one thing to share. */
-    private static function share_card(array $frames, string $text, string $plain): void
+    /**
+     * Images, text and buttons for one thing to share. The text is plain (no WhatsApp formatting),
+     * so it fits every messenger. "Share …" only appears on phones that can hand images to apps.
+     */
+    private static function share_card(array $frames, string $text): void
     {
         $images = IMM_TK_Sharepic::available() ? $frames : [];
-        echo '<div class="imm-tk-share" data-plain="' . esc_attr($plain) . '" data-copied="' . esc_attr__('Copied', 'event-toolkit-for-custom-fields') . '">';
+        echo '<div class="imm-tk-share" data-copied="' . esc_attr__('Copied', 'event-toolkit-for-custom-fields') . '" data-error="' . esc_attr__('Sharing did not work:', 'event-toolkit-for-custom-fields') . '">';
         if ($images) {
             echo '<div class="imm-tk-share-images">';
             foreach ($images as $spec) {
@@ -1135,11 +1136,11 @@ class IMM_TK_Admin
         echo '<div class="imm-tk-share-body">';
         echo '<textarea class="large-text" rows="8" readonly aria-label="' . esc_attr__('Text to share', 'event-toolkit-for-custom-fields') . '">' . esc_textarea($text) . '</textarea>';
         echo '<p class="imm-tk-share-buttons">';
-        echo '<button type="button" class="button button-primary" data-imm-share hidden>' . esc_html__('Share …', 'event-toolkit-for-custom-fields') . '</button> ';
-        echo '<button type="button" class="button" data-imm-copy="formatted">' . esc_html__('Copy text', 'event-toolkit-for-custom-fields') . '</button> ';
-        echo '<button type="button" class="button" data-imm-copy="plain">' . esc_html__('Copy for Signal', 'event-toolkit-for-custom-fields') . '</button> ';
-        echo '<a class="button" href="' . esc_url(IMM_TK_Share::whatsapp_url($text)) . '" target="_blank" rel="noopener">' . esc_html__('Open in WhatsApp', 'event-toolkit-for-custom-fields') . '</a>';
-        echo '</p></div></div>';
+        if ($images) {
+            echo '<button type="button" class="button button-primary" data-imm-share hidden>' . esc_html__('Share images and text …', 'event-toolkit-for-custom-fields') . '</button> ';
+        }
+        echo '<button type="button" class="button" data-imm-copy>' . esc_html__('Copy text', 'event-toolkit-for-custom-fields') . '</button>';
+        echo '</p><p class="imm-tk-share-error" role="alert" hidden></p></div></div>';
     }
 
     /* ------------------------------------------------------------------ Instagram */

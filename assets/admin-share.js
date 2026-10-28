@@ -1,17 +1,67 @@
-/* Event Toolkit for Custom Fields: share helpers on the settings page. */
+/* Event Toolkit for Custom Fields: share helpers on the admin pages. */
 (function () {
 	'use strict';
 
+	// "Share images and text" only where it works: touch devices whose browser can hand
+	// image files to other apps (Web Share API Level 2). On computers it stays hidden.
+	var touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
 	var canShareFiles = false;
 	try {
-		canShareFiles = !!(navigator.canShare && navigator.canShare({ files: [new File([''], 'x.jpg', { type: 'image/jpeg' })] }));
+		canShareFiles = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [new File(['x'], 'x.jpg', { type: 'image/jpeg' })] }));
 	} catch (e) {
 		canShareFiles = false;
 	}
-	if (canShareFiles) {
-		document.querySelectorAll('[data-imm-share], [data-imm-share-hint]').forEach(function (el) {
+	var sharing = touch && canShareFiles;
+
+	// Browsers open the share sheet only right after a tap. So the images are loaded
+	// in advance, and the tap calls navigator.share() without waiting for the network.
+	var files = new WeakMap();
+
+	function loadFiles(card) {
+		if (!files.has(card)) {
+			var images = Array.prototype.slice.call(card.querySelectorAll('img[data-full]'));
+			files.set(card, Promise.all(images.map(function (img, i) {
+				return fetch(img.getAttribute('data-full'), { credentials: 'same-origin' })
+					.then(function (r) {
+						if (!r.ok) {
+							throw new Error('HTTP ' + r.status);
+						}
+						return r.blob();
+					})
+					.then(function (blob) {
+						return new File([blob], 'story-' + (i + 1) + '.jpg', { type: 'image/jpeg' });
+					});
+			})).then(function (list) {
+				card.immFiles = list;
+				return list;
+			}));
+		}
+		return files.get(card);
+	}
+
+	if (sharing) {
+		document.querySelectorAll('[data-imm-share-hint]').forEach(function (el) {
 			el.hidden = false;
 		});
+		document.querySelectorAll('[data-imm-share]').forEach(function (button) {
+			button.hidden = false;
+			var card = button.closest('.imm-tk-share');
+			button.disabled = true;
+			loadFiles(card).then(function () {
+				button.disabled = false;
+			}).catch(function (error) {
+				showError(card, error);
+			});
+		});
+	}
+
+	function showError(card, error) {
+		var box = card.querySelector('.imm-tk-share-error');
+		if (!box) {
+			return;
+		}
+		box.textContent = (card.getAttribute('data-error') || 'Sharing did not work:') + ' ' + (error && error.message ? error.message : String(error));
+		box.hidden = false;
 	}
 
 	function flash(button, card) {
@@ -51,34 +101,34 @@
 		}
 		var card = button.closest('.imm-tk-share');
 		var text = card.querySelector('textarea').value;
+		var box  = card.querySelector('.imm-tk-share-error');
+		if (box) {
+			box.hidden = true;
+		}
 
 		if (button.hasAttribute('data-imm-copy')) {
-			if (button.getAttribute('data-imm-copy') === 'plain') {
-				text = card.getAttribute('data-plain');
-			}
 			copy(text).then(function () {
 				flash(button, card);
+			}).catch(function (error) {
+				showError(card, error);
 			});
 			return;
 		}
 
-		// Share: hand the images (and the text) to the share sheet of the phone.
-		var images = Array.prototype.slice.call(card.querySelectorAll('img[data-full]'));
-		button.disabled = true;
-		Promise.all(images.map(function (img, i) {
-			return fetch(img.getAttribute('data-full'), { credentials: 'same-origin' })
-				.then(function (r) { return r.blob(); })
-				.then(function (blob) { return new File([blob], 'story-' + (i + 1) + '.jpg', { type: 'image/jpeg' }); });
-		})).then(function (files) {
-			var data = { files: files, text: text };
-			if (!navigator.canShare(data)) {
-				data = { files: files };
+		// Share: called directly in the tap, with the images loaded beforehand.
+		var list = card.immFiles;
+		if (!list || !list.length) {
+			return;
+		}
+		var data = { files: list, text: text };
+		if (!navigator.canShare(data)) {
+			data = { files: list };
+		}
+		navigator.share(data).catch(function (error) {
+			if (error && error.name === 'AbortError') {
+				return; // Closed the share sheet.
 			}
-			return navigator.share(data);
-		}).catch(function () {
-			/* Cancelled or not supported. */
-		}).then(function () {
-			button.disabled = false;
+			showError(card, error);
 		});
 	});
 })();

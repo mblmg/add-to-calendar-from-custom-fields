@@ -83,11 +83,6 @@ class IMM_TK_Share
         return $plain ? str_replace('*', '', $text) : $text;
     }
 
-    /** Opens WhatsApp (app or web) with the text filled in. The admin picks the chat or channel there. */
-    public static function whatsapp_url(string $text): string
-    {
-        return 'https://wa.me/?text=' . rawurlencode($text);
-    }
 
     /* ------------------------------------------------------------ what to share */
 

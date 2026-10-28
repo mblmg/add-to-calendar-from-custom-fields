@@ -25,6 +25,11 @@
 	color: var(--imm-ink);
 }
 
+/* WordPress gives .button a display value, which would override the hidden attribute. */
+.imm-tk [hidden] {
+	display: none !important;
+}
+
 /* ---------------------------------------------------------------- header and navigation */
 
 .imm-tk-head h1 {
@@ -904,4 +909,9 @@
 	display: block;
 	margin-bottom: 4px;
 	color: var(--imm-muted);
+}
+
+.imm-tk-share-error {
+	margin: 8px 0 0;
+	color: var(--imm-error);
 }

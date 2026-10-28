@@ -60,7 +60,7 @@ Once a week, a preview of what is coming up: the events of the next days, plus t
 
 **Share by hand**
 
-* WhatsApp channels and Signal groups cannot be automated without costs or breaking their rules. The page "Share" has everything ready: the text with WhatsApp formatting, a plain version for Signal, the story images, and a "Share" button that hands both to the apps on your phone.
+* WhatsApp channels and Signal groups cannot be automated without costs or breaking their rules. The page "Share" has everything ready: the text to copy, the story images to download, and on phones a button that hands images and text to WhatsApp, Signal, Instagram or any other app.
 * Optional reminder mail at the time of the weekly preview.
 
 **Page builders**
@@ -218,8 +218,6 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 
 **Emailit (optional).** Only when you choose Emailit for direct sending and enter an API key, the plugin connects to api.emailit.com, provided by Emailit, at the same occasions as for Brevo, with the same content. [Terms](https://emailit.com/terms/), [Privacy Policy](https://emailit.com/privacy/)
 
-**WhatsApp (optional).** The button "Open in WhatsApp" on the page "Share" opens wa.me with the text filled in. This only happens when an administrator clicks it. [Privacy Policy](https://www.whatsapp.com/legal/privacy-policy)
-
 **Google Rich Results Test.** The settings page contains a link to this Google tool. Clicking it opens the tool with the address of one of your event pages. Nothing is sent unless an administrator clicks the link.
 
 == Credits ==
@@ -234,6 +232,7 @@ The bundled fonts Syne (by Bonjour Monde) and Atkinson Hyperlegible Mono (by Bra
 * New: cancelled and postponed events, read from a status field, in search engines, calendars, the weekly preview, texts and story images; one notice on Telegram, Mastodon and Bluesky.
 * New: QR code of every event page (SVG and PNG).
 * The overview shows newsletter, Mastodon and Bluesky.
+* Share page: one "Copy text" button (plain text for every messenger); "Share images and text" only on phones, with the images loaded in advance so the share sheet opens reliably.
 
 = 2.1.0 =
 * New: story images (1080 × 1920) for the weekly preview and every event, in the fonts (including the heading weight) and colours of your website.

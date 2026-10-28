@@ -11,7 +11,7 @@ msgstr ""
 
 #. Description of the plugin
 #: event-toolkit-for-custom-fields.php
-msgid "Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters, Instagram stories and story images to share. Extra dynamic data fields for Breakdance and abilities for AI agents."
+msgid "Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for newsletters, Telegram, Mastodon and Bluesky, Instagram stories, story images and QR codes, and cancellations everywhere at once. Extra dynamic data fields for Breakdance and abilities for AI agents."
 msgstr ""
 
 #: event-toolkit-for-custom-fields.php:27
@@ -96,7 +96,7 @@ msgid "Search engines"
 msgstr ""
 
 #. translators: %s: link to the page "Weekly preview"
-#: includes/class-admin.php:139 includes/class-admin.php:409 includes/class-admin.php:480 includes/class-admin.php:796 includes/class-admin.php:1050 includes/class-admin.php:1417 includes/class-admin.php:1561 includes/social/class-social.php:225
+#: includes/class-admin.php:139 includes/class-admin.php:409 includes/class-admin.php:480 includes/class-admin.php:796 includes/class-admin.php:1050 includes/class-admin.php:1418 includes/class-admin.php:1562 includes/social/class-social.php:225
 msgid "Weekly preview"
 msgstr ""
 
@@ -644,7 +644,7 @@ msgstr ""
 msgid "Calendar subscription address"
 msgstr ""
 
-#: includes/class-admin.php:573 includes/class-admin.php:862 includes/class-admin.php:1232 includes/class-admin.php:1422 includes/class-admin.php:1660
+#: includes/class-admin.php:573 includes/class-admin.php:862 includes/class-admin.php:1233 includes/class-admin.php:1423 includes/class-admin.php:1661
 msgid "Save settings"
 msgstr ""
 
@@ -677,7 +677,7 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-#: includes/class-admin.php:669 includes/class-admin.php:725 includes/class-admin.php:769 includes/class-admin.php:958 includes/class-admin.php:1462 includes/class-admin.php:1680 includes/class-admin.php:1688
+#: includes/class-admin.php:669 includes/class-admin.php:725 includes/class-admin.php:769 includes/class-admin.php:958 includes/class-admin.php:1463 includes/class-admin.php:1681 includes/class-admin.php:1689
 msgid "Preview"
 msgstr ""
 
@@ -739,7 +739,7 @@ msgstr ""
 msgid "Enter this address in an RSS campaign of your newsletter service (e.g. Brevo, CleverReach or Mailchimp). The feed contains one entry per issue with the whole preview, so the service sends one mail per week. In weeks with no upcoming and no new events, the feed stays empty and no mail is sent."
 msgstr ""
 
-#: includes/class-admin.php:772 includes/class-admin.php:963 includes/class-admin.php:1053 includes/class-admin.php:1465 includes/class-admin.php:1683
+#: includes/class-admin.php:772 includes/class-admin.php:963 includes/class-admin.php:1053 includes/class-admin.php:1466 includes/class-admin.php:1684
 msgid "Right now there would be nothing in it: no events in the coming days and nothing new."
 msgstr ""
 
@@ -764,11 +764,11 @@ msgstr ""
 msgid "Bot token"
 msgstr ""
 
-#: includes/class-admin.php:813 includes/class-admin.php:1207 includes/class-admin.php:1389 includes/class-admin.php:1648
+#: includes/class-admin.php:813 includes/class-admin.php:1208 includes/class-admin.php:1390 includes/class-admin.php:1649
 msgid "Saved. Leave empty to keep it."
 msgstr ""
 
-#: includes/class-admin.php:815 includes/class-admin.php:1209
+#: includes/class-admin.php:815 includes/class-admin.php:1210
 msgid "Delete token"
 msgstr ""
 
@@ -812,11 +812,11 @@ msgstr ""
 msgid "Shows the preview of the next event page with its image, as when you post a link yourself. Image, title and description come from the page (e.g. set by your SEO plugin)."
 msgstr ""
 
-#: includes/class-admin.php:846 includes/class-admin.php:1419
+#: includes/class-admin.php:846 includes/class-admin.php:1420
 msgid "Cancellations"
 msgstr ""
 
-#: includes/class-admin.php:848 includes/class-admin.php:1419
+#: includes/class-admin.php:848 includes/class-admin.php:1420
 msgid "Post a short notice when an upcoming event is cancelled or postponed"
 msgstr ""
 
@@ -824,11 +824,11 @@ msgstr ""
 msgid "Needs the status field on the page \"Events\". Goes out once, about a minute after saving."
 msgstr ""
 
-#: includes/class-admin.php:853 includes/class-admin.php:1418
+#: includes/class-admin.php:853 includes/class-admin.php:1419
 msgid "On event days"
 msgstr ""
 
-#: includes/class-admin.php:855 includes/class-admin.php:1418
+#: includes/class-admin.php:855 includes/class-admin.php:1419
 msgid "Short \"Today\" post at"
 msgstr ""
 
@@ -905,12 +905,12 @@ msgstr ""
 msgid "Goes to the chat and topic above. Does not change the weekly schedule."
 msgstr ""
 
-#: includes/class-admin.php:1000 includes/class-admin.php:1019 includes/class-admin.php:1336 includes/class-admin.php:1361 includes/class-admin.php:1490 includes/class-admin.php:1513 includes/class-admin.php:1707 includes/class-admin.php:1719 includes/class-share.php:143
+#: includes/class-admin.php:1000 includes/class-admin.php:1019 includes/class-admin.php:1337 includes/class-admin.php:1362 includes/class-admin.php:1491 includes/class-admin.php:1514 includes/class-admin.php:1708 includes/class-admin.php:1720 includes/class-share.php:138
 msgid "Not allowed."
 msgstr ""
 
 #: includes/class-admin.php:1043
-msgid "WhatsApp channels and Signal groups cannot be posted to automatically without costs or breaking their rules. Everything here is ready to post by hand: the text with WhatsApp formatting, and story images for status updates, Signal stories and Instagram."
+msgid "WhatsApp channels and Signal groups cannot be posted to automatically without costs or breaking their rules. Everything here is ready to post by hand: the text, and story images for status updates, Signal stories and Instagram."
 msgstr ""
 
 #: includes/class-admin.php:1045
@@ -918,7 +918,7 @@ msgid "Story images need the PHP extension GD with FreeType and JPEG support. As
 msgstr ""
 
 #: includes/class-admin.php:1047
-msgid "On your phone, \"Share\" hands the images and the text directly to WhatsApp, Signal or Instagram."
+msgid "\"Share images and text\" hands both to WhatsApp, Signal, Instagram or another app on this phone. On a computer, download the images and copy the text."
 msgstr ""
 
 #: includes/class-admin.php:1058
@@ -941,509 +941,505 @@ msgstr ""
 msgid "On the day"
 msgstr ""
 
-#: includes/class-admin.php:1097
+#: includes/class-admin.php:1095
 msgid "QR code for posters"
 msgstr ""
 
-#: includes/class-admin.php:1125
+#: includes/class-admin.php:1126
 msgid "Copied"
 msgstr ""
 
-#: includes/class-admin.php:1131
+#: includes/class-admin.php:1126
+msgid "Sharing did not work:"
+msgstr ""
+
+#: includes/class-admin.php:1132
 msgid "Download"
 msgstr ""
 
-#: includes/class-admin.php:1136
+#: includes/class-admin.php:1137
 msgid "Text to share"
 msgstr ""
 
-#: includes/class-admin.php:1138
-msgid "Share …"
+#: includes/class-admin.php:1140
+msgid "Share images and text …"
 msgstr ""
 
-#: includes/class-admin.php:1139
+#: includes/class-admin.php:1142
 msgid "Copy text"
 msgstr ""
 
-#: includes/class-admin.php:1140
-msgid "Copy for Signal"
-msgstr ""
-
-#: includes/class-admin.php:1141
-msgid "Open in WhatsApp"
-msgstr ""
-
-#: includes/class-admin.php:1166
+#: includes/class-admin.php:1167
 msgid "Stories posted through the API cannot contain link stickers. The images show your web address instead."
 msgstr ""
 
-#: includes/class-admin.php:1168
+#: includes/class-admin.php:1169
 msgid "Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it."
 msgstr ""
 
-#: includes/class-admin.php:1175
+#: includes/class-admin.php:1176
 msgid "Account"
 msgstr ""
 
-#: includes/class-admin.php:1175
+#: includes/class-admin.php:1176
 msgid "not connected"
 msgstr ""
 
-#: includes/class-admin.php:1176
+#: includes/class-admin.php:1177
 msgid "Next stories"
 msgstr ""
 
-#: includes/class-admin.php:1176
+#: includes/class-admin.php:1177
 msgid "not scheduled (turn on automatic stories and save an access token)"
 msgstr ""
 
-#: includes/class-admin.php:1179 includes/class-admin.php:1204 includes/class-admin.php:1402
+#: includes/class-admin.php:1180 includes/class-admin.php:1205 includes/class-admin.php:1403
 msgid "Access token"
 msgstr ""
 
 #. translators: %s: date
-#: includes/class-admin.php:1181
+#: includes/class-admin.php:1182
 msgid "valid until about %s, renewed automatically every week"
 msgstr ""
 
-#: includes/class-admin.php:1186
+#: includes/class-admin.php:1187
 msgid "Note"
 msgstr ""
 
-#: includes/class-admin.php:1186
+#: includes/class-admin.php:1187
 msgid "Instagram allows stories through the API only for business accounts. Switch the account type in the Instagram app (free of charge)."
 msgstr ""
 
-#: includes/class-admin.php:1197
+#: includes/class-admin.php:1198
 msgid "Connection and schedule"
 msgstr ""
 
-#: includes/class-admin.php:1200
+#: includes/class-admin.php:1201
 msgid "Automatic stories"
 msgstr ""
 
-#: includes/class-admin.php:1201
+#: includes/class-admin.php:1202
 msgid "Post stories automatically"
 msgstr ""
 
-#: includes/class-admin.php:1211
+#: includes/class-admin.php:1212
 msgid "See \"Connect Instagram\" below. Keep the token secret."
 msgstr ""
 
-#: includes/class-admin.php:1215
+#: includes/class-admin.php:1216
 msgid "Time of day"
 msgstr ""
 
-#: includes/class-admin.php:1218
+#: includes/class-admin.php:1219
 msgid "All stories of a day go out at this time. Stories stay visible for 24 hours, so the story of the day before ends when the one of the day begins."
 msgstr ""
 
-#: includes/class-admin.php:1222
+#: includes/class-admin.php:1223
 msgid "Stories"
 msgstr ""
 
-#: includes/class-admin.php:1224
+#: includes/class-admin.php:1225
 msgid "Weekly overview, on the day of the weekly preview"
 msgstr ""
 
-#: includes/class-admin.php:1225
+#: includes/class-admin.php:1226
 msgid "Every event the day before"
 msgstr ""
 
-#: includes/class-admin.php:1226
+#: includes/class-admin.php:1227
 msgid "Every event on the day"
 msgstr ""
 
-#: includes/class-admin.php:1227
+#: includes/class-admin.php:1228
 msgid "So that followers do not see the same event too often: on the day of the weekly overview there is no extra story for the next day, and more than three events on one day share one story."
 msgstr ""
 
-#: includes/class-admin.php:1240 includes/class-admin.php:1429 includes/class-admin.php:1665
+#: includes/class-admin.php:1241 includes/class-admin.php:1430 includes/class-admin.php:1666
 msgid "Check connection"
 msgstr ""
 
-#: includes/class-admin.php:1246
+#: includes/class-admin.php:1247
 msgid "Post today's stories now"
 msgstr ""
 
-#: includes/class-admin.php:1251
+#: includes/class-admin.php:1252
 msgid "Posts the stories planned for today that are not online yet. Stories already posted are not posted twice."
 msgstr ""
 
-#: includes/class-admin.php:1253 includes/class-admin.php:1275
+#: includes/class-admin.php:1254 includes/class-admin.php:1276
 msgid "Connect Instagram"
 msgstr ""
 
-#: includes/class-admin.php:1262 includes/class-admin.php:1446 includes/class-admin.php:1694
+#: includes/class-admin.php:1263 includes/class-admin.php:1447 includes/class-admin.php:1695
 msgid "Recent activity"
 msgstr ""
 
-#: includes/class-admin.php:1276
+#: includes/class-admin.php:1277
 msgid "In the Instagram app, switch the account to a business account (Settings → Account type and tools). This is free."
 msgstr ""
 
-#: includes/class-admin.php:1277
+#: includes/class-admin.php:1278
 msgid "On <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a>, create an app of the type \"Business\" and add the product \"Instagram\" with \"API setup with Instagram login\"."
 msgstr ""
 
-#: includes/class-admin.php:1278
+#: includes/class-admin.php:1279
 msgid "Under \"Generate access tokens\", add your Instagram account and generate a token. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it."
 msgstr ""
 
-#: includes/class-admin.php:1279
+#: includes/class-admin.php:1280
 msgid "Paste the token above and save. The plugin reads the account and renews the token every week. If the site is unreachable for more than 60 days, generate a new token."
 msgstr ""
 
-#: includes/class-admin.php:1281
+#: includes/class-admin.php:1282
 msgid "Instagram downloads the story images from your site, so the uploads folder must be publicly reachable (no maintenance mode or password protection)."
 msgstr ""
 
-#: includes/class-admin.php:1290
+#: includes/class-admin.php:1291
 msgid "Plan for the next 7 days"
 msgstr ""
 
-#: includes/class-admin.php:1292
+#: includes/class-admin.php:1293
 msgid "This is what would go out once the stories are switched on."
 msgstr ""
 
-#: includes/class-admin.php:1314
+#: includes/class-admin.php:1315
 msgid "No stories in the next 7 days."
 msgstr ""
 
-#: includes/class-admin.php:1328 includes/class-admin.php:1527
+#: includes/class-admin.php:1329 includes/class-admin.php:1528
 msgid "posted"
 msgstr ""
 
 #. translators: 1: Instagram username, 2: number of posts in the last 24 hours
-#: includes/class-admin.php:1348
+#: includes/class-admin.php:1349
 msgid "Connected with @%1$s. Posts through the API in the last 24 hours: %2$s."
 msgstr ""
 
-#: includes/class-admin.php:1367
+#: includes/class-admin.php:1368
 msgid "Error"
 msgstr ""
 
 #. translators: %d: number of stories
-#: includes/class-admin.php:1370
+#: includes/class-admin.php:1371
 msgid "Stories posted: %d"
 msgstr ""
 
-#: includes/class-admin.php:1372
+#: includes/class-admin.php:1373
 msgid "Nothing to post: no stories planned for today, or all of them are online already."
 msgstr ""
 
-#: includes/class-admin.php:1391 includes/class-admin.php:1650
+#: includes/class-admin.php:1392 includes/class-admin.php:1651
 msgid "Delete"
 msgstr ""
 
-#: includes/class-admin.php:1400 includes/class-admin.php:1408
+#: includes/class-admin.php:1401 includes/class-admin.php:1409
 msgid "Post"
 msgstr ""
 
-#: includes/class-admin.php:1400
+#: includes/class-admin.php:1401
 msgid "Post to Mastodon"
 msgstr ""
 
-#: includes/class-admin.php:1401 includes/class-admin.php:1413
+#: includes/class-admin.php:1402 includes/class-admin.php:1414
 msgid "Server"
 msgstr ""
 
-#: includes/class-admin.php:1404
+#: includes/class-admin.php:1405
 msgid "In Mastodon: Preferences → Development → New application. Allow \"write:statuses\" and \"write:media\", save, and copy \"Your access token\"."
 msgstr ""
 
-#: includes/class-admin.php:1408
+#: includes/class-admin.php:1409
 msgid "Post to Bluesky"
 msgstr ""
 
-#: includes/class-admin.php:1409
+#: includes/class-admin.php:1410
 msgid "Handle"
 msgstr ""
 
-#: includes/class-admin.php:1410
+#: includes/class-admin.php:1411
 msgid "App password"
 msgstr ""
 
-#: includes/class-admin.php:1412
+#: includes/class-admin.php:1413
 msgid "In Bluesky: Settings → Privacy and security → App passwords → Add. Not your normal password."
 msgstr ""
 
-#: includes/class-admin.php:1413
+#: includes/class-admin.php:1414
 msgid "Only change this if your account is on its own server."
 msgstr ""
 
-#: includes/class-admin.php:1416
+#: includes/class-admin.php:1417
 msgid "What is posted"
 msgstr ""
 
-#: includes/class-admin.php:1417
+#: includes/class-admin.php:1418
 msgid "At the time of the weekly preview"
 msgstr ""
 
-#: includes/class-admin.php:1418
+#: includes/class-admin.php:1419
 msgid "Not on the day of the weekly preview, which already lists the events."
 msgstr ""
 
-#: includes/class-admin.php:1420
+#: includes/class-admin.php:1421
 msgid "Images"
 msgstr ""
 
-#: includes/class-admin.php:1420
+#: includes/class-admin.php:1421
 msgid "Attach the story images (up to four, with the text as image description)"
 msgstr ""
 
-#: includes/class-admin.php:1434
+#: includes/class-admin.php:1435
 msgid "Post the weekly preview now"
 msgstr ""
 
 #. translators: 1: network name, 2: length of the text, 3: maximum length
-#: includes/class-admin.php:1471
+#: includes/class-admin.php:1472
 msgid "%1$s (%2$d of %3$d characters)"
 msgstr ""
 
-#: includes/class-admin.php:1522
+#: includes/class-admin.php:1523
 msgid "nothing to post"
 msgstr ""
 
-#: includes/class-admin.php:1550
+#: includes/class-admin.php:1551
 msgid "Two ways to send"
 msgstr ""
 
-#: includes/class-admin.php:1552
+#: includes/class-admin.php:1553
 msgid "RSS feed"
 msgstr ""
 
-#: includes/class-admin.php:1552
+#: includes/class-admin.php:1553
 msgid "Your newsletter service fetches the weekly preview from the feed and sends it on its own schedule. Works with every service that has RSS-to-email, for example Brevo, Mailchimp or MailerLite."
 msgstr ""
 
-#: includes/class-admin.php:1553
+#: includes/class-admin.php:1554
 msgid "Direct"
 msgstr ""
 
-#: includes/class-admin.php:1553
+#: includes/class-admin.php:1554
 msgid "The plugin creates the campaign at the time of the weekly preview and sends it through the interface of Brevo or Emailit. Needed for Emailit, which has no RSS-to-email."
 msgstr ""
 
-#: includes/class-admin.php:1556
+#: includes/class-admin.php:1557
 msgid "Feed address"
 msgstr ""
 
 #. translators: %s: link to the page "Weekly preview"
-#: includes/class-admin.php:1560
+#: includes/class-admin.php:1561
 msgid "Both ways send nothing in weeks without upcoming events. \"Only with news\" and the feed itself are set on the page %s."
 msgstr ""
 
-#: includes/class-admin.php:1566
+#: includes/class-admin.php:1567
 msgid "Connect your service"
 msgstr ""
 
-#: includes/class-admin.php:1569
+#: includes/class-admin.php:1570
 msgid "Brevo with the RSS feed"
 msgstr ""
 
-#: includes/class-admin.php:1571
+#: includes/class-admin.php:1572
 msgid "In Brevo, open Integrations and add \"RSS campaign\"."
 msgstr ""
 
-#: includes/class-admin.php:1572
+#: includes/class-admin.php:1573
 msgid "Paste the feed address and load the feed."
 msgstr ""
 
-#: includes/class-admin.php:1573
+#: includes/class-admin.php:1574
 msgid "In the template, replace the description in the repeated block with <code>{{ item.CONTENT_ENCODED }}</code>. Without it, the mail only shows the title and the list of event names, not the whole preview."
 msgstr ""
 
-#: includes/class-admin.php:1574
+#: includes/class-admin.php:1575
 msgid "Choose the contact list, subject and sender."
 msgstr ""
 
-#: includes/class-admin.php:1575
+#: includes/class-admin.php:1576
 msgid "Schedule: weekly, on the day of the weekly preview, at least one hour after its time. Brevo creates no campaign when the feed has nothing new."
 msgstr ""
 
-#: includes/class-admin.php:1576
+#: includes/class-admin.php:1577
 msgid "Save and activate."
 msgstr ""
 
-#: includes/class-admin.php:1578
+#: includes/class-admin.php:1579
 msgid "Brevo help: RSS campaign"
 msgstr ""
 
-#: includes/class-admin.php:1581
+#: includes/class-admin.php:1582
 msgid "Brevo, sent directly"
 msgstr ""
 
-#: includes/class-admin.php:1583
+#: includes/class-admin.php:1584
 msgid "In Brevo, create an API key (account menu, \"SMTP & API\", tab \"API keys\")."
 msgstr ""
 
-#: includes/class-admin.php:1584
+#: includes/class-admin.php:1585
 msgid "Note the ID of the contact list (Contacts, Lists)."
 msgstr ""
 
-#: includes/class-admin.php:1585
+#: includes/class-admin.php:1586
 msgid "Use a sender address that is verified in Brevo (Senders, domains)."
 msgstr ""
 
-#: includes/class-admin.php:1586
+#: includes/class-admin.php:1587
 msgid "Enter everything below, choose \"Brevo\", send a test mail and switch on sending."
 msgstr ""
 
-#: includes/class-admin.php:1591
+#: includes/class-admin.php:1592
 msgid "Emailit, sent directly"
 msgstr ""
 
-#: includes/class-admin.php:1593
+#: includes/class-admin.php:1594
 msgid "In Emailit, verify your sending domain."
 msgstr ""
 
-#: includes/class-admin.php:1594
+#: includes/class-admin.php:1595
 msgid "Create an audience for the newsletter and note its ID (starts with <code>aud_</code>)."
 msgstr ""
 
-#: includes/class-admin.php:1595
+#: includes/class-admin.php:1596
 msgid "Create an API key with full access (scope \"full\"); campaigns need it."
 msgstr ""
 
-#: includes/class-admin.php:1596
+#: includes/class-admin.php:1597
 msgid "Enter everything below, choose \"Emailit\", send a test mail and switch on sending."
 msgstr ""
 
-#: includes/class-admin.php:1598
+#: includes/class-admin.php:1599
 msgid "Emailit documentation: campaigns"
 msgstr ""
 
-#: includes/class-admin.php:1603
+#: includes/class-admin.php:1604
 msgid "Automations, Classic automations, \"Share blog updates\"."
 msgstr ""
 
-#: includes/class-admin.php:1604
+#: includes/class-admin.php:1605
 msgid "Enter the feed address and choose weekly sending on the day of the weekly preview."
 msgstr ""
 
-#: includes/class-admin.php:1605
+#: includes/class-admin.php:1606
 msgid "In the content, use <code>*|RSSITEMS:|*</code> <code>*|RSSITEM:CONTENT_FULL|*</code> <code>*|END:RSSITEMS|*</code> for the whole preview."
 msgstr ""
 
-#: includes/class-admin.php:1607
+#: includes/class-admin.php:1608
 msgid "Mailchimp help: RSS merge tags"
 msgstr ""
 
-#: includes/class-admin.php:1612
+#: includes/class-admin.php:1613
 msgid "Create a campaign of the type \"RSS campaign\" (only in paid plans)."
 msgstr ""
 
-#: includes/class-admin.php:1613
+#: includes/class-admin.php:1614
 msgid "Enter the feed address, choose weekly sending and \"only new posts\"."
 msgstr ""
 
-#: includes/class-admin.php:1614
+#: includes/class-admin.php:1615
 msgid "In the design, add an RSS block and choose the full content."
 msgstr ""
 
-#: includes/class-admin.php:1616
+#: includes/class-admin.php:1617
 msgid "MailerLite help: RSS campaign"
 msgstr ""
 
-#: includes/class-admin.php:1619
+#: includes/class-admin.php:1620
 msgid "Other services"
 msgstr ""
 
-#: includes/class-admin.php:1621
+#: includes/class-admin.php:1622
 msgid "Look for \"RSS-to-email\" or \"RSS campaign\"."
 msgstr ""
 
-#: includes/class-admin.php:1622
+#: includes/class-admin.php:1623
 msgid "Send weekly, only new entries, with the full content of the entry (field content:encoded), not just the description."
 msgstr ""
 
-#: includes/class-admin.php:1639
+#: includes/class-admin.php:1640
 msgid "In the EU, newsletters need a double opt-in and the legal notice of the sender. Signup forms come from your newsletter service."
 msgstr ""
 
-#: includes/class-admin.php:1642
+#: includes/class-admin.php:1643
 msgid "Send directly"
 msgstr ""
 
-#: includes/class-admin.php:1646
+#: includes/class-admin.php:1647
 msgid "Sending"
 msgstr ""
 
-#: includes/class-admin.php:1646
+#: includes/class-admin.php:1647
 msgid "Send the weekly preview to the list at its time"
 msgstr ""
 
-#: includes/class-admin.php:1646
+#: includes/class-admin.php:1647
 msgid "Leave this off if your service already uses the RSS feed, or subscribers get two mails."
 msgstr ""
 
-#: includes/class-admin.php:1647
+#: includes/class-admin.php:1648
 msgid "Service"
 msgstr ""
 
-#: includes/class-admin.php:1647
+#: includes/class-admin.php:1648
 msgid "Choose …"
 msgstr ""
 
-#: includes/class-admin.php:1648
+#: includes/class-admin.php:1649
 msgid "API key"
 msgstr ""
 
-#: includes/class-admin.php:1653
+#: includes/class-admin.php:1654
 msgid "List or audience"
 msgstr ""
 
-#: includes/class-admin.php:1653
+#: includes/class-admin.php:1654
 msgid "Brevo: number of the contact list, e.g. <code>3</code>. Emailit: audience ID, e.g. <code>aud_…</code>."
 msgstr ""
 
-#: includes/class-admin.php:1654
+#: includes/class-admin.php:1655
 msgid "Sender name"
 msgstr ""
 
-#: includes/class-admin.php:1655
+#: includes/class-admin.php:1656
 msgid "Sender address"
 msgstr ""
 
-#: includes/class-admin.php:1655
+#: includes/class-admin.php:1656
 msgid "Must be verified with the service."
 msgstr ""
 
-#: includes/class-admin.php:1656
+#: includes/class-admin.php:1657
 msgid "Subject"
 msgstr ""
 
-#: includes/class-admin.php:1656
+#: includes/class-admin.php:1657
 msgid "Empty = \"Weekly preview\" with the date."
 msgstr ""
 
-#: includes/class-admin.php:1657
+#: includes/class-admin.php:1658
 msgid "Footer"
 msgstr ""
 
-#: includes/class-admin.php:1657
+#: includes/class-admin.php:1658
 msgid "Name and postal address of the sender (legal notice). The unsubscribe link is added automatically."
 msgstr ""
 
-#: includes/class-admin.php:1658
+#: includes/class-admin.php:1659
 msgid "Test address"
 msgstr ""
 
-#: includes/class-admin.php:1665
+#: includes/class-admin.php:1666
 msgid "Send a test mail"
 msgstr ""
 
-#: includes/class-admin.php:1671
+#: includes/class-admin.php:1672
 msgid "The test mail goes only to the test address, not to the list."
 msgstr ""
 
-#: includes/class-admin.php:1725
+#: includes/class-admin.php:1726
 msgid "Nothing to send: no events in the coming days and nothing new."
 msgstr ""
 
 #. translators: %s: e-mail address
-#: includes/class-admin.php:1730
+#: includes/class-admin.php:1731
 msgid "Test mail sent to %s."
 msgstr ""
 
@@ -1601,16 +1597,16 @@ msgstr ""
 msgid "Tomorrow: %s"
 msgstr ""
 
-#: includes/class-share.php:149 includes/class-sharepic.php:134
+#: includes/class-share.php:144 includes/class-sharepic.php:134
 msgid "Unknown image."
 msgstr ""
 
-#: includes/class-share.php:205
+#: includes/class-share.php:200
 msgid "The weekly preview is out. To share it in WhatsApp or Signal, copy the text below, or open the share page for the story images and the announcements of the single events:"
 msgstr ""
 
 #. translators: %s: site name
-#: includes/class-share.php:213
+#: includes/class-share.php:208
 msgid "[%s] Weekly preview to share"
 msgstr ""
 
@@ -1713,7 +1709,7 @@ msgid "Unsubscribe: %s"
 msgstr ""
 
 #. translators: 1: HTTP status code, 2: error message
-#: includes/newsletter/class-newsletter.php:267 includes/social/class-social.php:393
+#: includes/newsletter/class-newsletter.php:267 includes/social/class-social.php:395
 msgid "HTTP %1$d %2$s"
 msgstr ""
 
@@ -1745,12 +1741,12 @@ msgid "[Test] %s"
 msgstr ""
 
 #. translators: 1: Mastodon or Bluesky, 2: what was posted, 3: error message
-#: includes/social/class-social.php:372
+#: includes/social/class-social.php:374
 msgid "%1$s, %2$s – not posted: %3$s"
 msgstr ""
 
 #. translators: 1: Mastodon or Bluesky, 2: what was posted
-#: includes/social/class-social.php:376
+#: includes/social/class-social.php:378
 msgid "%1$s, %2$s – posted."
 msgstr ""
 
