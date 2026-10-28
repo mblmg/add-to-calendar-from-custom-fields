@@ -123,7 +123,7 @@ class IMM_TK_Settings
             'sharepic_footer'   => '', // Empty = address of the programme page.
             'sharepic_fonts'    => 'site', // 'site' = fonts of the website, 'bundled' = Syne and Atkinson Hyperlegible Mono.
             'sharepic_heading_font'   => '', // Empty = detected.
-            'sharepic_heading_weight' => 700,
+            'sharepic_heading_weight' => 0, // 0 = as on the website.
             'sharepic_text_font'      => '',
             'share_reminder'    => 0,
             'share_reminder_to' => get_option('admin_email'),
@@ -237,6 +237,7 @@ class IMM_TK_Settings
                 'bundled' => __('Bundled fonts (Syne, Atkinson Hyperlegible Mono)', 'event-toolkit-for-custom-fields'),
             ],
             'sharepic_heading_weight' => [
+                0   => __('As on the website', 'event-toolkit-for-custom-fields'),
                 400 => __('Regular (400)', 'event-toolkit-for-custom-fields'),
                 500 => __('Medium (500)', 'event-toolkit-for-custom-fields'),
                 600 => __('Semibold (600)', 'event-toolkit-for-custom-fields'),

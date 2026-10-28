@@ -244,6 +244,7 @@ return [
 		'Subscription: subscribe in Google Calendar' => 'Kalender-Abo: in Google Kalender abonnieren',
 		'Fonts of the website' => 'Schriften der Webseite',
 		'Bundled fonts (Syne, Atkinson Hyperlegible Mono)' => 'Mitgelieferte Schriften (Syne, Atkinson Hyperlegible Mono)',
+		'As on the website' => 'Wie auf der Website',
 		'Regular (400)' => 'Normal (400)',
 		'Medium (500)' => 'Medium (500)',
 		'Semibold (600)' => 'Halbfett (600)',

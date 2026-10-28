@@ -923,7 +923,7 @@ msgstr ""
 msgid "D, F j"
 msgstr ""
 
-#: includes/class-digest.php:137 includes/class-sharepic.php:386
+#: includes/class-digest.php:137 includes/class-sharepic.php:422
 msgid "all day"
 msgstr ""
 
@@ -933,7 +933,7 @@ msgid "doors %1$s, start %2$s"
 msgstr ""
 
 #. translators: %s: start time
-#: includes/class-digest.php:151 includes/class-sharepic.php:390
+#: includes/class-digest.php:151 includes/class-sharepic.php:426
 msgid "at %s"
 msgstr ""
 
@@ -983,26 +983,30 @@ msgid "Bundled fonts (Syne, Atkinson Hyperlegible Mono)"
 msgstr ""
 
 #: includes/class-settings.php:240
-msgid "Regular (400)"
+msgid "As on the website"
 msgstr ""
 
 #: includes/class-settings.php:241
-msgid "Medium (500)"
+msgid "Regular (400)"
 msgstr ""
 
 #: includes/class-settings.php:242
-msgid "Semibold (600)"
+msgid "Medium (500)"
 msgstr ""
 
 #: includes/class-settings.php:243
-msgid "Bold (700)"
+msgid "Semibold (600)"
 msgstr ""
 
 #: includes/class-settings.php:244
-msgid "Extra bold (800)"
+msgid "Bold (700)"
 msgstr ""
 
 #: includes/class-settings.php:245
+msgid "Extra bold (800)"
+msgstr ""
+
+#: includes/class-settings.php:246
 msgid "Black (900)"
 msgstr ""
 
@@ -1016,7 +1020,7 @@ msgstr ""
 msgid "Tomorrow: %s"
 msgstr ""
 
-#: includes/class-share.php:145 includes/class-sharepic.php:132
+#: includes/class-share.php:145 includes/class-sharepic.php:134
 msgid "Unknown image."
 msgstr ""
 
@@ -1029,37 +1033,37 @@ msgstr ""
 msgid "[%s] Weekly preview to share"
 msgstr ""
 
-#: includes/class-sharepic.php:135
+#: includes/class-sharepic.php:137
 msgid "Story images need the PHP extension GD with FreeType and JPEG support."
 msgstr ""
 
-#: includes/class-sharepic.php:139
+#: includes/class-sharepic.php:141
 msgid "The event was not found or has no valid date."
 msgstr ""
 
-#: includes/class-sharepic.php:150
+#: includes/class-sharepic.php:152
 msgid "The uploads folder is not writable."
 msgstr ""
 
-#: includes/class-sharepic.php:156
+#: includes/class-sharepic.php:158
 msgid "The image could not be saved."
 msgstr ""
 
-#: includes/class-sharepic.php:353 includes/telegram/class-telegram.php:211
+#: includes/class-sharepic.php:389 includes/telegram/class-telegram.php:211
 msgid "Today"
 msgstr ""
 
-#: includes/class-sharepic.php:353
+#: includes/class-sharepic.php:389
 msgid "Tomorrow"
 msgstr ""
 
 #. translators: long date on story images, see https://www.php.net/manual/datetime.format.php
-#: includes/class-sharepic.php:372
+#: includes/class-sharepic.php:408
 msgid "l, F j"
 msgstr ""
 
 #. translators: short date on story images, see https://www.php.net/manual/datetime.format.php
-#: includes/class-sharepic.php:379
+#: includes/class-sharepic.php:415
 msgid "D, n/j"
 msgstr ""
 

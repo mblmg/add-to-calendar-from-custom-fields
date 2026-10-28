@@ -201,7 +201,7 @@ The bundled fonts Syne (by Bonjour Monde) and Atkinson Hyperlegible Mono (by Bra
 == Changelog ==
 
 = 2.1.0 =
-* New: story images (1080 × 1920) for the weekly preview and every event, in the fonts and colours of your website.
+* New: story images (1080 × 1920) for the weekly preview and every event, in the fonts (including the heading weight) and colours of your website.
 * New: Instagram stories through the official API: the weekly overview, and every event the day before and on the day.
 * New: tab "Share" with ready texts and images for WhatsApp, Signal and Instagram, and an optional reminder mail.
 * New: optional silent "Today" message in Telegram on event days.

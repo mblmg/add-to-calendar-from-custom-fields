@@ -37,7 +37,7 @@ class IMM_TK_Fonts
         $files = self::bundled();
         if (IMM_TK_Settings::get('sharepic_fonts') === 'site') {
             $families = self::families();
-            $weight   = (int) IMM_TK_Settings::get('sharepic_heading_weight');
+            $weight   = (int) IMM_TK_Settings::get('sharepic_heading_weight') ?: self::heading_weight();
             $wanted   = [
                 'display' => [$families['heading'], $weight],
                 'text'    => [$families['text'], 400],
@@ -67,6 +67,32 @@ class IMM_TK_Fonts
             'heading' => $heading !== '' ? $heading : $detected['heading'],
             'text'    => $text !== '' ? $text : $detected['text'],
         ];
+    }
+
+    /**
+     * Weight of the headings on the website (Breakdance or theme.json), 700 if unknown.
+     */
+    public static function heading_weight(): int
+    {
+        $weight = 0;
+        $css    = trailingslashit(wp_upload_dir()['basedir']) . 'breakdance/css/global-settings.css';
+        if (is_readable($css)) {
+            $content = (string) file_get_contents($css); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- local file.
+            // The rule for h1 … h6 (Breakdance writes them in one selector list).
+            preg_match_all('/([^{}]+)\{([^{}]*)\}/', $content, $rules, PREG_SET_ORDER);
+            foreach ($rules as $rule) {
+                $selectors = array_map('trim', explode(',', $rule[1]));
+                if (in_array('h1', $selectors, true) && preg_match('/font-weight\s*:\s*(\d{3})/', $rule[2], $m)) {
+                    $weight = (int) $m[1];
+                }
+            }
+        }
+        if (!$weight && function_exists('wp_get_global_styles')) {
+            $value  = (string) wp_get_global_styles(['elements', 'heading', 'typography', 'fontWeight']);
+            $weight = ctype_digit($value) ? (int) $value : 0;
+        }
+        $weight = (int) apply_filters('imm_tk_site_heading_weight', $weight);
+        return $weight >= 100 && $weight <= 900 ? (int) (round($weight / 100) * 100) : 700;
     }
 
     /**
