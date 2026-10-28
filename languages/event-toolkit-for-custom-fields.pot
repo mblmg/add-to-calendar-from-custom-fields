@@ -90,11 +90,11 @@ msgstr ""
 msgid "Share today"
 msgstr ""
 
-#: includes/class-admin.php:135 includes/class-share-kit.php:45 includes/class-sharepic.php:390 includes/social/class-social.php:291 includes/telegram/class-telegram.php:211
+#: includes/class-admin.php:135 includes/class-share-kit.php:45 includes/class-sharepic.php:402 includes/social/class-social.php:291 includes/telegram/class-telegram.php:211
 msgid "Today"
 msgstr ""
 
-#: includes/class-admin.php:135 includes/class-share-kit.php:46 includes/class-sharepic.php:390
+#: includes/class-admin.php:135 includes/class-share-kit.php:46 includes/class-sharepic.php:402
 msgid "Tomorrow"
 msgstr ""
 
@@ -541,7 +541,7 @@ msgid "Font for text"
 msgstr ""
 
 #: includes/class-admin.php:301
-msgid "Empty = the font detected on the website. If the theme does not ship the font as .ttf or .otf file, it is downloaded once from Google Fonts. Fonts that are not available there fall back to the bundled ones."
+msgid "Empty = the font detected on the website. If the theme does not ship the font as .ttf or .otf file, it is downloaded once from Google Fonts. Fonts that are not available there are replaced by a neutral standard font."
 msgstr ""
 
 #: includes/class-admin.php:302
@@ -679,7 +679,7 @@ msgstr ""
 
 #. translators: %s: font names
 #: includes/class-admin.php:674
-msgid "No fonts detected on the website. Enter them below, or the bundled fonts are used."
+msgid "No fonts detected on the website. Enter them below, or a neutral standard font is used."
 msgstr ""
 
 #: includes/class-admin.php:705
@@ -955,10 +955,6 @@ msgstr ""
 
 #: includes/class-admin.php:1154
 msgid "Stories posted through the API cannot contain link stickers. The images show your web address instead."
-msgstr ""
-
-#: includes/class-admin.php:1156
-msgid "Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it."
 msgstr ""
 
 #: includes/class-admin.php:1163
@@ -1451,7 +1447,7 @@ msgstr ""
 msgid "D, F j"
 msgstr ""
 
-#: includes/class-digest.php:137 includes/class-sharepic.php:423
+#: includes/class-digest.php:137 includes/class-sharepic.php:435
 msgid "all day"
 msgstr ""
 
@@ -1461,7 +1457,7 @@ msgid "doors %1$s, start %2$s"
 msgstr ""
 
 #. translators: %s: start time
-#: includes/class-digest.php:151 includes/class-sharepic.php:427
+#: includes/class-digest.php:151 includes/class-sharepic.php:439
 msgid "at %s"
 msgstr ""
 
@@ -1535,11 +1531,11 @@ msgstr ""
 msgid "QR code of the event page (PNG)"
 msgstr ""
 
-#: includes/class-qr.php:125 includes/class-sharepic.php:142
+#: includes/class-qr.php:125 includes/class-sharepic.php:154
 msgid "The event was not found or has no valid date."
 msgstr ""
 
-#: includes/class-qr.php:135 includes/class-sharepic.php:153
+#: includes/class-qr.php:135 includes/class-sharepic.php:165
 msgid "The uploads folder is not writable."
 msgstr ""
 
@@ -1552,7 +1548,7 @@ msgid "Fonts of the website"
 msgstr ""
 
 #: includes/class-settings.php:243
-msgid "Bundled fonts (Syne, Atkinson Hyperlegible Mono)"
+msgid "Neutral standard font (from WordPress or the server)"
 msgstr ""
 
 #: includes/class-settings.php:246
@@ -1584,7 +1580,7 @@ msgid "Black (900)"
 msgstr ""
 
 #: includes/class-share-kit.php:28
-msgid "Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it. The texts work without it."
+msgid "The texts work without it."
 msgstr ""
 
 #: includes/class-share-kit.php:31
@@ -1661,7 +1657,7 @@ msgstr ""
 msgid "Tomorrow: %s"
 msgstr ""
 
-#: includes/class-share.php:151 includes/class-sharepic.php:135
+#: includes/class-share.php:151 includes/class-sharepic.php:147
 msgid "Unknown image."
 msgstr ""
 
@@ -1674,21 +1670,25 @@ msgstr ""
 msgid "[%s] Weekly preview to share"
 msgstr ""
 
-#: includes/class-sharepic.php:138
-msgid "Story images need the PHP extension GD with FreeType and JPEG support."
+#: includes/class-sharepic.php:51
+msgid "Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it."
 msgstr ""
 
-#: includes/class-sharepic.php:159
+#: includes/class-sharepic.php:54
+msgid "Story images need a font file (.ttf or .otf), and none was found: neither the fonts of the website nor a standard font of the server. Enter a Google font under Story images."
+msgstr ""
+
+#: includes/class-sharepic.php:171
 msgid "The image could not be saved."
 msgstr ""
 
 #. translators: long date on story images, see https://www.php.net/manual/datetime.format.php
-#: includes/class-sharepic.php:409
+#: includes/class-sharepic.php:421
 msgid "l, F j"
 msgstr ""
 
 #. translators: short date on story images, see https://www.php.net/manual/datetime.format.php
-#: includes/class-sharepic.php:416
+#: includes/class-sharepic.php:428
 msgid "D, n/j"
 msgstr ""
 

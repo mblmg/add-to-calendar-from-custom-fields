@@ -24,8 +24,8 @@ class IMM_TK_Share_Kit
         ];
         $admin = self::$o['context'] === 'admin';
 
-        if (!IMM_TK_Sharepic::available()) {
-            self::note(__('Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it. The texts work without it.', 'event-toolkit-for-custom-fields'), 'warning');
+        if (IMM_TK_Sharepic::problem() !== '') {
+            self::note(IMM_TK_Sharepic::problem() . ' ' . __('The texts work without it.', 'event-toolkit-for-custom-fields'), 'warning');
         }
         // Which hint appears depends on what the browser can share (see share.js).
         echo '<p class="imm-tk-share-hint" data-imm-share-hint="files" hidden>' . esc_html__('"Share images and text" hands both to WhatsApp, Signal, Instagram or another app on this phone.', 'event-toolkit-for-custom-fields') . '</p>';

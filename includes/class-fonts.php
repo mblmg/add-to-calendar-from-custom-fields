@@ -6,8 +6,12 @@
  * Detection: Breakdance global settings, then the global styles of the theme (theme.json).
  * GD needs TrueType/OpenType files, which websites rarely ship (they use WOFF2). So the font
  * file comes from the theme if it ships a .ttf/.otf, otherwise it is downloaded once from
- * Google Fonts and kept in uploads/event-toolkit/fonts. If neither works, the bundled fonts
- * (Syne, Atkinson Hyperlegible Mono; SIL OFL 1.1) are used.
+ * Google Fonts and kept in uploads/event-toolkit/fonts.
+ *
+ * The plugin ships no fonts of its own. Without the website's fonts it uses a neutral font that
+ * is already there: from a default theme that comes with WordPress (DM Sans in Twenty
+ * Twenty-Two), or else a common font of the server (DejaVu Sans, Liberation Sans, Noto Sans,
+ * FreeSans, Arial).
  */
 
 defined('ABSPATH') || exit;
@@ -16,25 +20,14 @@ class IMM_TK_Fonts
 {
     const DIR = 'event-toolkit/fonts';
 
-    /** Bundled fallback fonts. */
-    public static function bundled(): array
-    {
-        $dir = IMM_TK_DIR . 'assets/fonts/';
-        return [
-            'display' => $dir . 'Syne-Bold.ttf',
-            'text'    => $dir . 'AtkinsonHyperlegibleMono-Regular.ttf',
-            'bold'    => $dir . 'AtkinsonHyperlegibleMono-Bold.ttf',
-        ];
-    }
-
     /**
-     * Font files for the story images.
+     * Font files for the story images. A role is '' if no font file could be found at all.
      *
      * @return array{display: string, text: string, bold: string}
      */
     public static function files(): array
     {
-        $files = self::bundled();
+        $files = self::standard();
         if (IMM_TK_Settings::get('sharepic_fonts') === 'site') {
             $families = self::families();
             $weight   = (int) IMM_TK_Settings::get('sharepic_heading_weight') ?: self::heading_weight();
@@ -51,6 +44,80 @@ class IMM_TK_Fonts
             }
         }
         return (array) apply_filters('imm_tk_sharepic_fonts', $files);
+    }
+
+    /**
+     * A neutral font that is already on the server: from a WordPress default theme, or a common
+     * system font. Regular and bold of the same family.
+     *
+     * @return array{display: string, text: string, bold: string}
+     */
+    public static function standard(): array
+    {
+        static $found = null;
+        if ($found !== null) {
+            return $found;
+        }
+        $themes = trailingslashit(get_theme_root());
+        $system = ['/usr/share/fonts', '/usr/local/share/fonts', '/Library/Fonts', '/System/Library/Fonts/Supplemental', 'C:/Windows/Fonts'];
+        // Regular and bold file names, searched in the given folders (and one or two levels below).
+        $candidates = [
+            [[$themes . 'twentytwentytwo/assets/fonts/dm-sans'], 'DMSans-Regular.ttf', 'DMSans-Bold.ttf'],
+            [$system, 'DejaVuSans.ttf', 'DejaVuSans-Bold.ttf'],
+            [$system, 'LiberationSans-Regular.ttf', 'LiberationSans-Bold.ttf'],
+            [$system, 'NotoSans-Regular.ttf', 'NotoSans-Bold.ttf'],
+            [$system, 'FreeSans.ttf', 'FreeSansBold.ttf'],
+            [$system, 'Arial.ttf', 'Arial Bold.ttf'],
+            [$system, 'arial.ttf', 'arialbd.ttf'],
+        ];
+        foreach ((array) apply_filters('imm_tk_standard_font_candidates', $candidates) as [$dirs, $regular, $bold]) {
+            foreach ($dirs as $dir) {
+                $r = self::find($dir, $regular);
+                $b = $r !== '' ? self::find($dir, $bold) : '';
+                if ($r !== '') {
+                    $found = ['display' => $b ?: $r, 'text' => $r, 'bold' => $b ?: $r];
+                    return $found;
+                }
+            }
+        }
+        $found = ['display' => '', 'text' => '', 'bold' => ''];
+        return $found;
+    }
+
+    /** A file by name in a folder or up to two folder levels below it. */
+    private static function find(string $dir, string $name): string
+    {
+        if (!self::reachable($dir)) {
+            return '';
+        }
+        foreach (['', '/*', '/*/*'] as $levels) {
+            $matches = glob($dir . $levels . '/' . $name, GLOB_NOSORT);
+            foreach ((array) $matches as $file) {
+                if (is_readable($file)) {
+                    return $file;
+                }
+            }
+        }
+        return '';
+    }
+
+    /** Whether PHP may look into a folder (open_basedir restricts many shared hosts). */
+    private static function reachable(string $dir): bool
+    {
+        $base = (string) ini_get('open_basedir');
+        if ($base !== '') {
+            $allowed = false;
+            foreach (explode(PATH_SEPARATOR, $base) as $prefix) {
+                if ($prefix !== '' && strpos(rtrim($dir, '/') . '/', rtrim($prefix, '/') . '/') === 0) {
+                    $allowed = true;
+                    break;
+                }
+            }
+            if (!$allowed) {
+                return false;
+            }
+        }
+        return is_dir($dir);
     }
 
     /**

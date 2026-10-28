@@ -298,7 +298,7 @@ class IMM_TK_Admin
             'sharepic_fonts'    => [__('Fonts', 'event-toolkit-for-custom-fields'), '', 'choice'],
             'sharepic_heading_font'   => [__('Font for headings', 'event-toolkit-for-custom-fields'), '', 'font'],
             'sharepic_heading_weight' => [__('Weight of headings', 'event-toolkit-for-custom-fields'), '', 'choice'],
-            'sharepic_text_font'      => [__('Font for text', 'event-toolkit-for-custom-fields'), __('Empty = the font detected on the website. If the theme does not ship the font as .ttf or .otf file, it is downloaded once from Google Fonts. Fonts that are not available there fall back to the bundled ones.', 'event-toolkit-for-custom-fields'), 'font'],
+            'sharepic_text_font'      => [__('Font for text', 'event-toolkit-for-custom-fields'), __('Empty = the font detected on the website. If the theme does not ship the font as .ttf or .otf file, it is downloaded once from Google Fonts. Fonts that are not available there are replaced by a neutral standard font.', 'event-toolkit-for-custom-fields'), 'font'],
             'share_reminder'    => [__('Reminder mail', 'event-toolkit-for-custom-fields'), __('At the time of the weekly preview, a mail with the text to share and a link to this page.', 'event-toolkit-for-custom-fields'), 'check', __('Send a reminder to share the weekly preview', 'event-toolkit-for-custom-fields')],
             'share_reminder_to' => [__('Reminder to', 'event-toolkit-for-custom-fields'), '', 'email'],
         ];
@@ -671,7 +671,7 @@ class IMM_TK_Admin
                     echo '<p class="description">' . esc_html($names
                         /* translators: %s: font names */
                         ? sprintf(__('Detected on the website: %s.', 'event-toolkit-for-custom-fields'), implode(', ', $names))
-                        : __('No fonts detected on the website. Enter them below, or the bundled fonts are used.', 'event-toolkit-for-custom-fields')) . '</p>';
+                        : __('No fonts detected on the website. Enter them below, or a neutral standard font is used.', 'event-toolkit-for-custom-fields')) . '</p>';
                 }
                 break;
             case 'font':
@@ -1152,8 +1152,8 @@ class IMM_TK_Admin
 
         echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
         echo '<p>' . esc_html__('Stories posted through the API cannot contain link stickers. The images show your web address instead.', 'event-toolkit-for-custom-fields') . '</p>';
-        if (!IMM_TK_Sharepic::available()) {
-            echo '<div class="notice notice-warning inline"><p>' . esc_html__('Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it.', 'event-toolkit-for-custom-fields') . '</p></div>';
+        if (IMM_TK_Sharepic::problem() !== '') {
+            echo '<div class="notice notice-warning inline"><p>' . esc_html(IMM_TK_Sharepic::problem()) . '</p></div>';
         }
 
         // Status.

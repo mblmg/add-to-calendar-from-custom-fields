@@ -23,7 +23,7 @@ Where the plugin stands and what comes next. Keep this file up to date when a fe
 
 **2.1.0**
 - Own admin menu "Event Toolkit" with an overview: plan of the next 7 days (events and everything that goes out) next to the state of all channels.
-- Story images (1080 × 1920 JPEG, GD) for the weekly preview and every event, in the fonts of the website (Breakdance / theme.json; TTF from the theme or Google Fonts; bundled Syne and Atkinson Hyperlegible Mono as fallback), heading weight as on the website.
+- Story images (1080 × 1920 JPEG, GD) for the weekly preview and every event, in the fonts of the website (Breakdance / theme.json; TTF from the theme or Google Fonts; no bundled fonts: fallback is a neutral font already on the server, DM Sans from Twenty Twenty-Two or a system font), heading weight as on the website.
 - Share page: texts for WhatsApp (formatted) and Signal (plain), copy buttons, wa.me link, image downloads, Web Share on phones; optional reminder mail at issue time.
 - Instagram stories through the official Instagram API (Instagram login): weekly overview, every event the day before and on the day; weekly token refresh, retries, 7-day plan and log.
 - Telegram: optional silent "Today" message on event days.

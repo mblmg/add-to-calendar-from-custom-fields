@@ -123,11 +123,11 @@ class IMM_TK_Settings
             'digest_feed_slug'    => 'weekly',
             'digest_feed_only_new' => 0,
 
-            'sharepic_paper'    => '#faf9fb',
-            'sharepic_ink'      => '#211f26',
-            'sharepic_accent'   => '#cf3716',
+            'sharepic_paper'    => '#ffffff',
+            'sharepic_ink'      => '#1e1e1e',
+            'sharepic_accent'   => '#3858e9',
             'sharepic_footer'   => '', // Empty = address of the programme page.
-            'sharepic_fonts'    => 'site', // 'site' = fonts of the website, 'bundled' = Syne and Atkinson Hyperlegible Mono.
+            'sharepic_fonts'    => 'site', // 'site' = fonts of the website, 'standard' = a neutral font already on the server.
             'sharepic_heading_font'   => '', // Empty = detected.
             'sharepic_heading_weight' => 0, // 0 = as on the website.
             'sharepic_text_font'      => '',
@@ -240,7 +240,7 @@ class IMM_TK_Settings
         return [
             'sharepic_fonts'          => [
                 'site'    => __('Fonts of the website', 'event-toolkit-for-custom-fields'),
-                'bundled' => __('Bundled fonts (Syne, Atkinson Hyperlegible Mono)', 'event-toolkit-for-custom-fields'),
+                'standard' => __('Neutral standard font (from WordPress or the server)', 'event-toolkit-for-custom-fields'),
             ],
             'sharepic_heading_weight' => [
                 0   => __('As on the website', 'event-toolkit-for-custom-fields'),

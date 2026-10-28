@@ -147,7 +147,7 @@ No. Instagram does not allow link stickers in stories posted through the API. Th
 
 = Which fonts do the story images use? =
 
-The main fonts of your website: the plugin reads them from Breakdance or from the theme (theme.json). Image rendering needs TrueType or OpenType files, while websites usually load WOFF2. If the theme does not ship a .ttf or .otf, the plugin downloads the font once from Google Fonts. Fonts that are not available there fall back to the bundled fonts Syne and Atkinson Hyperlegible Mono. You can also enter other fonts on the page "Share".
+The main fonts of your website: the plugin reads them from Breakdance or from the theme (theme.json). Image rendering needs TrueType or OpenType files, while websites usually load WOFF2. If the theme does not ship a .ttf or .otf, the plugin downloads the font once from Google Fonts. The plugin ships no fonts of its own: without the website's fonts it uses a neutral font that is already on the server, DM Sans from the default theme Twenty Twenty-Two or a common system font (DejaVu Sans, Liberation Sans, Noto Sans, FreeSans, Arial). You can also enter other fonts under Event Toolkit → Story images.
 
 = Why can't the plugin post to WhatsApp or Signal? =
 
@@ -234,10 +234,6 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 
 **Google Rich Results Test.** The settings page contains a link to this Google tool. Clicking it opens the tool with the address of one of your event pages. Nothing is sent unless an administrator clicks the link.
 
-== Credits ==
-
-The bundled fonts Syne (by Bonjour Monde) and Atkinson Hyperlegible Mono (by Braille Institute) are licensed under the SIL Open Font License 1.1, see assets/fonts.
-
 == Changelog ==
 
 = 2.2.0 =
@@ -246,6 +242,7 @@ The bundled fonts Syne (by Bonjour Monde) and Atkinson Hyperlegible Mono (by Bra
 * New: cancelled and postponed events, read from a status field, in search engines, calendars, the weekly preview, texts and story images; one notice on Telegram, Mastodon and Bluesky.
 * New: QR code of every event page (SVG and PNG).
 * The overview shows newsletter, Mastodon and Bluesky.
+* Story images: no bundled fonts any more. Without the website's fonts, a neutral font already on the server is used (DM Sans from Twenty Twenty-Two, or a system font). Neutral default colours.
 * New: share button for event pages and share page for members on the website, without a login (shortcodes `[event_toolkit_share_button]` and `[event_toolkit_share_page]`).
 * New: own menu item "Share" for everyone who may write posts, "Share today" first, and a "Share today" box on the dashboard. The settings of the story images moved to their own tab.
 * Share page: one "Copy text" button (plain text for every messenger); "Share images and text" only on phones, with the images loaded in advance so the share sheet opens reliably; text only in browsers that cannot share images (Firefox on Android).

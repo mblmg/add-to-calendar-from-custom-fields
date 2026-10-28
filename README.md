@@ -37,7 +37,7 @@ includes/social/                           Mastodon and Bluesky (imm_so_settings
 includes/newsletter/                       direct sending through Brevo or Emailit (imm_nl_settings)
 includes/class-status.php                  cancelled / postponed events, one-time notices
 includes/class-qr.php                      QR encoder (SVG, PNG, cache in uploads/event-toolkit/qr)
-assets/                                    share script, admin and website styles, bundled fonts (SIL OFL 1.1)
+assets/                                    share script, admin and website styles
 includes/class-admin.php                   admin menu "Event Toolkit": overview and one page per area
 includes/class-abilities.php               abilities (WordPress Abilities API) for AI agents / MCP
 includes/shortcode.php                     [imm_calendar_link]

@@ -28,7 +28,7 @@ class IMM_TK_Sharepic
     const MAX_SINGLE = 3;
     const DIR = 'event-toolkit/stories';
     /** Raise when the layout changes, so cached images are rendered again. */
-    const DESIGN = 2;
+    const DESIGN = 3;
 
     /** Rendering needs GD with FreeType and JPEG support. */
     public static function available(): bool
@@ -37,14 +37,26 @@ class IMM_TK_Sharepic
             return false;
         }
         foreach (self::fonts() as $file) {
-            if (!is_readable($file)) {
+            if ($file === '' || !is_readable($file)) {
                 return false;
             }
         }
         return true;
     }
 
-    /** Font files: the website's fonts or the bundled ones (see IMM_TK_Fonts). */
+    /** Why story images cannot be rendered, or '' if they can. */
+    public static function problem(): string
+    {
+        if (!function_exists('imagettftext') || !function_exists('imagejpeg') || !function_exists('imagerotate')) {
+            return __('Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it.', 'event-toolkit-for-custom-fields');
+        }
+        if (!self::available()) {
+            return __('Story images need a font file (.ttf or .otf), and none was found: neither the fonts of the website nor a standard font of the server. Enter a Google font under Story images.', 'event-toolkit-for-custom-fields');
+        }
+        return '';
+    }
+
+    /** Font files: the website's fonts or a standard font of the server (see IMM_TK_Fonts). */
     public static function fonts(): array
     {
         static $fonts = null;
@@ -135,7 +147,7 @@ class IMM_TK_Sharepic
             return new WP_Error('imm_tk_sharepic_spec', __('Unknown image.', 'event-toolkit-for-custom-fields'));
         }
         if (!self::available()) {
-            return new WP_Error('imm_tk_sharepic_gd', __('Story images need the PHP extension GD with FreeType and JPEG support.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('imm_tk_sharepic_gd', self::problem());
         }
         $events = self::events($spec);
         if (!$events) {
@@ -596,13 +608,14 @@ class IMM_TK_Sharepic
         }
         $y = self::big_word($im, $variant, $p, $word);
 
-        // When: today only the time, tomorrow day and time; with the date as big word the weekday and time.
+        // When: today and with the date as big word only the time, tomorrow day and time.
         if ($e->is_off()) {
             $when = self::long_date($e) . ', ' . IMM_TK_Digest::time($e);
         } elseif ($today) {
             $when = IMM_TK_Digest::time($e);
         } elseif ($dated) {
-            $when = wp_date('l', $e->start->getTimestamp(), $e->start->getTimezone()) . ', ' . IMM_TK_Digest::time($e);
+            // The big word already shows weekday and date.
+            $when = IMM_TK_Digest::time($e);
         } else {
             $when = self::long_date($e) . ', ' . IMM_TK_Digest::time($e);
         }
