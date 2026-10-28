@@ -803,3 +803,39 @@
 .imm-tk-check span {
 	color: var(--imm-muted);
 }
+
+/* ---------------------------------------------------------------- QR codes (share page) */
+
+.imm-tk-qr-row {
+	grid-column: 2;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px 24px;
+	margin: 0 0 12px;
+}
+
+.imm-tk-qr {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0;
+}
+
+.imm-tk-qr img {
+	display: block;
+	width: 72px;
+	height: 72px;
+	background: #fff;
+	border: 1px solid var(--imm-line);
+}
+
+.imm-tk-qr figcaption {
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+@media (max-width: 782px) {
+	.imm-tk-qr-row {
+		grid-column: 1;
+	}
+}

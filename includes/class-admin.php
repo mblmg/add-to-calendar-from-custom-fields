@@ -1033,8 +1033,30 @@ class IMM_TK_Admin
                 self::share_card(IMM_TK_Sharepic::day_frames($events, $variant), implode("\n\n", $text), implode("\n\n", $plain));
                 echo '</div>';
             }
-            echo '</div></section>';
+            echo '</div>';
+            self::render_qr_codes($events);
+            echo '</section>';
         }
+    }
+
+    /** QR codes of the event pages, for posters and flyers. */
+    private static function render_qr_codes(array $events): void
+    {
+        echo '<div class="imm-tk-qr-row">';
+        foreach ($events as $e) {
+            $svg = IMM_TK_QR::file($e->id, 'svg');
+            $png = IMM_TK_QR::file($e->id, 'png');
+            if (is_wp_error($svg)) {
+                continue;
+            }
+            echo '<figure class="imm-tk-qr"><img src="' . esc_url($svg['url']) . '" alt="" width="72" height="72" loading="lazy">'
+                . '<figcaption><strong>' . esc_html__('QR code for posters', 'event-toolkit-for-custom-fields') . '</strong>'
+                . (count($events) > 1 ? '<br>' . esc_html(IMM_TK_Digest::title($e)) : '')
+                . '<br><a href="' . esc_url($svg['url']) . '" download>SVG</a>'
+                . (is_wp_error($png) ? '' : ' &nbsp; <a href="' . esc_url($png['url']) . '" download>PNG</a>')
+                . '</figcaption></figure>';
+        }
+        echo '</div>';
     }
 
     /** Day of the month, large, with weekday and month: a page of a tear-off calendar. */

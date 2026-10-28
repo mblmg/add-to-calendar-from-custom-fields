@@ -46,6 +46,7 @@ require_once IMM_TK_DIR . 'includes/class-fonts.php';
 require_once IMM_TK_DIR . 'includes/class-sharepic.php';
 require_once IMM_TK_DIR . 'includes/class-share.php';
 require_once IMM_TK_DIR . 'includes/class-status.php';
+require_once IMM_TK_DIR . 'includes/class-qr.php';
 require_once IMM_TK_DIR . 'includes/telegram/class-telegram-settings.php';
 require_once IMM_TK_DIR . 'includes/telegram/class-telegram.php';
 require_once IMM_TK_DIR . 'includes/telegram/class-telegram-scheduler.php';

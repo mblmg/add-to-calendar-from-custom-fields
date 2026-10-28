@@ -18,6 +18,8 @@ class IMM_TK_Links
             'feed'        => __('Subscription: feed URL (https)', 'event-toolkit-for-custom-fields'),
             'webcal'      => __('Subscription: webcal link (Apple, Outlook, phones)', 'event-toolkit-for-custom-fields'),
             'feed_google' => __('Subscription: subscribe in Google Calendar', 'event-toolkit-for-custom-fields'),
+            'qr_svg'      => __('QR code of the event page (SVG, for print)', 'event-toolkit-for-custom-fields'),
+            'qr_png'      => __('QR code of the event page (PNG)', 'event-toolkit-for-custom-fields'),
         ];
     }
 
@@ -47,6 +49,10 @@ class IMM_TK_Links
                 return self::outlook($event, 'https://outlook.live.com/calendar/0/action/compose');
             case 'office365':
                 return self::outlook($event, 'https://outlook.office.com/calendar/0/action/compose');
+            case 'qr_svg':
+            case 'qr_png':
+                $file = IMM_TK_QR::file($event->id, $type === 'qr_png' ? 'png' : 'svg');
+                return is_wp_error($file) ? '' : $file['url'];
         }
         return '';
     }
