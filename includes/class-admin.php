@@ -46,8 +46,13 @@ class IMM_TK_Admin
             if (self::current_tab() === '') {
                 return;
             }
-            wp_enqueue_script('imm-tk-share', plugins_url('assets/admin-share.js', IMM_TK_FILE), [], IMM_TK_VERSION, true);
-            wp_enqueue_style('imm-tk-admin', plugins_url('assets/admin.css', IMM_TK_FILE), [], IMM_TK_VERSION);
+            // The file time as version, so browsers load a changed file even within the same plugin version.
+            $version = function (string $file): string {
+                $time = filemtime(IMM_TK_DIR . $file);
+                return IMM_TK_VERSION . ($time ? '.' . $time : '');
+            };
+            wp_enqueue_script('imm-tk-share', plugins_url('assets/admin-share.js', IMM_TK_FILE), [], $version('assets/admin-share.js'), true);
+            wp_enqueue_style('imm-tk-admin', plugins_url('assets/admin.css', IMM_TK_FILE), [], $version('assets/admin.css'));
         });
         add_filter('plugin_action_links_' . plugin_basename(IMM_TK_FILE), function ($links) {
             array_unshift($links, '<a href="' . esc_url(self::url('events')) . '">' . esc_html__('Settings', 'event-toolkit-for-custom-fields') . '</a>');
@@ -325,15 +330,15 @@ class IMM_TK_Admin
                 foreach ($events as $e) {
                     $edit = get_edit_post_link($e->id);
                     $name = esc_html(IMM_TK_Digest::title($e));
-                    echo '<li><span class="imm-tk-week-time">' . esc_html(IMM_TK_Sharepic::start_time($e)) . '</span> '
-                        . ($edit ? '<a href="' . esc_url($edit) . '">' . $name . '</a>' : $name) . '</li>'; // phpcs:ignore WordPress.Security.EscapeOutput -- $name is escaped above.
+                    echo '<li><span class="imm-tk-week-time">' . esc_html(IMM_TK_Sharepic::start_time($e)) . '</span> <span>'
+                        . ($edit ? '<a href="' . esc_url($edit) . '">' . $name . '</a>' : $name) . '</span></li>'; // phpcs:ignore WordPress.Security.EscapeOutput -- $name is escaped above.
                 }
                 echo '</ul>';
             }
             if ($out) {
                 echo '<ul class="imm-tk-week-out">';
                 foreach ($out as $item) {
-                    echo '<li><span class="imm-tk-week-time">' . esc_html($item['time']) . '</span> <strong>' . esc_html($item['channel']) . '</strong> ' . esc_html($item['label']);
+                    echo '<li><span class="imm-tk-week-time">' . esc_html($item['time']) . '</span> <span class="imm-tk-week-what"><strong>' . esc_html($item['channel']) . '</strong> ' . esc_html($item['label']) . '</span>';
                     if (!empty($item['spec']) && IMM_TK_Sharepic::available()) {
                         $url = IMM_TK_Share::image_url($item['spec']);
                         echo ' <a class="imm-tk-thumb" href="' . esc_url($url) . '" target="_blank" rel="noopener"><img src="' . esc_url($url) . '" alt="" width="27" height="48" loading="lazy"></a>';
@@ -1016,7 +1021,11 @@ class IMM_TK_Admin
         $tz = $day->getTimezone();
         echo '<div class="imm-tk-date' . ($today ? ' is-today' : '') . '">';
         echo '<span class="imm-tk-date-day">' . esc_html(wp_date('j', $ts, $tz)) . '</span>';
-        echo '<span class="imm-tk-date-rest">' . esc_html(wp_date('l', $ts, $tz)) . '<br>' . esc_html(wp_date('F', $ts, $tz)) . '</span>';
+        // Full names, and short ones for narrow screens.
+        echo '<span class="imm-tk-date-rest">'
+            . '<span class="imm-tk-long">' . esc_html(wp_date('l', $ts, $tz)) . '<br>' . esc_html(wp_date('F', $ts, $tz)) . '</span>'
+            . '<span class="imm-tk-short" aria-hidden="true">' . esc_html(wp_date('D', $ts, $tz)) . '<br>' . esc_html(wp_date('M', $ts, $tz)) . '</span>'
+            . '</span>';
         echo '</div>';
     }
 

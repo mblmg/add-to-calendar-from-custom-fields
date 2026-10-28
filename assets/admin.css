@@ -321,6 +321,10 @@
 	font-size: 12px;
 }
 
+.imm-tk-short {
+	display: none;
+}
+
 /* ---------------------------------------------------------------- week plan (overview) */
 
 .imm-tk-week {
@@ -410,6 +414,11 @@
 	border-top: 1px solid var(--imm-canvas);
 }
 
+.imm-tk-week-what {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
 .imm-tk-week-time {
 	display: inline-block;
 	min-width: 5.5em;
@@ -430,13 +439,119 @@
 }
 
 @media (max-width: 600px) {
+	/* Phones: a narrow calendar page on the left, the day's content next to it. */
 	.imm-tk-week-day {
-		grid-template-columns: minmax(0, 1fr);
-		gap: 8px;
+		grid-template-columns: 64px minmax(0, 1fr);
+		gap: 12px;
+		padding-bottom: 16px;
 	}
 
 	.imm-tk-week-day::before {
+		left: 32px;
+	}
+
+	.imm-tk-week-day .imm-tk-date {
+		flex-direction: column;
+		gap: 4px;
+		padding: 6px 4px 8px;
+		text-align: center;
+	}
+
+	.imm-tk-week-day .imm-tk-date-day {
+		min-width: 0;
+		font-size: 24px;
+	}
+
+	.imm-tk-week-day .imm-tk-date-rest {
+		font-size: 12px;
+	}
+
+	.imm-tk-week-day .imm-tk-long {
 		display: none;
+	}
+
+	.imm-tk-week-day .imm-tk-short {
+		display: inline;
+	}
+
+	.imm-tk-week-body {
+		padding-top: 2px;
+	}
+
+	.imm-tk-week-events li {
+		display: grid;
+		gap: 2px;
+	}
+
+	.imm-tk-week-out {
+		padding: 6px 10px;
+	}
+
+	.imm-tk-week-out li {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 2px 10px;
+		align-items: start;
+	}
+
+	.imm-tk-week-out .imm-tk-week-time,
+	.imm-tk-week-out .imm-tk-week-what {
+		grid-column: 1;
+	}
+
+	.imm-tk-week-out .imm-tk-thumb {
+		grid-column: 2;
+		grid-row: 1 / span 2;
+		margin-left: 0;
+	}
+
+	.imm-tk-week-time {
+		min-width: 0;
+	}
+
+	.imm-tk-nav {
+		margin-left: -10px;
+		margin-right: -10px;
+		padding: 0 10px;
+	}
+
+	.imm-tk-intro {
+		font-size: 13px;
+	}
+
+	.imm-tk-panel {
+		padding: 4px 14px 12px;
+	}
+
+	.imm-tk-panel .form-table th {
+		width: auto;
+		padding-bottom: 4px;
+	}
+
+	.imm-tk-panel .form-table tr + tr td {
+		border-top: 0;
+	}
+
+	.imm-tk-share {
+		padding: 12px;
+	}
+
+	.imm-tk-share-images img {
+		width: 108px;
+		height: 192px;
+	}
+
+	.imm-tk-share-buttons .button {
+		flex: 1 1 auto;
+		text-align: center;
+	}
+
+	.imm-tk-channels {
+		margin: 0 -14px;
+	}
+
+	.imm-tk-channels a {
+		padding: 10px 14px;
 	}
 }
 
