@@ -13,7 +13,7 @@ class IMM_TK_Settings
 {
     const OPTION = 'imm_tk_settings';
 
-    /** Fields per settings tab, with their type (key, keys, text, int, check, url, time, weekday, textarea). */
+    /** Fields per settings tab, with their type (key, keys, text, int, check, url, time, weekday, textarea, color, email, choice). */
     public static function tabs(): array
     {
         return [
@@ -56,6 +56,19 @@ class IMM_TK_Settings
                 'digest_program_url'  => 'url',
                 'digest_feed_enabled' => 'check',
                 'digest_feed_slug'    => 'slug',
+                'digest_feed_only_new' => 'check',
+            ],
+            'share' => [
+                'sharepic_paper'    => 'color',
+                'sharepic_ink'      => 'color',
+                'sharepic_accent'   => 'color',
+                'sharepic_footer'   => 'text',
+                'sharepic_fonts'    => 'choice',
+                'sharepic_heading_font'   => 'text',
+                'sharepic_heading_weight' => 'choice',
+                'sharepic_text_font'      => 'text',
+                'share_reminder'    => 'check',
+                'share_reminder_to' => 'email',
             ],
         ];
     }
@@ -102,6 +115,18 @@ class IMM_TK_Settings
             'digest_program_url'  => (string) ($tg['program_url'] ?? home_url('/')),
             'digest_feed_enabled' => 1,
             'digest_feed_slug'    => 'weekly',
+            'digest_feed_only_new' => 0,
+
+            'sharepic_paper'    => '#faf9fb',
+            'sharepic_ink'      => '#211f26',
+            'sharepic_accent'   => '#cf3716',
+            'sharepic_footer'   => '', // Empty = address of the programme page.
+            'sharepic_fonts'    => 'site', // 'site' = fonts of the website, 'bundled' = Syne and Atkinson Hyperlegible Mono.
+            'sharepic_heading_font'   => '', // Empty = detected.
+            'sharepic_heading_weight' => 700,
+            'sharepic_text_font'      => '',
+            'share_reminder'    => 0,
+            'share_reminder_to' => get_option('admin_email'),
         ];
     }
 
@@ -183,6 +208,13 @@ class IMM_TK_Settings
                 return sanitize_textarea_field($value);
             case 'weekday':
                 return min(7, max(1, absint($value)));
+            case 'choice':
+                $choices = self::choices()[$key] ?? [];
+                return array_key_exists($value, $choices) ? (is_int(array_key_first($choices)) ? (int) $value : $value) : self::defaults()[$key];
+            case 'color':
+                return sanitize_hex_color($value) ?: self::defaults()[$key];
+            case 'email':
+                return sanitize_email($value);
             case 'time':
                 return preg_match('/^([01]?\d|2[0-3]):([0-5]\d)$/', trim($value), $m) ? sprintf('%02d:%02d', $m[1], $m[2]) : '10:00';
         }
@@ -194,6 +226,25 @@ class IMM_TK_Settings
             return strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $value), 0, 2));
         }
         return sanitize_text_field($value);
+    }
+
+    /** Allowed values of the 'choice' settings (value => label). */
+    public static function choices(): array
+    {
+        return [
+            'sharepic_fonts'          => [
+                'site'    => __('Fonts of the website', 'event-toolkit-for-custom-fields'),
+                'bundled' => __('Bundled fonts (Syne, Atkinson Hyperlegible Mono)', 'event-toolkit-for-custom-fields'),
+            ],
+            'sharepic_heading_weight' => [
+                400 => __('Regular (400)', 'event-toolkit-for-custom-fields'),
+                500 => __('Medium (500)', 'event-toolkit-for-custom-fields'),
+                600 => __('Semibold (600)', 'event-toolkit-for-custom-fields'),
+                700 => __('Bold (700)', 'event-toolkit-for-custom-fields'),
+                800 => __('Extra bold (800)', 'event-toolkit-for-custom-fields'),
+                900 => __('Black (900)', 'event-toolkit-for-custom-fields'),
+            ],
+        ];
     }
 
     public static function is_configured(): bool

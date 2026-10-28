@@ -86,6 +86,19 @@ class IMM_TK_Digest
         return !$selection['week'] && !$selection['new'];
     }
 
+    /** True if one of the events was published during the week before the issue. */
+    public static function has_new(array $selection, DateTimeImmutable $issue): bool
+    {
+        $since = $issue->modify('-7 days')->getTimestamp();
+        foreach (array_merge($selection['week'], $selection['new']) as $event) {
+            $published = (int) get_post_time('U', true, $event->id);
+            if ($published > $since && $published <= $issue->getTimestamp()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** The event whose image leads the digest: the next event, else the first new one. */
     public static function lead_event(array $selection): ?IMM_TK_Event
     {

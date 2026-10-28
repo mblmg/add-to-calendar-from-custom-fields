@@ -1,14 +1,14 @@
 === Event Toolkit for Custom Fields ===
 Contributors: mblmg
-Tags: events, calendar, ics, telegram, newsletter
+Tags: events, calendar, telegram, instagram, newsletter
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Spread the events you keep in custom fields: calendar links and feeds, search engine markup, a weekly Telegram post and an RSS feed for newsletters.
+Spread the events you keep in custom fields: calendar links and feeds, search engine markup, Telegram, Instagram stories and newsletters.
 
 == Description ==
 
@@ -29,7 +29,19 @@ Your events already have a date, a start time and a location in custom fields. T
 Once a week, a preview of what is coming up: the events of the next days, plus the events added to the programme during the past week. In weeks without either, nothing goes out. The same preview is available on two channels:
 
 * **Telegram:** a bot posts it to a group, a topic in a group or a channel, with the link preview and image of the next event
-* **E-mail newsletter:** an RSS feed with one entry per week, ready for the RSS campaigns of newsletter services such as Brevo, CleverReach or Mailchimp
+* **E-mail newsletter:** an RSS feed with one entry per week, ready for the RSS campaigns of newsletter services such as Brevo, CleverReach or Mailchimp. Optionally only in weeks in which an event was added.
+* **Telegram, on event days (optional):** one short, silent "Today" message with the events of the day
+
+**Instagram stories**
+
+* Story images (1080 × 1920) in the look of your website: its fonts, your colours, the event picture as a polaroid
+* Posted automatically through the official Instagram API, free of charge: the weekly overview, and every event the day before and on the day
+* Built not to overwhelm followers: no extra story for tomorrow on the day of the weekly overview, and many events on one day share one story
+
+**Share by hand**
+
+* WhatsApp channels and Signal groups cannot be automated without costs or breaking their rules. The tab "Share" has everything ready: the text with WhatsApp formatting, a plain version for Signal, the story images, and a "Share" button that hands both to the apps on your phone.
+* Optional reminder mail at the time of the weekly preview.
 
 **Page builders**
 
@@ -65,7 +77,7 @@ Base path and file names can be changed in the settings.
 4. Add the calendar links to your event template:
    * Breakdance: choose the dynamic data category "Add to Calendar" in the link field of a button or text link.
    * Any other theme or builder: use the shortcode, e.g. `[imm_calendar_link type="ics" text="Add to calendar"]`.
-5. Optional: set day and time of the weekly preview, connect a Telegram bot, and enter the newsletter feed address in your newsletter service.
+5. Optional: set day and time of the weekly preview, connect a Telegram bot, enter the newsletter feed address in your newsletter service, and connect Instagram.
 
 == Frequently Asked Questions ==
 
@@ -93,6 +105,27 @@ If another plugin already outputs event markup for the same posts, turn the opti
 2. Add the bot to your group (or as administrator to your channel). In a group with topics, send `/start@YourBotName` in the topic the preview should go to. The bot does not answer; it only reads the chat ID.
 3. Click "Find chats", copy the chat ID (and topic ID) into the settings and save.
 4. Check the preview, post it once to test, then turn on "Post automatically every week".
+
+= How do I connect Instagram? =
+
+1. Switch your Instagram account to a business account (free, in the Instagram app). Instagram only allows stories through the API for business accounts.
+2. On developers.facebook.com, create an app of the type "Business" and add the product "Instagram" with "API setup with Instagram login".
+3. Under "Generate access tokens", add your account and generate a token. The app can stay in development mode, because it only posts to your own account.
+4. Paste the token in the tab "Instagram", check the plan for the next days and turn on automatic stories.
+
+The plugin renews the token every week. Instagram downloads the images from your site, so the uploads folder must be publicly reachable.
+
+= Can the stories contain a link? =
+
+No. Instagram does not allow link stickers in stories posted through the API. The images show your web address instead (bottom line in the tab "Share").
+
+= Which fonts do the story images use? =
+
+The main fonts of your website: the plugin reads them from Breakdance or from the theme (theme.json). Image rendering needs TrueType or OpenType files, while websites usually load WOFF2. If the theme does not ship a .ttf or .otf, the plugin downloads the font once from Google Fonts. Fonts that are not available there fall back to the bundled fonts Syne and Atkinson Hyperlegible Mono. You can also enter other fonts in the tab "Share".
+
+= Why can't the plugin post to WhatsApp or Signal? =
+
+WhatsApp has no interface for channels, and its business API charges per message and recipient in groups. Signal has no bot interface, and its terms forbid automated messages. Services that work around this break those rules and risk your number being blocked. The tab "Share" makes posting by hand quick instead.
 
 = How do I use the newsletter feed? =
 
@@ -123,10 +156,15 @@ The first three only return what visitors can see on the website anyway. Posting
 * Filter `imm_tk_digest_events` ($selection, $issue): change the events of a weekly preview (`week` and `new`).
 * Filter `imm_tk_digest_email_html` ($html, $selection): change the newsletter HTML.
 * Filter `imm_tg_message` ($message, $selection): change the Telegram message (Telegram HTML).
+* Filter `imm_tg_today_message` ($message, $events): change the silent "Today" message.
+* Filter `imm_tk_share_text` ($text): change the texts in the tab "Share".
+* Filter `imm_tk_sharepic_fonts` ($files): font files of the story images (`display`, `text`, `bold`).
+* Filter `imm_tk_site_fonts` ($fonts): the detected fonts of the website (`heading`, `text`).
+* Filter `imm_ig_plan` ($items, $now): change the stories planned for a day.
 
 == External services ==
 
-The plugin does not load external scripts and does not track visitors. The .ics files, the subscription feed and the newsletter feed are generated on your own server. External services are only involved as described below.
+The plugin does not load external scripts and does not track visitors. The .ics files, the subscription feed, the newsletter feed and the story images are generated on your own server. External services are only involved as described below.
 
 **Calendar links.** The optional calendar links send the visitor to a third-party calendar service. This only happens when a visitor clicks such a link. The link contains the event title, date and time, location, description and the URL of the event page.
 
@@ -142,9 +180,32 @@ If you do not want to offer these services, simply do not place these links on y
 
 No data about visitors of your site is sent. [Terms of Service](https://telegram.org/tos), [Bot Developer Terms](https://telegram.org/tos/bot-developers), [Privacy Policy](https://telegram.org/privacy)
 
+**Instagram (optional).** Only when you save an Instagram access token, the plugin connects to the Instagram API (graph.instagram.com), provided by Meta Platforms:
+
+* When you save the token or click "Check connection", it asks for the account name and type.
+* At the set time of day, or when an administrator clicks "Post today's stories now", it sends the address of a story image on your site; Instagram then downloads the image (event title, date, time, venue and picture) and publishes it as story.
+* Once a week it renews the access token.
+
+No data about visitors of your site is sent. [Terms of Use](https://help.instagram.com/581066165581870), [Platform Terms](https://developers.facebook.com/terms/), [Privacy Policy](https://privacycenter.instagram.com/policy)
+
+**Google Fonts (optional).** Only when the story images use the fonts of your website and the theme does not ship them as .ttf or .otf file, the plugin downloads these font files once from Google Fonts (fonts.googleapis.com, fonts.gstatic.com), provided by Google LLC, and keeps them in the uploads folder. Only the font name and weight are sent. Choose "Bundled fonts" in the tab "Share" to avoid this. [Privacy Policy](https://policies.google.com/privacy), [Google Fonts FAQ](https://developers.google.com/fonts/faq/privacy)
+
+**WhatsApp (optional).** The button "Open in WhatsApp" in the tab "Share" opens wa.me with the text filled in. This only happens when an administrator clicks it. [Privacy Policy](https://www.whatsapp.com/legal/privacy-policy)
+
 **Google Rich Results Test.** The settings page contains a link to this Google tool. Clicking it opens the tool with the address of one of your event pages. Nothing is sent unless an administrator clicks the link.
 
+== Credits ==
+
+The bundled fonts Syne (by Bonjour Monde) and Atkinson Hyperlegible Mono (by Braille Institute) are licensed under the SIL Open Font License 1.1, see assets/fonts.
+
 == Changelog ==
+
+= 2.1.0 =
+* New: story images (1080 × 1920) for the weekly preview and every event, in the fonts and colours of your website.
+* New: Instagram stories through the official API: the weekly overview, and every event the day before and on the day.
+* New: tab "Share" with ready texts and images for WhatsApp, Signal and Instagram, and an optional reminder mail.
+* New: optional silent "Today" message in Telegram on event days.
+* New: newsletter feed optionally only in weeks in which an event was added.
 
 = 2.0.0 =
 * New name: Event Toolkit for Custom Fields. Replaces "Add to Calendar from Custom Fields" and "Event Digest for Telegram"; settings are taken over.

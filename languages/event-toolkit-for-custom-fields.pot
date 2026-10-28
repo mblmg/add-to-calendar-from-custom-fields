@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Event Toolkit for Custom Fields 2.0.0\n"
+"Project-Id-Version: Event Toolkit for Custom Fields 2.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/event-toolkit-for-custom-fields\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -11,7 +11,7 @@ msgstr ""
 
 #. Description of the plugin
 #: event-toolkit-for-custom-fields.php
-msgid "Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters. Extra dynamic data fields for Breakdance and abilities for AI agents."
+msgid "Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters, Instagram stories and story images to share. Extra dynamic data fields for Breakdance and abilities for AI agents."
 msgstr ""
 
 #: event-toolkit-for-custom-fields.php:27
@@ -22,610 +22,923 @@ msgstr ""
 msgid "Add to Calendar"
 msgstr ""
 
-#: includes/class-abilities.php:32 includes/class-admin.php:17
+#: includes/class-abilities.php:29 includes/class-admin.php:17
 msgid "Event Toolkit"
 msgstr ""
 
-#: includes/class-abilities.php:33
+#: includes/class-abilities.php:30
 msgid "Events from custom fields: upcoming events, event details with calendar links, and the weekly preview."
 msgstr ""
 
-#: includes/class-abilities.php:49
+#: includes/class-abilities.php:46
 msgid "List upcoming events"
 msgstr ""
 
-#: includes/class-abilities.php:50
+#: includes/class-abilities.php:47
 msgid "Lists the published events in a period, sorted by start, with date, time (doors and start), venue, image, ticket link and calendar links. Returns the same information visitors see on the website."
 msgstr ""
 
-#: includes/class-abilities.php:73
+#: includes/class-abilities.php:70
 msgid "Get event details"
 msgstr ""
 
-#: includes/class-abilities.php:74
+#: includes/class-abilities.php:71
 msgid "Returns one published event by post ID or page URL: date, time (doors and start), venue and address, description, image, ticket link and calendar links."
 msgstr ""
 
-#: includes/class-abilities.php:91
+#: includes/class-abilities.php:88
 msgid "Get the weekly preview"
 msgstr ""
 
-#: includes/class-abilities.php:92
+#: includes/class-abilities.php:89
 msgid "Returns the weekly preview: the events of the coming days and the events newly added to the programme, as structured data, as Telegram text and as e-mail HTML. \"now\" shows it as if it went out now, \"current\" is the latest issue, \"next\" the upcoming one."
 msgstr ""
 
-#: includes/class-abilities.php:124
+#: includes/class-abilities.php:121
 msgid "Post the weekly preview to Telegram"
 msgstr ""
 
-#: includes/class-abilities.php:125
+#: includes/class-abilities.php:122
 msgid "Posts the weekly preview, as it would look now, to the configured Telegram chat. Visible to all members of that chat. Does not change the weekly schedule. Ask the person before using it."
 msgstr ""
 
-#: includes/class-abilities.php:186
+#: includes/class-abilities.php:183
 msgid "No published event found with this ID or URL."
 msgstr ""
 
-#: includes/class-abilities.php:233
+#: includes/class-abilities.php:230
 msgid "Telegram is not set up: enter bot token and chat ID in the tab \"Telegram\"."
 msgstr ""
 
-#: includes/class-abilities.php:239 includes/class-admin.php:422
+#: includes/class-abilities.php:236 includes/class-admin.php:486
 msgid "Nothing to post: no events in the coming days and nothing new."
 msgstr ""
 
-#: includes/class-admin.php:16 includes/class-admin.php:118
+#: includes/class-admin.php:16 includes/class-admin.php:146
 msgid "Event Toolkit for Custom Fields"
 msgstr ""
 
-#: includes/class-admin.php:43
+#: includes/class-admin.php:57
 msgid "Settings"
 msgstr ""
 
-#: includes/class-admin.php:57
+#: includes/class-admin.php:71
 msgid "Events"
 msgstr ""
 
-#: includes/class-admin.php:58
+#: includes/class-admin.php:72
 msgid "Calendar"
 msgstr ""
 
-#: includes/class-admin.php:59
+#: includes/class-admin.php:73
 msgid "Search engines"
 msgstr ""
 
 #. translators: %s: link to the tab "Weekly preview"
-#: includes/class-admin.php:60 includes/class-admin.php:363
+#: includes/class-admin.php:74 includes/class-admin.php:419 includes/class-admin.php:663
 msgid "Weekly preview"
 msgstr ""
 
-#: includes/class-admin.php:68
+#: includes/class-admin.php:75
+msgid "Share"
+msgstr ""
+
+#: includes/class-admin.php:84
 msgid "If this field is also one of the start time fields, calendars still start at the doors time, but search engines and the weekly preview show the start of the programme and the doors time separately."
 msgstr ""
 
-#: includes/class-admin.php:70
+#: includes/class-admin.php:86
 msgid "Post type"
 msgstr ""
 
-#: includes/class-admin.php:70
+#: includes/class-admin.php:86
 msgid "Slug of the post type that holds the events, e.g. <code>event</code>."
 msgstr ""
 
-#: includes/class-admin.php:71
+#: includes/class-admin.php:87
 msgid "Date field"
 msgstr ""
 
-#: includes/class-admin.php:71
+#: includes/class-admin.php:87
 msgid "Field name (meta key) of the date. Required."
 msgstr ""
 
-#: includes/class-admin.php:72
+#: includes/class-admin.php:88
 msgid "End date field (optional)"
 msgstr ""
 
-#: includes/class-admin.php:72
+#: includes/class-admin.php:88
 msgid "Only needed for events spanning several days."
 msgstr ""
 
-#: includes/class-admin.php:73
+#: includes/class-admin.php:89
 msgid "Start time fields"
 msgstr ""
 
-#: includes/class-admin.php:73
+#: includes/class-admin.php:89
 msgid "One or more fields, separated by commas. The first field with a value is used. If none has a value, the event is added as an all-day event."
 msgstr ""
 
-#: includes/class-admin.php:74
+#: includes/class-admin.php:90
 msgid "End time field (optional)"
 msgstr ""
 
-#: includes/class-admin.php:74
+#: includes/class-admin.php:90
 msgid "If the end time is earlier than the start time, the event ends on the next day."
 msgstr ""
 
-#: includes/class-admin.php:75
+#: includes/class-admin.php:91
 msgid "Doors time field (optional)"
 msgstr ""
 
-#: includes/class-admin.php:76
+#: includes/class-admin.php:92
 msgid "Default duration in minutes"
 msgstr ""
 
-#: includes/class-admin.php:76
+#: includes/class-admin.php:92
 msgid "Used when no end time is set."
 msgstr ""
 
-#: includes/class-admin.php:77
+#: includes/class-admin.php:93
 msgid "Location fields (optional)"
 msgstr ""
 
-#: includes/class-admin.php:77
+#: includes/class-admin.php:93
 msgid "One or more fields, separated by commas. The first is read as venue name, the others as address."
 msgstr ""
 
-#: includes/class-admin.php:78
+#: includes/class-admin.php:94
 msgid "Description field (optional)"
 msgstr ""
 
-#: includes/class-admin.php:78
+#: includes/class-admin.php:94
 msgid "Field for the description. Empty = the post excerpt, or the beginning of the post content if there is no excerpt. In calendars, the link to the post is always added."
 msgstr ""
 
-#: includes/class-admin.php:79
+#: includes/class-admin.php:95
 msgid "Ticket link field (optional)"
 msgstr ""
 
-#: includes/class-admin.php:79
+#: includes/class-admin.php:95
 msgid "Field with a link to buy tickets or register."
 msgstr ""
 
-#: includes/class-admin.php:80
+#: includes/class-admin.php:96
 msgid "Price field (optional)"
 msgstr ""
 
-#: includes/class-admin.php:80
+#: includes/class-admin.php:96
 msgid "Field with the price, e.g. <code>12</code>, <code>12,50 €</code> or <code>free</code>."
 msgstr ""
 
-#: includes/class-admin.php:82
+#: includes/class-admin.php:98
 msgid "Base path"
 msgstr ""
 
-#: includes/class-admin.php:82
+#: includes/class-admin.php:98
 msgid "Results in the addresses /<em>base</em>/event-123.ics and /<em>base</em>/<em>feed</em>.ics."
 msgstr ""
 
-#: includes/class-admin.php:83 includes/class-admin.php:103
+#: includes/class-admin.php:99 includes/class-admin.php:119
 msgid "Feed file name"
 msgstr ""
 
-#: includes/class-admin.php:83
+#: includes/class-admin.php:99
 msgid "Without .ics."
 msgstr ""
 
-#: includes/class-admin.php:84
+#: includes/class-admin.php:100
 msgid "Subscription calendar name"
 msgstr ""
 
-#: includes/class-admin.php:84
+#: includes/class-admin.php:100
 msgid "The name subscribers see in their calendar app."
 msgstr ""
 
-#: includes/class-admin.php:85
+#: includes/class-admin.php:101
 msgid "Past days in the feed"
 msgstr ""
 
-#: includes/class-admin.php:85
+#: includes/class-admin.php:101
 msgid "How long past events stay visible in the subscription."
 msgstr ""
 
-#: includes/class-admin.php:87
+#: includes/class-admin.php:103
 msgid "Structured data"
 msgstr ""
 
-#: includes/class-admin.php:87
+#: includes/class-admin.php:103
 msgid "Adds schema.org event markup (JSON-LD) to each event page, so search engines like Google can show the event with date and place in their event listings. Turn it off if another plugin already does this."
 msgstr ""
 
-#: includes/class-admin.php:87
+#: includes/class-admin.php:103
 msgid "Output structured data on event pages"
 msgstr ""
 
-#: includes/class-admin.php:88
+#: includes/class-admin.php:104
 msgid "Currency"
 msgstr ""
 
-#: includes/class-admin.php:88
+#: includes/class-admin.php:104
 msgid "Three-letter code, e.g. <code>EUR</code>."
 msgstr ""
 
-#: includes/class-admin.php:89
+#: includes/class-admin.php:105
 msgid "Country"
 msgstr ""
 
-#: includes/class-admin.php:89
+#: includes/class-admin.php:105
 msgid "Two-letter code of the venue country, e.g. <code>DE</code>."
 msgstr ""
 
-#: includes/class-admin.php:90
+#: includes/class-admin.php:106
 msgid "Default venue name"
 msgstr ""
 
-#: includes/class-admin.php:90
+#: includes/class-admin.php:106
 msgid "Used when an event has no location fields filled. Not repeated in the weekly preview."
 msgstr ""
 
-#: includes/class-admin.php:91
+#: includes/class-admin.php:107
 msgid "Default venue address"
 msgstr ""
 
-#: includes/class-admin.php:91
+#: includes/class-admin.php:107
 msgid "Format: <code>Street 1, 12345 City</code>."
 msgstr ""
 
-#: includes/class-admin.php:92
+#: includes/class-admin.php:108
 msgid "Organizer"
 msgstr ""
 
-#: includes/class-admin.php:92
+#: includes/class-admin.php:108
 msgid "Name of the organizer. Empty = no organizer."
 msgstr ""
 
-#: includes/class-admin.php:93
+#: includes/class-admin.php:109
 msgid "Organizer website"
 msgstr ""
 
-#: includes/class-admin.php:95
+#: includes/class-admin.php:111
 msgid "Day and time"
 msgstr ""
 
-#: includes/class-admin.php:95
+#: includes/class-admin.php:111
 msgid "When a new issue starts. Telegram posts at this time; the newsletter feed switches to the new issue."
 msgstr ""
 
-#: includes/class-admin.php:96
+#: includes/class-admin.php:112
 msgid "Days ahead"
 msgstr ""
 
-#: includes/class-admin.php:96
+#: includes/class-admin.php:112
 msgid "Events starting within this many days are listed in the first part."
 msgstr ""
 
-#: includes/class-admin.php:97
+#: includes/class-admin.php:113
 msgid "New events"
 msgstr ""
 
-#: includes/class-admin.php:97
+#: includes/class-admin.php:113
 msgid "Also list events published during the week before the issue"
 msgstr ""
 
-#: includes/class-admin.php:98
+#: includes/class-admin.php:114
 msgid "Intro (optional)"
 msgstr ""
 
-#: includes/class-admin.php:99
+#: includes/class-admin.php:115
 msgid "Heading for the coming days"
 msgstr ""
 
-#: includes/class-admin.php:99 includes/class-digest.php:97
+#: includes/class-admin.php:115 includes/class-digest.php:110
 msgid "This week"
 msgstr ""
 
-#: includes/class-admin.php:100
+#: includes/class-admin.php:116
 msgid "Heading for new events"
 msgstr ""
 
-#: includes/class-admin.php:100 includes/class-digest.php:102
+#: includes/class-admin.php:116 includes/class-digest.php:115
 msgid "New in the programme"
 msgstr ""
 
-#: includes/class-admin.php:101
+#: includes/class-admin.php:117
 msgid "Programme page"
 msgstr ""
 
-#: includes/class-admin.php:101
+#: includes/class-admin.php:117
 msgid "Linked at the end of every issue."
 msgstr ""
 
-#: includes/class-admin.php:102 includes/class-admin.php:332
+#: includes/class-admin.php:118 includes/class-admin.php:388
 msgid "Newsletter feed"
 msgstr ""
 
-#: includes/class-admin.php:102
+#: includes/class-admin.php:118
 msgid "Provide the weekly preview as RSS feed for newsletter services"
 msgstr ""
 
-#: includes/class-admin.php:103
+#: includes/class-admin.php:119
 msgid "Without .xml."
 msgstr ""
 
-#: includes/class-admin.php:119
+#: includes/class-admin.php:120
+msgid "Only with news"
+msgstr ""
+
+#: includes/class-admin.php:120
+msgid "Weeks in which no event was added stay empty in the feed, so no newsletter goes out. Fewer mails, and each one has something new."
+msgstr ""
+
+#: includes/class-admin.php:120
+msgid "Send the newsletter only when an event was added during the past week"
+msgstr ""
+
+#: includes/class-admin.php:122
+msgid "Background"
+msgstr ""
+
+#: includes/class-admin.php:122
+msgid "Light colour of the story images. \"Today\" images swap background and text colour."
+msgstr ""
+
+#: includes/class-admin.php:123
+msgid "Text"
+msgstr ""
+
+#: includes/class-admin.php:124
+msgid "Accent"
+msgstr ""
+
+#: includes/class-admin.php:124
+msgid "Only used for the web address at the bottom."
+msgstr ""
+
+#: includes/class-admin.php:125
+msgid "Bottom line"
+msgstr ""
+
+#: includes/class-admin.php:125
+msgid "Usually your web address. Empty = the address of the programme page."
+msgstr ""
+
+#: includes/class-admin.php:126
+msgid "Fonts"
+msgstr ""
+
+#: includes/class-admin.php:127
+msgid "Font for headings"
+msgstr ""
+
+#: includes/class-admin.php:128
+msgid "Weight of headings"
+msgstr ""
+
+#: includes/class-admin.php:129
+msgid "Font for text"
+msgstr ""
+
+#: includes/class-admin.php:129
+msgid "Empty = the font detected on the website. If the theme does not ship the font as .ttf or .otf file, it is downloaded once from Google Fonts. Fonts that are not available there fall back to the bundled ones."
+msgstr ""
+
+#: includes/class-admin.php:130
+msgid "Reminder mail"
+msgstr ""
+
+#: includes/class-admin.php:130
+msgid "At the time of the weekly preview, a mail with the text to share and a link to this page."
+msgstr ""
+
+#: includes/class-admin.php:130
+msgid "Send a reminder to share the weekly preview"
+msgstr ""
+
+#: includes/class-admin.php:131
+msgid "Reminder to"
+msgstr ""
+
+#: includes/class-admin.php:147
 msgid "Reads your events from existing fields (ACF, ACPT or plain post meta) and spreads them: calendar links, search engines, Telegram and newsletters. Nothing has to be entered twice."
 msgstr ""
 
 #: includes/class-admin.php:163
+msgid "Design and reminder"
+msgstr ""
+
+#: includes/class-admin.php:197
 msgid "First enter the post type and the date field in the tab \"Events\"."
 msgstr ""
 
-#: includes/class-admin.php:203 includes/class-admin.php:411
+#. translators: %s: font names
+#: includes/class-admin.php:238
+msgid "Detected on the website: %s."
+msgstr ""
+
+#. translators: %s: font names
+#: includes/class-admin.php:239
+msgid "No fonts detected on the website. Enter them below, or the bundled fonts are used."
+msgstr ""
+
+#: includes/class-admin.php:259 includes/class-admin.php:475 includes/class-admin.php:804
 msgid "Save settings"
 msgstr ""
 
-#: includes/class-admin.php:218
+#: includes/class-admin.php:274
 msgid "Available fields"
 msgstr ""
 
 #. translators: %s: title of a sample post
-#: includes/class-admin.php:220
+#: includes/class-admin.php:276
 msgid "Field names and values of the sample post \"%s\":"
 msgstr ""
 
 #. translators: %s: title of a sample post
-#: includes/class-admin.php:221
+#: includes/class-admin.php:277
 msgid "Field name"
 msgstr ""
 
 #. translators: %s: title of a sample post
-#: includes/class-admin.php:221
+#: includes/class-admin.php:277
 msgid "Value"
 msgstr ""
 
-#: includes/class-admin.php:239 includes/class-admin.php:296 includes/class-admin.php:338 includes/class-admin.php:504
+#: includes/class-admin.php:295 includes/class-admin.php:352 includes/class-admin.php:394 includes/class-admin.php:568
 msgid "Preview"
 msgstr ""
 
-#: includes/class-admin.php:241
+#: includes/class-admin.php:297
 msgid "No events found in the feed period. Are the post type and the date field correct?"
 msgstr ""
 
-#: includes/class-admin.php:247
+#: includes/class-admin.php:303
 msgid "Event"
 msgstr ""
 
-#: includes/class-admin.php:248
+#: includes/class-admin.php:304
 msgid "Start"
 msgstr ""
 
-#: includes/class-admin.php:249
+#: includes/class-admin.php:305
 msgid "End"
 msgstr ""
 
-#: includes/class-admin.php:250
+#: includes/class-admin.php:306
 msgid "Location"
 msgstr ""
 
-#: includes/class-admin.php:251
+#: includes/class-admin.php:307
 msgid "File"
 msgstr ""
 
-#: includes/class-admin.php:255
+#: includes/class-admin.php:311
 msgid "(all day)"
 msgstr ""
 
-#: includes/class-admin.php:268
+#: includes/class-admin.php:324
 msgid "Subscription URL:"
 msgstr ""
 
-#: includes/class-admin.php:270
+#: includes/class-admin.php:326
 msgid "Usage"
 msgstr ""
 
-#: includes/class-admin.php:271
+#: includes/class-admin.php:327
 msgid "In the link field of a button or text link, choose the dynamic data category \"Add to Calendar\"."
 msgstr ""
 
-#: includes/class-admin.php:272
+#: includes/class-admin.php:328
 msgid "Shortcode:"
 msgstr ""
 
-#: includes/class-admin.php:272
+#: includes/class-admin.php:328
 msgid "Without \"text\" only the URL is returned."
 msgstr ""
 
-#: includes/class-admin.php:273
+#: includes/class-admin.php:329
 msgid "Link"
 msgstr ""
 
 #. translators: %s: event title
-#: includes/class-admin.php:298
+#: includes/class-admin.php:354
 msgid "This is what search engines read on the page of \"%s\":"
 msgstr ""
 
-#: includes/class-admin.php:303
+#: includes/class-admin.php:359
 msgid "Check this page with Google's Rich Results Test"
 msgstr ""
 
 #. translators: %s: date and time of the next issue
-#: includes/class-admin.php:316
+#: includes/class-admin.php:372
 msgid "This is what the weekly preview would look like if it went out now. Next issue: %s."
 msgstr ""
 
-#: includes/class-admin.php:334
+#: includes/class-admin.php:390
 msgid "Enter this address in an RSS campaign of your newsletter service (e.g. Brevo, CleverReach or Mailchimp). The feed contains one entry per issue with the whole preview, so the service sends one mail per week. In weeks with no upcoming and no new events, the feed stays empty and no mail is sent."
 msgstr ""
 
-#: includes/class-admin.php:341 includes/class-admin.php:512
+#: includes/class-admin.php:397 includes/class-admin.php:576 includes/class-admin.php:666
 msgid "Right now there would be nothing in it: no events in the coming days and nothing new."
 msgstr ""
 
 #. translators: %s: link to the tab "Weekly preview"
-#: includes/class-admin.php:362
+#: includes/class-admin.php:418
 msgid "Posts the weekly preview to a Telegram group, topic or channel. Schedule and content are set in the tab %s."
 msgstr ""
 
-#: includes/class-admin.php:371
+#: includes/class-admin.php:427
 msgid "Weekly digest"
 msgstr ""
 
-#: includes/class-admin.php:372
+#: includes/class-admin.php:428
 msgid "Post automatically every week"
 msgstr ""
 
-#: includes/class-admin.php:375
+#: includes/class-admin.php:431
 msgid "Bot token"
 msgstr ""
 
-#: includes/class-admin.php:378
+#: includes/class-admin.php:434 includes/class-admin.php:780
 msgid "Saved. Leave empty to keep it."
 msgstr ""
 
-#: includes/class-admin.php:380
+#: includes/class-admin.php:436 includes/class-admin.php:782
 msgid "Delete token"
 msgstr ""
 
-#: includes/class-admin.php:382
+#: includes/class-admin.php:438
 msgid "Create a bot with <code>@BotFather</code> in Telegram (command <code>/newbot</code>) and paste the token it gives you. Keep the token secret."
 msgstr ""
 
-#: includes/class-admin.php:386 includes/class-admin.php:491
+#: includes/class-admin.php:442 includes/class-admin.php:555
 msgid "Chat ID"
 msgstr ""
 
-#: includes/class-admin.php:389
+#: includes/class-admin.php:445
 msgid "ID of the group or channel, e.g. -1001234567890. Use \"Find chats\" below to look it up."
 msgstr ""
 
-#: includes/class-admin.php:393
+#: includes/class-admin.php:449
 msgid "Topic ID (optional)"
 msgstr ""
 
-#: includes/class-admin.php:396
+#: includes/class-admin.php:452
 msgid "For groups with topics: the topic the digest goes to. Empty = the general chat."
 msgstr ""
 
-#: includes/class-admin.php:400
+#: includes/class-admin.php:456
 msgid "Link preview"
 msgstr ""
 
-#: includes/class-admin.php:403
+#: includes/class-admin.php:459
 msgid "Above the text"
 msgstr ""
 
-#: includes/class-admin.php:404
+#: includes/class-admin.php:460
 msgid "Below the text"
 msgstr ""
 
-#: includes/class-admin.php:405
+#: includes/class-admin.php:461
 msgid "No preview"
 msgstr ""
 
-#: includes/class-admin.php:407
+#: includes/class-admin.php:463
 msgid "Shows the preview of the next event page with its image, as when you post a link yourself. Image, title and description come from the page (e.g. set by your SEO plugin)."
 msgstr ""
 
-#: includes/class-admin.php:421
+#: includes/class-admin.php:467
+msgid "On event days"
+msgstr ""
+
+#: includes/class-admin.php:469
+msgid "Short \"Today\" post at"
+msgstr ""
+
+#: includes/class-admin.php:471
+msgid "One silent message per day with all events of the day: members see it in the chat, but their phone does not ring. Not on the day of the weekly preview, which already lists them. Fewer notifications mean fewer members who mute the chat."
+msgstr ""
+
+#: includes/class-admin.php:485
 msgid "The preview was posted to the chat."
 msgstr ""
 
-#: includes/class-admin.php:440
+#: includes/class-admin.php:504
 msgid "Next digest"
 msgstr ""
 
-#: includes/class-admin.php:440
+#: includes/class-admin.php:504
 msgid "not scheduled (turn on the weekly digest and enter token and chat ID)"
 msgstr ""
 
-#: includes/class-admin.php:441
+#: includes/class-admin.php:505
 msgid "Last posted"
 msgstr ""
 
-#: includes/class-admin.php:444
+#: includes/class-admin.php:508
 msgid "Last run"
 msgstr ""
 
-#: includes/class-admin.php:455 includes/class-admin.php:469
+#: includes/class-admin.php:519 includes/class-admin.php:533
 msgid "Find chats"
 msgstr ""
 
-#: includes/class-admin.php:457
+#: includes/class-admin.php:521
 msgid "Add the bot to your group (or as administrator to your channel) and allow it to post messages."
 msgstr ""
 
-#: includes/class-admin.php:458
+#: includes/class-admin.php:522
 msgid "In a group with topics: open the topic and send <code>/start@YourBotName</code> there. In a channel: post any message. The bot does not answer; it only reads the chat ID."
 msgstr ""
 
-#: includes/class-admin.php:459
+#: includes/class-admin.php:523
 msgid "Click the button. The chats and topics the bot has seen in the last 24 hours appear below."
 msgstr ""
 
-#: includes/class-admin.php:463
+#: includes/class-admin.php:527
 msgid "Save the bot token first."
 msgstr ""
 
 #. translators: %s: bot username
-#: includes/class-admin.php:485
+#: includes/class-admin.php:549
 msgid "Bot: @%s"
 msgstr ""
 
-#: includes/class-admin.php:488
+#: includes/class-admin.php:552
 msgid "The bot has not seen any chat yet. Follow the steps above and try again."
 msgstr ""
 
-#: includes/class-admin.php:491
+#: includes/class-admin.php:555
 msgid "Chat"
 msgstr ""
 
-#: includes/class-admin.php:491
+#: includes/class-admin.php:555
 msgid "Type"
 msgstr ""
 
-#: includes/class-admin.php:491
+#: includes/class-admin.php:555
 msgid "Topics (ID: name)"
 msgstr ""
 
-#: includes/class-admin.php:540
+#: includes/class-admin.php:604
 msgid "Post this preview to the chat now"
 msgstr ""
 
-#: includes/class-admin.php:541
+#: includes/class-admin.php:605
 msgid "Goes to the chat and topic above. Does not change the weekly schedule."
 msgstr ""
 
-#: includes/class-admin.php:549 includes/class-admin.php:568
+#: includes/class-admin.php:613 includes/class-admin.php:632 includes/class-admin.php:878 includes/class-admin.php:903 includes/class-share.php:139
 msgid "Not allowed."
 msgstr ""
 
+#: includes/class-admin.php:653
+msgid "WhatsApp channels and Signal groups cannot be posted to automatically without costs or breaking their rules. Here you find everything ready to post by hand: the text (with WhatsApp formatting) and story images for status updates, Signal stories and Instagram."
+msgstr ""
+
+#: includes/class-admin.php:658
+msgid "Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it. The texts work without it."
+msgstr ""
+
+#: includes/class-admin.php:660
+msgid "On your phone, \"Share\" hands the images and the text directly to WhatsApp, Signal or Instagram."
+msgstr ""
+
+#: includes/class-admin.php:671
+msgid "Single events"
+msgstr ""
+
+#: includes/class-admin.php:672
+msgid "One announcement the day before and one on the day. Share the one that fits today."
+msgstr ""
+
+#: includes/class-admin.php:675
+msgid "No events in the next 14 days."
+msgstr ""
+
+#: includes/class-admin.php:681
+msgid "The day before"
+msgstr ""
+
+#: includes/class-admin.php:681
+msgid "On the day"
+msgstr ""
+
+#: includes/class-admin.php:700
+msgid "Copied"
+msgstr ""
+
+#: includes/class-admin.php:706
+msgid "Download"
+msgstr ""
+
+#: includes/class-admin.php:713
+msgid "Share …"
+msgstr ""
+
+#: includes/class-admin.php:714
+msgid "Copy text"
+msgstr ""
+
+#: includes/class-admin.php:715
+msgid "Copy without formatting (Signal)"
+msgstr ""
+
+#: includes/class-admin.php:716
+msgid "Open in WhatsApp"
+msgstr ""
+
+#: includes/class-admin.php:740
+msgid "Posts stories to your Instagram account through the official Instagram API, free of charge: the weekly overview on the day of the weekly preview, and for every event one story the day before and one on the day."
+msgstr ""
+
+#: includes/class-admin.php:741
+msgid "Stories posted through the API cannot contain link stickers. The images show your web address instead."
+msgstr ""
+
+#: includes/class-admin.php:743
+msgid "Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it."
+msgstr ""
+
+#: includes/class-admin.php:750
+msgid "Account"
+msgstr ""
+
+#: includes/class-admin.php:750
+msgid "not connected"
+msgstr ""
+
+#: includes/class-admin.php:751
+msgid "Next stories"
+msgstr ""
+
+#: includes/class-admin.php:751
+msgid "not scheduled (turn on automatic stories and save an access token)"
+msgstr ""
+
+#: includes/class-admin.php:754 includes/class-admin.php:777
+msgid "Access token"
+msgstr ""
+
+#. translators: %s: date
+#: includes/class-admin.php:756
+msgid "valid until about %s, renewed automatically every week"
+msgstr ""
+
+#: includes/class-admin.php:761
+msgid "Note"
+msgstr ""
+
+#: includes/class-admin.php:761
+msgid "Instagram allows stories through the API only for business accounts. Switch the account type in the Instagram app (free of charge)."
+msgstr ""
+
+#: includes/class-admin.php:773
+msgid "Automatic stories"
+msgstr ""
+
+#: includes/class-admin.php:774
+msgid "Post stories automatically"
+msgstr ""
+
+#: includes/class-admin.php:784
+msgid "See \"Connect Instagram\" below. Keep the token secret."
+msgstr ""
+
+#: includes/class-admin.php:788
+msgid "Time of day"
+msgstr ""
+
+#: includes/class-admin.php:791
+msgid "All stories of a day go out at this time. Stories stay visible for 24 hours, so the story of the day before ends when the one of the day begins."
+msgstr ""
+
+#: includes/class-admin.php:795
+msgid "Stories"
+msgstr ""
+
+#: includes/class-admin.php:797
+msgid "Weekly overview, on the day of the weekly preview"
+msgstr ""
+
+#: includes/class-admin.php:798
+msgid "Every event the day before"
+msgstr ""
+
+#: includes/class-admin.php:799
+msgid "Every event on the day"
+msgstr ""
+
+#: includes/class-admin.php:800
+msgid "So that followers do not see the same event too often: on the day of the weekly overview there is no extra story for the next day, and more than three events on one day share one story."
+msgstr ""
+
+#: includes/class-admin.php:811
+msgid "Check connection"
+msgstr ""
+
+#: includes/class-admin.php:817
+msgid "Post today's stories now"
+msgstr ""
+
+#: includes/class-admin.php:819
+msgid "Posts the stories planned for today that are not online yet. Stories already posted are not posted twice."
+msgstr ""
+
+#: includes/class-admin.php:826
+msgid "Recent activity"
+msgstr ""
+
+#: includes/class-admin.php:833
+msgid "Connect Instagram"
+msgstr ""
+
+#: includes/class-admin.php:834
+msgid "In the Instagram app, switch the account to a business account (Settings → Account type and tools). This is free."
+msgstr ""
+
+#: includes/class-admin.php:835
+msgid "On <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a>, create an app of the type \"Business\" and add the product \"Instagram\" with \"API setup with Instagram login\"."
+msgstr ""
+
+#: includes/class-admin.php:836
+msgid "Under \"Generate access tokens\", add your Instagram account and generate a token. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it."
+msgstr ""
+
+#: includes/class-admin.php:837
+msgid "Paste the token above and save. The plugin reads the account and renews the token every week. If the site is unreachable for more than 60 days, generate a new token."
+msgstr ""
+
+#: includes/class-admin.php:839
+msgid "Instagram downloads the story images from your site, so the uploads folder must be publicly reachable (no maintenance mode or password protection)."
+msgstr ""
+
+#: includes/class-admin.php:848
+msgid "Plan for the next 7 days"
+msgstr ""
+
+#: includes/class-admin.php:871
+msgid "No stories in the next 7 days."
+msgstr ""
+
+#. translators: 1: Instagram username, 2: number of posts in the last 24 hours
+#: includes/class-admin.php:890
+msgid "Connected with @%1$s. Posts through the API in the last 24 hours: %2$s."
+msgstr ""
+
+#: includes/class-admin.php:909
+msgid "Error"
+msgstr ""
+
+#. translators: %d: number of stories
+#: includes/class-admin.php:912
+msgid "Stories posted: %d"
+msgstr ""
+
+#: includes/class-admin.php:914
+msgid "Nothing to post: no stories planned for today, or all of them are online already."
+msgstr ""
+
 #. translators: %s: name of the site or calendar
-#: includes/class-digest-feed.php:59
+#: includes/class-digest-feed.php:60
 msgid "%s: weekly preview"
 msgstr ""
 
-#: includes/class-digest-feed.php:62
+#: includes/class-digest-feed.php:63
 msgid "Upcoming events and new additions to the programme, once a week."
 msgstr ""
 
 #. translators: date format for the issue title, see https://www.php.net/manual/datetime.format.php
-#: includes/class-digest.php:109
+#: includes/class-digest.php:122
 msgid "F j"
 msgstr ""
 
 #. translators: %s: date of the issue
-#: includes/class-digest.php:111
+#: includes/class-digest.php:124
 msgid "Weekly preview, %s"
 msgstr ""
 
 #. translators: date format for the event date in the weekly preview, see https://www.php.net/manual/datetime.format.php
-#: includes/class-digest.php:117
+#: includes/class-digest.php:130
 msgid "D, F j"
 msgstr ""
 
-#: includes/class-digest.php:124
+#: includes/class-digest.php:137 includes/class-sharepic.php:386
 msgid "all day"
 msgstr ""
 
 #. translators: 1: doors time, 2: start time
-#: includes/class-digest.php:132
+#: includes/class-digest.php:145
 msgid "doors %1$s, start %2$s"
 msgstr ""
 
 #. translators: %s: start time
-#: includes/class-digest.php:138
+#: includes/class-digest.php:151 includes/class-sharepic.php:390
 msgid "at %s"
 msgstr ""
 
 #. translators: %s: link to the programme page
-#: includes/class-digest.php:166
+#: includes/class-digest.php:179
 msgid "Full programme and calendar subscription: %s"
 msgstr ""
 
@@ -661,20 +974,157 @@ msgstr ""
 msgid "Subscription: subscribe in Google Calendar"
 msgstr ""
 
-#: includes/telegram/class-telegram-scheduler.php:64
-msgid "Nothing posted: no events in the coming days and nothing new."
+#: includes/class-settings.php:236
+msgid "Fonts of the website"
+msgstr ""
+
+#: includes/class-settings.php:237
+msgid "Bundled fonts (Syne, Atkinson Hyperlegible Mono)"
+msgstr ""
+
+#: includes/class-settings.php:240
+msgid "Regular (400)"
+msgstr ""
+
+#: includes/class-settings.php:241
+msgid "Medium (500)"
+msgstr ""
+
+#: includes/class-settings.php:242
+msgid "Semibold (600)"
+msgstr ""
+
+#: includes/class-settings.php:243
+msgid "Bold (700)"
+msgstr ""
+
+#: includes/class-settings.php:244
+msgid "Extra bold (800)"
+msgstr ""
+
+#: includes/class-settings.php:245
+msgid "Black (900)"
+msgstr ""
+
+#. translators: %s: event title or number of events
+#: includes/class-share.php:59 includes/instagram/class-instagram-scheduler.php:132
+msgid "Today: %s"
+msgstr ""
+
+#. translators: %s: event title or number of events
+#: includes/class-share.php:63 includes/instagram/class-instagram-scheduler.php:134
+msgid "Tomorrow: %s"
+msgstr ""
+
+#: includes/class-share.php:145 includes/class-sharepic.php:132
+msgid "Unknown image."
+msgstr ""
+
+#: includes/class-share.php:201
+msgid "The weekly preview is out. To share it in WhatsApp or Signal, copy the text below, or open the share page for the story images and the announcements of the single events:"
+msgstr ""
+
+#. translators: %s: site name
+#: includes/class-share.php:209
+msgid "[%s] Weekly preview to share"
+msgstr ""
+
+#: includes/class-sharepic.php:135
+msgid "Story images need the PHP extension GD with FreeType and JPEG support."
+msgstr ""
+
+#: includes/class-sharepic.php:139
+msgid "The event was not found or has no valid date."
+msgstr ""
+
+#: includes/class-sharepic.php:150
+msgid "The uploads folder is not writable."
+msgstr ""
+
+#: includes/class-sharepic.php:156
+msgid "The image could not be saved."
+msgstr ""
+
+#: includes/class-sharepic.php:353 includes/telegram/class-telegram.php:211
+msgid "Today"
+msgstr ""
+
+#: includes/class-sharepic.php:353
+msgid "Tomorrow"
+msgstr ""
+
+#. translators: long date on story images, see https://www.php.net/manual/datetime.format.php
+#: includes/class-sharepic.php:372
+msgid "l, F j"
+msgstr ""
+
+#. translators: short date on story images, see https://www.php.net/manual/datetime.format.php
+#: includes/class-sharepic.php:379
+msgid "D, n/j"
+msgstr ""
+
+#. translators: %d: number of events (always more than three)
+#: includes/instagram/class-instagram-scheduler.php:118
+msgid "%d events"
+msgstr ""
+
+#. translators: 1: story label, 2: error message
+#: includes/instagram/class-instagram-scheduler.php:176
+msgid "%1$s – not posted: %2$s"
+msgstr ""
+
+#. translators: %s: story label
+#: includes/instagram/class-instagram-scheduler.php:182
+msgid "%s – posted."
 msgstr ""
 
 #. translators: %s: error message
-#: includes/telegram/class-telegram-scheduler.php:70
+#: includes/instagram/class-instagram.php:78
+msgid "The access token was not saved: %s"
+msgstr ""
+
+#. translators: %d: HTTP status code
+#: includes/instagram/class-instagram.php:153
+msgid "Instagram answered with HTTP status %d."
+msgstr ""
+
+#. translators: %s: error message from Instagram
+#: includes/instagram/class-instagram.php:158
+msgid "Instagram reports: %s"
+msgstr ""
+
+#: includes/instagram/class-instagram.php:181
+msgid "Instagram did not return a new token."
+msgstr ""
+
+#. translators: %s: error message
+#: includes/instagram/class-instagram.php:206
+msgid "Token could not be renewed: %s"
+msgstr ""
+
+#: includes/instagram/class-instagram.php:224
+msgid "Instagram did not create the story."
+msgstr ""
+
+#. translators: %s: status reported by Instagram
+#: includes/instagram/class-instagram.php:236
+msgid "Instagram could not process the image (%s)."
+msgstr ""
+
+#. translators: %s: error message
+#: includes/telegram/class-telegram-scheduler.php:79 includes/telegram/class-telegram-scheduler.php:119
 msgid "Error: %s"
 msgstr ""
 
-#: includes/telegram/class-telegram-scheduler.php:76
+#: includes/telegram/class-telegram-scheduler.php:113
+msgid "Nothing posted: no events in the coming days and nothing new."
+msgstr ""
+
+#: includes/telegram/class-telegram-scheduler.php:125
 msgid "Posted."
 msgstr ""
 
-#: includes/telegram/class-telegram-settings.php:51
+#: includes/telegram/class-telegram-settings.php:53
 msgid "The bot token does not look valid. It was not saved."
 msgstr ""
 

@@ -19,6 +19,8 @@ class IMM_TG_Settings
             'chat_id'      => '',
             'thread_id'    => '',
             'link_preview' => 'above', // Preview with image for the next event: above, below or none.
+            'today'        => 0,       // Silent "Today" post on event days.
+            'today_time'   => '12:00',
         ];
     }
 
@@ -66,6 +68,8 @@ class IMM_TG_Settings
             'chat_id'      => preg_replace('/[^0-9\-@A-Za-z_]/', '', (string) ($input['chat_id'] ?? '')),
             'thread_id'    => preg_replace('/\D/', '', (string) ($input['thread_id'] ?? '')),
             'link_preview' => in_array($input['link_preview'] ?? '', ['above', 'below', 'none'], true) ? $input['link_preview'] : 'above',
+            'today'        => empty($input['today']) ? 0 : 1,
+            'today_time'   => preg_match('/^([01]?\d|2[0-3]):([0-5]\d)$/', trim((string) ($input['today_time'] ?? '')), $m) ? sprintf('%02d:%02d', $m[1], $m[2]) : '12:00',
         ]);
     }
 
@@ -82,6 +86,7 @@ class IMM_TG_Settings
             'last_sent'   => 0,   // Unix time of the last scheduled digest that was posted.
             'last_run'    => 0,   // Unix time of the last scheduled run.
             'last_result' => '',  // Short status text of the last run.
+            'today_sent'  => '',  // Date (Y-m-d) of the last "Today" post.
         ]);
     }
 

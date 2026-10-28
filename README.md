@@ -6,6 +6,7 @@ WordPress plugin that spreads the events you keep in custom fields (ACF, ACPT or
 - a subscribable calendar feed (`webcal://`) with all upcoming events
 - schema.org Event markup (JSON-LD) on each event page for search engines
 - a weekly preview (upcoming events + new additions), posted to Telegram and provided as RSS feed for e-mail newsletters
+- story images (1080 × 1920) in the website's fonts, posted as Instagram stories (official API) and ready to share by hand in WhatsApp and Signal
 - all calendar links as Breakdance dynamic data and as a shortcode
 - abilities for AI agents (WordPress Abilities API, exposed by MCP adapters)
 
@@ -25,7 +26,12 @@ includes/class-endpoints.php               rewrite rules and file delivery
 includes/class-schema.php                  schema.org Event (JSON-LD) on event pages
 includes/class-digest.php                  weekly preview: issue times, event selection, e-mail HTML
 includes/class-digest-feed.php             RSS feed of the weekly preview (one item per issue)
-includes/telegram/                         Telegram: settings (imm_tg_settings), Bot API, schedule
+includes/class-fonts.php                   fonts of the website for the story images (detection, Google Fonts download)
+includes/class-sharepic.php                story images with GD (frames, rendering, cache in uploads/event-toolkit/stories)
+includes/class-share.php                   share texts for messengers, image endpoint for the admin, reminder mail
+includes/telegram/                         Telegram: settings (imm_tg_settings), Bot API, weekly and "Today" schedule
+includes/instagram/                        Instagram: settings and API (imm_ig_settings), daily story schedule
+assets/                                    admin script and styles, bundled fonts (SIL OFL 1.1)
 includes/class-admin.php                   settings page with tabs
 includes/class-abilities.php               abilities (WordPress Abilities API) for AI agents / MCP
 includes/shortcode.php                     [imm_calendar_link]
@@ -38,6 +44,10 @@ The internal prefixes `imm_tk` / `IMM_TK_` and `imm_tg` / `IMM_TG_` are kept on 
 ### Weekly preview
 
 An issue belongs to a scheduled time (weekday and time in the settings). It lists the events starting within the next days and the events published during the week before the issue. Because both parts depend only on the issue time, Telegram and the newsletter feed always show the same content. The feed's item GUID changes per issue, so RSS-to-email campaigns send one mail per issue.
+
+### Reminder rhythm
+
+Channels differ in how intrusive they are, so they get different rhythms (see the roadmap in the project for the reasoning): the newsletter at most weekly; Telegram the weekly preview plus an optional silent "Today" message; Instagram stories (pull, no notification) the weekly overview, the day before and the day itself, without the day-before story on the issue day and with one shared story for more than three events a day.
 
 ### Translations
 

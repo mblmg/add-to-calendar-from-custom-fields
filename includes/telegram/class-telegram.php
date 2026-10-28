@@ -41,7 +41,7 @@ class IMM_TG_Telegram
      *
      * @return array|WP_Error
      */
-    public static function send(string $html, string $preview_url = '')
+    public static function send(string $html, string $preview_url = '', bool $silent = false)
     {
         $position = (string) IMM_TG_Settings::get('link_preview');
         if ($preview_url !== '' && $position !== 'none') {
@@ -59,6 +59,9 @@ class IMM_TG_Telegram
             'parse_mode'           => 'HTML',
             'link_preview_options' => wp_json_encode($preview),
         ];
+        if ($silent) {
+            $params['disable_notification'] = 'true';
+        }
         $thread = (string) IMM_TG_Settings::get('thread_id');
         if ($thread !== '') {
             $params['message_thread_id'] = $thread;
@@ -171,6 +174,42 @@ class IMM_TG_Telegram
         }
 
         return (string) apply_filters('imm_tg_message', $message, $selection);
+    }
+
+    /**
+     * Posts today's events as one silent message (no notification sound).
+     *
+     * @return array|WP_Error|null Telegram result, error, or null if there is nothing today.
+     */
+    public static function post_today(DateTimeImmutable $now)
+    {
+        $events  = array_values(array_filter(IMM_TK_Share::events_on($now), function (IMM_TK_Event $e) use ($now) {
+            return $e->end > $now;
+        }));
+        $message = self::today_message($events);
+        if ($message === '') {
+            return null;
+        }
+        return self::send($message, $events[0]->url, true);
+    }
+
+    /** "Today" message in Telegram HTML. Empty string without events. */
+    public static function today_message(array $events): string
+    {
+        if (!$events) {
+            return '';
+        }
+        $items = [];
+        foreach ($events as $event) {
+            $lines   = [self::link($event)];
+            $details = array_filter([IMM_TK_Digest::time($event), IMM_TK_Digest::venue($event)]);
+            if ($details) {
+                $lines[] = self::esc(implode(', ', $details));
+            }
+            $items[] = implode("\n", $lines);
+        }
+        $message = '<b>' . self::esc(__('Today', 'event-toolkit-for-custom-fields')) . "</b>\n\n" . implode("\n\n", $items);
+        return (string) apply_filters('imm_tg_today_message', $message, $events);
     }
 
     private static function link(IMM_TK_Event $event): string

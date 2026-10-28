@@ -7,6 +7,7 @@
  * The feed contains at most one item: the current issue, with the whole preview as HTML.
  * Its GUID changes with every issue, so an RSS-to-email campaign sends exactly one mail per
  * issue. In weeks with no upcoming and no new events the feed has no item and nothing is sent.
+ * With "only when something is new", weeks without newly published events stay empty as well.
  */
 
 defined('ABSPATH') || exit;
@@ -64,7 +65,11 @@ class IMM_TK_Digest_Feed
         $xml[] = '<lastBuildDate>' . esc_xml($issue->format(DATE_RSS)) . '</lastBuildDate>';
         $xml[] = '<ttl>360</ttl>';
 
-        if (!IMM_TK_Digest::is_empty($selection)) {
+        $send = !IMM_TK_Digest::is_empty($selection);
+        if ($send && IMM_TK_Settings::get('digest_feed_only_new')) {
+            $send = IMM_TK_Digest::has_new($selection, $issue);
+        }
+        if ($send) {
             $lead  = IMM_TK_Digest::lead_event($selection);
             $image = $lead ? get_the_post_thumbnail_url($lead->id, 'large') : '';
             $names = array_map([IMM_TK_Digest::class, 'title'], array_merge($selection['week'], $selection['new']));
