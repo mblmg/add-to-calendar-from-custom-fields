@@ -9,6 +9,8 @@ class IMM_TK_Admin
 {
     /** Slug of the main page (overview); the other pages are PAGE . '-' . area. */
     const PAGE = 'event-toolkit';
+    /** Who may use the share page: everyone who can write posts. */
+    const SHARE_CAP = 'edit_posts';
     /** Slug of the former page under Settings, redirected to the new menu. */
     const OLD_PAGE = 'event-toolkit-for-custom-fields';
 
@@ -65,8 +67,14 @@ class IMM_TK_Admin
                 $time = filemtime(IMM_TK_DIR . $file);
                 return IMM_TK_VERSION . ($time ? '.' . $time : '');
             };
-            wp_enqueue_script('imm-tk-share', plugins_url('assets/admin-share.js', IMM_TK_FILE), [], $version('assets/admin-share.js'), true);
+            wp_enqueue_script('imm-tk-share', plugins_url('assets/share.js', IMM_TK_FILE), [], $version('assets/share.js'), true);
             wp_enqueue_style('imm-tk-admin', plugins_url('assets/admin.css', IMM_TK_FILE), [], $version('assets/admin.css'));
+        });
+        add_action('wp_dashboard_setup', [self::class, 'dashboard_widget']);
+        add_action('admin_enqueue_scripts', function ($hook) {
+            if ($hook === 'index.php') {
+                wp_enqueue_style('imm-tk-admin', plugins_url('assets/admin.css', IMM_TK_FILE), [], IMM_TK_VERSION . '.' . filemtime(IMM_TK_DIR . 'assets/admin.css'));
+            }
         });
         add_filter('plugin_action_links_' . plugin_basename(IMM_TK_FILE), function ($links) {
             array_unshift($links, '<a href="' . esc_url(self::url('events')) . '">' . esc_html__('Settings', 'event-toolkit-for-custom-fields') . '</a>');
@@ -88,6 +96,16 @@ class IMM_TK_Admin
         foreach (self::tabs() as $tab => $label) {
             add_submenu_page(self::PAGE, $label . ' ‹ ' . __('Event Toolkit', 'event-toolkit-for-custom-fields'), $label, 'manage_options', self::slug($tab), [self::class, 'render']);
         }
+        // Sharing is regular work, not a setting: an own menu item near the top, also for editors and authors.
+        add_menu_page(
+            __('Share events', 'event-toolkit-for-custom-fields'),
+            __('Share', 'event-toolkit-for-custom-fields'),
+            self::SHARE_CAP,
+            self::slug('share'),
+            [self::class, 'render_share_page'],
+            'dashicons-share',
+            3
+        );
         // The former page under Settings stays registered, but hidden, and only redirects.
         $old = add_options_page(__('Event Toolkit', 'event-toolkit-for-custom-fields'), __('Event Toolkit', 'event-toolkit-for-custom-fields'), 'manage_options', self::OLD_PAGE, '__return_null');
         remove_submenu_page('options-general.php', self::OLD_PAGE);
@@ -96,12 +114,50 @@ class IMM_TK_Admin
         }
     }
 
+    /** Dashboard widget "Share today", placed first. */
+    public static function dashboard_widget(): void
+    {
+        if (!current_user_can(self::SHARE_CAP) || !IMM_TK_Settings::is_configured()) {
+            return;
+        }
+        wp_add_dashboard_widget('imm_tk_share_today', __('Share today', 'event-toolkit-for-custom-fields'), [self::class, 'render_dashboard_widget']);
+        global $wp_meta_boxes;
+        $normal = $wp_meta_boxes['dashboard']['normal']['core'] ?? [];
+        if (isset($normal['imm_tk_share_today'])) {
+            $wp_meta_boxes['dashboard']['normal']['core'] = ['imm_tk_share_today' => $normal['imm_tk_share_today']] + $normal;
+        }
+    }
+
+    public static function render_dashboard_widget(): void
+    {
+        $now   = new DateTimeImmutable('now', wp_timezone());
+        $items = [];
+        foreach ([0 => __('Today', 'event-toolkit-for-custom-fields'), 1 => __('Tomorrow', 'event-toolkit-for-custom-fields')] as $offset => $label) {
+            foreach (IMM_TK_Share::events_on($now->setTime(0, 0)->modify('+' . $offset . ' days')) as $e) {
+                if ($e->end > $now) {
+                    $items[] = [$label, IMM_TK_Digest::title($e)];
+                }
+            }
+        }
+        echo '<div class="imm-tk-widget">';
+        if ($items) {
+            echo '<ul>';
+            foreach ($items as [$label, $title]) {
+                echo '<li><span>' . esc_html($label) . '</span> <strong>' . esc_html($title) . '</strong></li>';
+            }
+            echo '</ul>';
+        } else {
+            echo '<p>' . esc_html__('No events today or tomorrow. The weekly preview can be shared any time.', 'event-toolkit-for-custom-fields') . '</p>';
+        }
+        echo '<p><a class="button button-primary" href="' . esc_url(self::url('share')) . '">' . esc_html__('Open texts and images', 'event-toolkit-for-custom-fields') . '</a></p></div>';
+    }
+
     /** Bookmarks and links to the former page under Settings keep working. */
     public static function redirect_old_page(): void
     {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only redirect.
         $tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'events';
-        wp_safe_redirect(self::url(isset(self::tabs()[$tab]) ? $tab : 'events'));
+        wp_safe_redirect(self::url($tab === 'share' || isset(self::tabs()[$tab]) ? $tab : 'events'));
         exit;
     }
 
@@ -121,7 +177,7 @@ class IMM_TK_Admin
     {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only selects the page.
         $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
-        foreach (array_keys(self::tabs()) as $tab) {
+        foreach (array_merge(array_keys(self::tabs()), ['share']) as $tab) {
             if ($page === self::slug($tab)) {
                 return $tab;
             }
@@ -138,7 +194,7 @@ class IMM_TK_Admin
             'search'    => __('Search engines', 'event-toolkit-for-custom-fields'),
             'digest'     => __('Weekly preview', 'event-toolkit-for-custom-fields'),
             'newsletter' => __('Newsletter', 'event-toolkit-for-custom-fields'),
-            'share'      => __('Share', 'event-toolkit-for-custom-fields'),
+            'stories'    => __('Story images', 'event-toolkit-for-custom-fields'),
             'telegram'  => 'Telegram',
             'instagram' => 'Instagram',
             'social'    => 'Mastodon & Bluesky',
@@ -155,6 +211,7 @@ class IMM_TK_Admin
             'search'    => __('Event markup on every event page, so search engines can list date and place.', 'event-toolkit-for-custom-fields'),
             'digest'    => __('Once a week: the events of the coming days and what is new in the programme. Telegram, newsletter and Instagram use this schedule.', 'event-toolkit-for-custom-fields'),
             'share'     => __('Texts and story images for channels you post to by hand, like WhatsApp and Signal.', 'event-toolkit-for-custom-fields'),
+            'stories'   => __('Look of the story images, and a reminder mail when the weekly preview is ready to share.', 'event-toolkit-for-custom-fields'),
             'newsletter' => __('The weekly preview as e-mail: through the RSS feed of your newsletter service, or sent directly by Brevo or Emailit.', 'event-toolkit-for-custom-fields'),
             'telegram'  => __('A bot posts the weekly preview to your group, topic or channel.', 'event-toolkit-for-custom-fields'),
             'instagram' => __('Stories through the official Instagram API, free of charge: the week, the day before and the day itself.', 'event-toolkit-for-custom-fields'),
@@ -291,12 +348,12 @@ class IMM_TK_Admin
                 case 'newsletter':
                     self::render_newsletter();
                     break;
-                case 'share':
-                    self::render_share();
-                    echo '<h2 class="imm-tk-section-title" id="imm-tk-share-settings">' . esc_html__('Design and reminder', 'event-toolkit-for-custom-fields') . '</h2>';
-                    echo '<div class="imm-tk-narrow">';
+                case 'stories':
+                    echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
                     self::render_core_form('share');
-                    echo '</div>';
+                    echo '</div><aside class="imm-tk-aside">';
+                    self::panel([self::class, 'render_story_sample']);
+                    echo '</aside></div>';
                     break;
                 default:
                     echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
@@ -351,7 +408,7 @@ class IMM_TK_Admin
             }));
             $out    = self::outgoing($day, $events, $now);
             echo '<li class="imm-tk-week-day' . ($events || $out ? '' : ' is-quiet') . '">';
-            self::date_badge($day, $i === 0);
+            IMM_TK_Share_Kit::date_badge($day, $i === 0);
             echo '<div class="imm-tk-week-body">';
             if ($events) {
                 echo '<ul class="imm-tk-week-events">';
@@ -493,7 +550,7 @@ class IMM_TK_Admin
             ) : $off],
             ['social', 'Mastodon', self::social_state('mastodon'), self::social_state('mastodon') === 'on' ? (string) wp_parse_url((string) IMM_SO_Social::get('mastodon_instance'), PHP_URL_HOST) : (self::social_state('mastodon') === 'off' ? $off : $todo)],
             ['social', 'Bluesky', self::social_state('bluesky'), self::social_state('bluesky') === 'on' ? '@' . IMM_SO_Social::get('bluesky_handle') : (self::social_state('bluesky') === 'off' ? $off : $todo)],
-            ['share', __('Reminder to share', 'event-toolkit-for-custom-fields'), IMM_TK_Settings::get('share_reminder') ? 'on' : 'off', IMM_TK_Settings::get('share_reminder') ? (string) IMM_TK_Settings::get('share_reminder_to') : $off],
+            ['stories', __('Reminder to share', 'event-toolkit-for-custom-fields'), IMM_TK_Settings::get('share_reminder') ? 'on' : 'off', IMM_TK_Settings::get('share_reminder') ? (string) IMM_TK_Settings::get('share_reminder_to') : $off],
         ];
         $labels = ['on' => __('On', 'event-toolkit-for-custom-fields'), 'off' => __('Off', 'event-toolkit-for-custom-fields'), 'todo' => __('To do', 'event-toolkit-for-custom-fields')];
 
@@ -739,7 +796,7 @@ class IMM_TK_Admin
         return IMM_TK_Digest::select($now, $now);
     }
 
-    private static function preview_note(): string
+    public static function preview_note(): string
     {
         /* translators: %s: date and time of the next issue */
         return sprintf(__('This is what the weekly preview would look like if it went out now. Next issue: %s.', 'event-toolkit-for-custom-fields'), self::next_issue_text());
@@ -1035,112 +1092,42 @@ class IMM_TK_Admin
     }
     /* ------------------------------------------------------------------ Share */
 
-    private static function render_share(): void
+    /** The share page: an own menu item, for everyone who may write posts. */
+    public static function render_share_page(): void
     {
+        if (!current_user_can(self::SHARE_CAP)) {
+            return;
+        }
+        echo '<div class="wrap imm-tk imm-tk-sharepage"><header class="imm-tk-head"><h1>' . esc_html__('Share', 'event-toolkit-for-custom-fields') . '</h1>';
+        echo '<p class="imm-tk-intro">' . esc_html__('Ready-made texts and story images for WhatsApp, Signal, Instagram and everywhere else you post by hand.', 'event-toolkit-for-custom-fields');
+        if (current_user_can('manage_options')) {
+            echo ' <a href="' . esc_url(self::url('stories')) . '">' . esc_html__('Change the look of the images', 'event-toolkit-for-custom-fields') . '</a>';
+        }
+        echo '</p></header><hr class="wp-header-end">';
         if (!IMM_TK_Settings::is_configured()) {
+            echo '<div class="notice notice-info inline"><p>' . esc_html__('The plugin does not know yet where your events are. An administrator sets this up under Event Toolkit → Events.', 'event-toolkit-for-custom-fields') . '</p></div></div>';
             return;
         }
-        echo '<p>' . esc_html__('WhatsApp channels and Signal groups cannot be posted to automatically without costs or breaking their rules. Everything here is ready to post by hand: the text, and story images for status updates, Signal stories and Instagram.', 'event-toolkit-for-custom-fields') . '</p>';
-        if (!IMM_TK_Sharepic::available()) {
-            echo '<div class="notice notice-warning inline"><p>' . esc_html__('Story images need the PHP extension GD with FreeType and JPEG support. Ask your host to enable it. The texts work without it.', 'event-toolkit-for-custom-fields') . '</p></div>';
-        }
-        echo '<p class="imm-tk-share-hint" data-imm-share-hint hidden>' . esc_html__('"Share images and text" hands both to WhatsApp, Signal, Instagram or another app on this phone. On a computer, download the images and copy the text.', 'event-toolkit-for-custom-fields') . '</p>';
-
-        $selection = self::live_selection();
-        echo '<h2 class="imm-tk-section-title">' . esc_html__('Weekly preview', 'event-toolkit-for-custom-fields') . '</h2>';
-        echo '<p class="imm-tk-panel-note">' . esc_html(self::preview_note()) . '</p>';
-        if (IMM_TK_Digest::is_empty($selection)) {
-            echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
-        } else {
-            self::share_card(IMM_TK_Sharepic::week_frames($selection), IMM_TK_Share::week_text($selection, true));
-        }
-
-        echo '<h2 class="imm-tk-section-title">' . esc_html__('Single events', 'event-toolkit-for-custom-fields') . '</h2>';
-        echo '<p class="imm-tk-panel-note">' . esc_html__('One announcement the day before and one on the day. Share the one that fits today.', 'event-toolkit-for-custom-fields') . '</p>';
-        $days = IMM_TK_Share::upcoming_days(14);
-        if (!$days) {
-            echo '<p>' . esc_html__('No events in the next 14 days.', 'event-toolkit-for-custom-fields') . '</p>';
-            return;
-        }
-        foreach ($days as $date => $events) {
-            echo '<section class="imm-tk-day">';
-            self::date_badge($events[0]->start);
-            echo '<div class="imm-tk-share-pair">';
-            foreach (['tomorrow' => __('The day before', 'event-toolkit-for-custom-fields'), 'today' => __('On the day', 'event-toolkit-for-custom-fields')] as $variant => $label) {
-                $text = [];
-                foreach ($events as $e) {
-                    $text[] = IMM_TK_Share::event_text($e, $variant, true);
-                }
-                echo '<div class="imm-tk-share-col"><h3>' . esc_html($label) . '</h3>';
-                self::share_card(IMM_TK_Sharepic::day_frames($events, $variant), implode("\n\n", $text));
-                echo '</div>';
-            }
-            echo '</div>';
-            self::render_qr_codes($events);
-            echo '</section>';
-        }
-    }
-
-    /** QR codes of the event pages, for posters and flyers. */
-    private static function render_qr_codes(array $events): void
-    {
-        echo '<div class="imm-tk-qr-row">';
-        foreach ($events as $e) {
-            $svg = IMM_TK_QR::file($e->id, 'svg');
-            $png = IMM_TK_QR::file($e->id, 'png');
-            if (is_wp_error($svg)) {
-                continue;
-            }
-            echo '<figure class="imm-tk-qr"><img src="' . esc_url($svg['url']) . '" alt="" width="72" height="72" loading="lazy">'
-                . '<figcaption><strong>' . esc_html__('QR code for posters', 'event-toolkit-for-custom-fields') . '</strong>'
-                . (count($events) > 1 ? '<br>' . esc_html(IMM_TK_Digest::title($e)) : '')
-                . '<br><a href="' . esc_url($svg['url']) . '" download>SVG</a>'
-                . (is_wp_error($png) ? '' : ' &nbsp; <a href="' . esc_url($png['url']) . '" download>PNG</a>')
-                . '</figcaption></figure>';
-        }
+        IMM_TK_Share_Kit::render();
         echo '</div>';
     }
 
-    /** Day of the month, large, with weekday and month: a page of a tear-off calendar. */
-    private static function date_badge(DateTimeImmutable $day, bool $today = false): void
+    /** A sample story image on the settings page of the images. */
+    private static function render_story_sample(): void
     {
-        $ts = $day->getTimestamp();
-        $tz = $day->getTimezone();
-        echo '<div class="imm-tk-date' . ($today ? ' is-today' : '') . '">';
-        echo '<span class="imm-tk-date-day">' . esc_html(wp_date('j', $ts, $tz)) . '</span>';
-        // Full names, and short ones for narrow screens.
-        echo '<span class="imm-tk-date-rest">'
-            . '<span class="imm-tk-long">' . esc_html(wp_date('l', $ts, $tz)) . '<br>' . esc_html(wp_date('F', $ts, $tz)) . '</span>'
-            . '<span class="imm-tk-short" aria-hidden="true">' . esc_html(wp_date('D', $ts, $tz)) . '<br>' . esc_html(wp_date('M', $ts, $tz)) . '</span>'
-            . '</span>';
-        echo '</div>';
-    }
-
-    /**
-     * Images, text and buttons for one thing to share. The text is plain (no WhatsApp formatting),
-     * so it fits every messenger. "Share …" only appears on phones that can hand images to apps.
-     */
-    private static function share_card(array $frames, string $text): void
-    {
-        $images = IMM_TK_Sharepic::available() ? $frames : [];
-        echo '<div class="imm-tk-share" data-copied="' . esc_attr__('Copied', 'event-toolkit-for-custom-fields') . '" data-error="' . esc_attr__('Sharing did not work:', 'event-toolkit-for-custom-fields') . '">';
-        if ($images) {
-            echo '<div class="imm-tk-share-images">';
-            foreach ($images as $spec) {
-                $full = IMM_TK_Share::image_url($spec);
-                echo '<figure><a href="' . esc_url($full) . '" target="_blank" rel="noopener"><img src="' . esc_url($full) . '" data-full="' . esc_url($full) . '" alt="" width="135" height="240" loading="lazy"></a>'
-                    . '<figcaption><a href="' . esc_url(IMM_TK_Share::image_url($spec, true)) . '">' . esc_html__('Download', 'event-toolkit-for-custom-fields') . '</a></figcaption></figure>';
+        if (!IMM_TK_Settings::is_configured() || !IMM_TK_Sharepic::available()) {
+            return;
+        }
+        $now = new DateTimeImmutable('now', wp_timezone());
+        foreach (IMM_TK_Endpoints::feed_events() as $e) {
+            if ($e->end > $now && !$e->is_off()) {
+                $url = IMM_TK_Share::image_url(['type' => 'event', 'variant' => 'tomorrow', 'id' => $e->id]);
+                echo '<h2>' . esc_html__('Example', 'event-toolkit-for-custom-fields') . '</h2>';
+                echo '<p class="imm-tk-story-sample"><img src="' . esc_url($url) . '" alt="" width="270" height="480"></p>';
+                echo '<p><a href="' . esc_url(self::url('share')) . '">' . esc_html__('All images on the share page', 'event-toolkit-for-custom-fields') . '</a></p>';
+                return;
             }
-            echo '</div>';
         }
-        echo '<div class="imm-tk-share-body">';
-        echo '<textarea class="large-text" rows="8" readonly aria-label="' . esc_attr__('Text to share', 'event-toolkit-for-custom-fields') . '">' . esc_textarea($text) . '</textarea>';
-        echo '<p class="imm-tk-share-buttons">';
-        if ($images) {
-            echo '<button type="button" class="button button-primary" data-imm-share hidden>' . esc_html__('Share images and text …', 'event-toolkit-for-custom-fields') . '</button> ';
-        }
-        echo '<button type="button" class="button" data-imm-copy>' . esc_html__('Copy text', 'event-toolkit-for-custom-fields') . '</button>';
-        echo '</p><p class="imm-tk-share-error" role="alert" hidden></p></div></div>';
     }
 
     /* ------------------------------------------------------------------ Instagram */

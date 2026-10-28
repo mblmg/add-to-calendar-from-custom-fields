@@ -812,7 +812,6 @@
 /* ---------------------------------------------------------------- QR codes (share page) */
 
 .imm-tk-qr-row {
-	grid-column: 2;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 12px 24px;
@@ -839,11 +838,7 @@
 	line-height: 1.5;
 }
 
-@media (max-width: 782px) {
-	.imm-tk-qr-row {
-		grid-column: 1;
-	}
-}
+
 
 /* ---------------------------------------------------------------- newsletter page */
 
@@ -914,4 +909,46 @@
 .imm-tk-share-error {
 	margin: 8px 0 0;
 	color: var(--imm-error);
+}
+
+/* ---------------------------------------------------------------- share page: what is due today */
+
+.imm-tk-due-label {
+	margin: 0 0 4px;
+	font-size: 1.15em;
+}
+
+.imm-tk-due .imm-tk-share {
+	margin-top: 8px;
+}
+
+.imm-tk-share-why {
+	margin-top: 32px;
+}
+
+.imm-tk-story-sample img {
+	display: block;
+	width: 100%;
+	max-width: 270px;
+	height: auto;
+	border: 6px solid #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Dashboard widget */
+.imm-tk-widget ul {
+	margin: 0 0 12px;
+}
+
+.imm-tk-widget li {
+	display: flex;
+	gap: 8px;
+	margin: 0;
+	padding: 6px 0;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.imm-tk-widget li span {
+	min-width: 5.5em;
+	color: #646970;
 }

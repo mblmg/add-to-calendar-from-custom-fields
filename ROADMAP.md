@@ -17,6 +17,8 @@ Where the plugin stands and what comes next. Keep this file up to date when a fe
 - Cancelled and postponed events from a status field: schema.org `eventStatus`, iCalendar `STATUS` and `SEQUENCE`, title prefix in calendars and all texts, story images say "Cancelled" with a grey picture, no reminder stories; one notice on Telegram, Mastodon and Bluesky (action `imm_tk_status_notice`).
 - Mastodon and Bluesky: weekly preview, optional "Today" post, cancellation notice, story images attached; texts fitted to 500 / 300 characters, Bluesky link facets.
 - QR code per event page: own encoder (byte mode, versions 1–40, error correction raised where it fits; checked with OpenCV and the `qrcode` reference library), SVG and PNG, share page, link types `qr_svg` / `qr_png`.
+- Sharing without a login: share button for event pages (`[event_toolkit_share_button]`; Web Share with text and a story image showing the date, copy on computers) and the share kit for members on a password-protected page (`[event_toolkit_share_page]`, not cached, noindex). Story images on the website come from signed URLs (HMAC of the spec), so only images the site handed out can be rendered. Decided against Shariff: it shares URL and title only, no texts or images, and on phones the system share sheet does more.
+- Share page in its own menu (capability `edit_posts`), today first, dashboard box; story settings in their own tab.
 - Page "Newsletter": guides for Brevo (RSS, `{{ item.CONTENT_ENCODED }}`), Mailchimp (`*|RSSITEM:CONTENT_FULL|*`), MailerLite (paid plans), other services; direct sending through Brevo (`emailCampaigns` + `sendNow`, `{{ unsubscribe }}`) or Emailit (`campaigns`, recipients, `send`, `{{unsubscribe_url}}`) at issue time, test mail, mail preview.
 
 **2.1.0**

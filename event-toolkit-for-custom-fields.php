@@ -45,6 +45,8 @@ require_once IMM_TK_DIR . 'includes/class-digest-feed.php';
 require_once IMM_TK_DIR . 'includes/class-fonts.php';
 require_once IMM_TK_DIR . 'includes/class-sharepic.php';
 require_once IMM_TK_DIR . 'includes/class-share.php';
+require_once IMM_TK_DIR . 'includes/class-share-kit.php';
+require_once IMM_TK_DIR . 'includes/class-front.php';
 require_once IMM_TK_DIR . 'includes/class-status.php';
 require_once IMM_TK_DIR . 'includes/class-qr.php';
 require_once IMM_TK_DIR . 'includes/telegram/class-telegram-settings.php';
@@ -74,6 +76,7 @@ IMM_TK_Share::init();
 IMM_TK_Status::init();
 IMM_TK_Admin::init();
 IMM_TK_Shortcode::init();
+IMM_TK_Front::init();
 IMM_TK_Breakdance::init();
 IMM_TK_Abilities::init();
 

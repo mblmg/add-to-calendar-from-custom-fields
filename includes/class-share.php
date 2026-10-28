@@ -17,6 +17,7 @@ class IMM_TK_Share
         add_action('init', [self::class, 'ensure_schedule']);
         add_action('update_option_' . IMM_TK_Settings::OPTION, [self::class, 'reschedule']);
         add_action('admin_post_imm_tk_sharepic', [self::class, 'handle_image']);
+        add_action('init', [self::class, 'handle_public_image'], 20);
     }
 
     /* ------------------------------------------------------------ texts */
@@ -50,12 +51,18 @@ class IMM_TK_Share
         return self::finish(implode("\n\n", $out), $plain);
     }
 
-    /** Text announcing one event, the day before ("tomorrow") or on the day ("today"). */
+    /**
+     * Text announcing one event: the day before ("tomorrow"), on the day ("today"),
+     * or with its date ("date", for sharing on any day).
+     */
     public static function event_text(IMM_TK_Event $e, string $variant, bool $plain = false): string
     {
         $title = IMM_TK_Digest::title($e);
         if ($e->is_off()) {
             // No "Today:" for a cancelled event: the status leads.
+            $head = $title;
+            $when = IMM_TK_Sharepic::long_date($e) . ', ' . IMM_TK_Digest::time($e);
+        } elseif ($variant === 'date') {
             $head = $title;
             $when = IMM_TK_Sharepic::long_date($e) . ', ' . IMM_TK_Digest::time($e);
         } elseif ($variant === 'today') {
@@ -134,7 +141,7 @@ class IMM_TK_Share
 
     public static function handle_image(): void
     {
-        if (!current_user_can('manage_options')) {
+        if (!current_user_can(IMM_TK_Admin::SHARE_CAP)) {
             wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'), '', ['response' => 403]);
         }
         check_admin_referer('imm_tk_sharepic');
@@ -149,6 +156,75 @@ class IMM_TK_Share
         header('Content-Type: image/jpeg');
         header('Content-Length: ' . filesize($file['path']));
         if (!empty($_GET['download'])) {
+            header('Content-Disposition: attachment; filename="' . basename($file['path']) . '"');
+        }
+        readfile($file['path']); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- streams our own image.
+        exit;
+    }
+
+    /* ------------------------------------------------------------ images on the website */
+
+    /**
+     * Public URL of a story image, for share buttons and the share page on the website.
+     * The spec is signed, so only images the site itself handed out can be rendered.
+     */
+    public static function public_image_url(array $spec, bool $download = false): string
+    {
+        $spec = IMM_TK_Sharepic::clean_spec($spec);
+        if (!$spec) {
+            return '';
+        }
+        $data = rtrim(strtr(base64_encode((string) wp_json_encode($spec)), '+/', '-_'), '=');
+        $args = ['imm_tk_story' => $data, 'sig' => self::sign($data)];
+        if ($download) {
+            $args['download'] = 1;
+        }
+        return add_query_arg($args, home_url('/'));
+    }
+
+    private static function sign(string $data): string
+    {
+        return substr(hash_hmac('sha256', 'imm_tk_story|' . $data, wp_salt('auth')), 0, 24);
+    }
+
+    /** Streams a story image for a signed public URL. Renders it on the first request. */
+    public static function handle_public_image(): void
+    {
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- public, read-only, signed with an HMAC instead.
+        if (!isset($_GET['imm_tk_story'], $_GET['sig'])) {
+            return;
+        }
+        $data = sanitize_text_field(wp_unslash($_GET['imm_tk_story']));
+        $sig  = sanitize_text_field(wp_unslash($_GET['sig']));
+        $down = !empty($_GET['download']);
+        // phpcs:enable
+        if (!hash_equals(self::sign($data), $sig)) {
+            status_header(403);
+            exit;
+        }
+        $spec = IMM_TK_Sharepic::clean_spec(json_decode((string) base64_decode(strtr($data, '-_', '+/'), true), true));
+        if (!$spec) {
+            status_header(404);
+            exit;
+        }
+        // Only published events, even with a valid signature.
+        foreach ($spec['type'] === 'event' ? [$spec['id']] : $spec['ids'] as $id) {
+            if (get_post_status($id) !== 'publish' || post_password_required($id)) {
+                status_header(404);
+                exit;
+            }
+        }
+        $file = IMM_TK_Sharepic::file($spec);
+        if (is_wp_error($file)) {
+            status_header(404);
+            exit;
+        }
+        header('Content-Type: image/jpeg');
+        header('Content-Length: ' . filesize($file['path']));
+        // The same address can show a newer image after the event changed, so browsers keep it only briefly.
+        header('Cache-Control: public, max-age=600');
+        header('X-Robots-Tag: noindex');
+        if ($down) {
             header('Content-Disposition: attachment; filename="' . basename($file['path']) . '"');
         }
         readfile($file['path']); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- streams our own image.

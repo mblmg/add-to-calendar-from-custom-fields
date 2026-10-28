@@ -1,9 +1,11 @@
-/* Event Toolkit for Custom Fields: share helpers on the admin pages. */
+/* Event Toolkit for Custom Fields: share buttons (share page in the admin, share page and share buttons on the website). */
 (function () {
 	'use strict';
 
-	// "Share images and text" only where it works: touch devices whose browser can hand
-	// image files to other apps (Web Share API Level 2). On computers it stays hidden.
+	// Sharing only on touch devices, where it hands content to installed apps.
+	// 'files': images and text (Chrome on Android, Safari on iOS);
+	// 'text':  text only (e.g. Firefox on Android, which cannot share files);
+	// '':      no share button (computers, browsers without Web Share).
 	var touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
 	var canShareFiles = false;
 	try {
@@ -11,7 +13,16 @@
 	} catch (e) {
 		canShareFiles = false;
 	}
-	var sharing = touch && canShareFiles;
+	var mode = !touch || !navigator.share ? '' : (canShareFiles ? 'files' : 'text');
+
+	// Image addresses of a card: thumbnails with data-full, or data-files on the card itself.
+	function imageUrls(card) {
+		var urls = Array.prototype.map.call(card.querySelectorAll('img[data-full]'), function (img) {
+			return img.getAttribute('data-full');
+		});
+		var own = card.getAttribute('data-files');
+		return own ? urls.concat(own.split(' ').filter(Boolean)) : urls;
+	}
 
 	// Browsers open the share sheet only right after a tap. So the images are loaded
 	// in advance, and the tap calls navigator.share() without waiting for the network.
@@ -19,9 +30,8 @@
 
 	function loadFiles(card) {
 		if (!files.has(card)) {
-			var images = Array.prototype.slice.call(card.querySelectorAll('img[data-full]'));
-			files.set(card, Promise.all(images.map(function (img, i) {
-				return fetch(img.getAttribute('data-full'), { credentials: 'same-origin' })
+			files.set(card, Promise.all(imageUrls(card).map(function (url, i) {
+				return fetch(url, { credentials: 'same-origin' })
 					.then(function (r) {
 						if (!r.ok) {
 							throw new Error('HTTP ' + r.status);
@@ -39,21 +49,60 @@
 		return files.get(card);
 	}
 
-	if (sharing) {
-		document.querySelectorAll('[data-imm-share-hint]').forEach(function (el) {
+	// Cards with optional images (share buttons on event pages) load them only when they come
+	// into view, and share the text alone if the images are not there (yet).
+	function whenVisible(el, callback) {
+		if (!('IntersectionObserver' in window)) {
+			callback();
+			return;
+		}
+		var observer = new IntersectionObserver(function (entries) {
+			if (entries.some(function (entry) { return entry.isIntersecting; })) {
+				observer.disconnect();
+				callback();
+			}
+		}, { rootMargin: '300px' });
+		observer.observe(el);
+	}
+
+	if (mode !== '') {
+		document.querySelectorAll('[data-imm-share-hint="' + mode + '"]').forEach(function (el) {
 			el.hidden = false;
 		});
-		document.querySelectorAll('[data-imm-share]').forEach(function (button) {
-			button.hidden = false;
-			var card = button.closest('.imm-tk-share');
-			button.disabled = true;
-			loadFiles(card).then(function () {
-				button.disabled = false;
-			}).catch(function (error) {
-				showError(card, error);
-			});
+		document.querySelectorAll('[data-imm-desktop]').forEach(function (el) {
+			el.hidden = true;
 		});
 	}
+
+	document.querySelectorAll('[data-imm-share]').forEach(function (button) {
+		var card = button.closest('.imm-tk-share');
+		var optional = card.hasAttribute('data-files-optional');
+		if (mode === '') {
+			return;
+		}
+		button.hidden = false;
+		var textLabel = button.getAttribute('data-label-text');
+		if (mode === 'text' || !imageUrls(card).length) {
+			if (textLabel) {
+				button.textContent = textLabel;
+			}
+			return;
+		}
+		if (optional) {
+			whenVisible(card, function () {
+				loadFiles(card).catch(function () {
+					card.immFiles = [];
+				});
+			});
+			return;
+		}
+		button.disabled = true;
+		loadFiles(card).then(function () {
+			button.disabled = false;
+		}).catch(function (error) {
+			showError(card, error);
+		});
+	});
 
 	function showError(card, error) {
 		var box = card.querySelector('.imm-tk-share-error');
@@ -116,13 +165,13 @@
 		}
 
 		// Share: called directly in the tap, with the images loaded beforehand.
-		var list = card.immFiles;
-		if (!list || !list.length) {
-			return;
-		}
-		var data = { files: list, text: text };
-		if (!navigator.canShare(data)) {
-			data = { files: list };
+		var list = mode === 'files' ? card.immFiles : null;
+		var data = { text: text };
+		if (list && list.length) {
+			data = { files: list, text: text };
+			if (!navigator.canShare(data)) {
+				data = { files: list };
+			}
 		}
 		navigator.share(data).catch(function (error) {
 			if (error && error.name === 'AbortError') {

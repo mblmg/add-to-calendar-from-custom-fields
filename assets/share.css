@@ -1,0 +1,278 @@
+/*
+ * Event Toolkit for Custom Fields: share button and share page on the website.
+ *
+ * Takes font and colours from the theme (currentColor), so it fits light and dark designs.
+ * Adjust with the custom properties below, or give the buttons your theme's button classes
+ * through the shortcode attributes.
+ */
+
+.imm-tk-kit,
+.imm-tk-sharebutton {
+	--imm-accent: currentColor;
+	--imm-line: color-mix(in srgb, currentColor 20%, transparent);
+	--imm-soft: color-mix(in srgb, currentColor 6%, transparent);
+	--imm-muted: color-mix(in srgb, currentColor 68%, transparent);
+	--imm-radius: 4px;
+}
+
+.imm-tk-kit [hidden],
+.imm-tk-sharebutton [hidden] {
+	display: none !important;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.imm-tk-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 44px;
+	padding: 0.55em 1.2em;
+	border: 1px solid currentColor;
+	border-radius: var(--imm-radius);
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	line-height: 1.2;
+	cursor: pointer;
+}
+
+.imm-tk-button:hover,
+.imm-tk-button:focus-visible {
+	background: var(--imm-soft);
+}
+
+.imm-tk-button[disabled] {
+	opacity: 0.55;
+	cursor: progress;
+}
+
+/* The main button: stronger outline, since the theme's colours are unknown. */
+.imm-tk-button-primary {
+	border-width: 2px;
+	font-weight: 600;
+}
+
+.imm-tk-sharebutton {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+/* ---------------------------------------------------------------- share page */
+
+.imm-tk-kit {
+	max-width: 1100px;
+}
+
+.imm-tk-kit .imm-tk-section-title {
+	margin: 2em 0 0.4em;
+}
+
+.imm-tk-kit .imm-tk-section-title:first-of-type {
+	margin-top: 0.5em;
+}
+
+.imm-tk-kit .imm-tk-panel-note {
+	margin: 0 0 1em;
+	color: var(--imm-muted);
+}
+
+.imm-tk-kit .imm-tk-share-hint {
+	padding: 0.6em 0.9em;
+	border-left: 3px solid currentColor;
+	background: var(--imm-soft);
+}
+
+.imm-tk-kit .imm-tk-share {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	margin: 12px 0 16px;
+	padding: 16px;
+	border: 1px solid var(--imm-line);
+	border-radius: var(--imm-radius);
+}
+
+.imm-tk-kit .imm-tk-share-images {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-content: flex-start;
+}
+
+.imm-tk-kit .imm-tk-share-images figure {
+	margin: 0;
+	text-align: center;
+}
+
+.imm-tk-kit .imm-tk-share-images img {
+	display: block;
+	width: 126px;
+	height: 224px;
+	max-width: none;
+	object-fit: cover;
+	border: 4px solid #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.imm-tk-kit .imm-tk-share-images figcaption {
+	margin-top: 6px;
+	font-size: 0.85em;
+}
+
+.imm-tk-kit .imm-tk-share-body {
+	flex: 1 1 300px;
+	min-width: 0;
+}
+
+.imm-tk-kit .imm-tk-share-body textarea {
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 12em;
+	padding: 0.6em 0.8em;
+	border: 1px solid var(--imm-line);
+	border-radius: var(--imm-radius);
+	background: var(--imm-soft);
+	color: inherit;
+	font: inherit;
+	font-size: 0.9em;
+	line-height: 1.5;
+	resize: vertical;
+}
+
+.imm-tk-kit .imm-tk-share-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 10px 0 0;
+}
+
+.imm-tk-kit .imm-tk-share-error,
+.imm-tk-sharebutton .imm-tk-share-error {
+	margin: 8px 0 0;
+	color: #c62828;
+}
+
+.imm-tk-kit .imm-tk-day {
+	display: grid;
+	grid-template-columns: 150px minmax(0, 1fr);
+	gap: 20px;
+	align-items: start;
+	padding: 20px 0 4px;
+	border-top: 1px solid var(--imm-line);
+}
+
+.imm-tk-kit .imm-tk-due-label,
+.imm-tk-kit .imm-tk-share-col > h4 {
+	margin: 0 0 4px;
+}
+
+.imm-tk-kit .imm-tk-share-col > h4 {
+	font-size: 1em;
+	color: var(--imm-muted);
+}
+
+.imm-tk-kit .imm-tk-share-pair {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+	gap: 16px;
+}
+
+/* Tear-off calendar date. */
+.imm-tk-kit .imm-tk-date {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 10px;
+	border: 1px solid var(--imm-line);
+	border-top: 4px solid currentColor;
+	border-radius: 2px;
+	line-height: 1.25;
+}
+
+.imm-tk-kit .imm-tk-date-day {
+	min-width: 1.6em;
+	font-size: 2em;
+	font-weight: 700;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+}
+
+.imm-tk-kit .imm-tk-date-rest {
+	color: var(--imm-muted);
+	font-size: 0.8em;
+}
+
+.imm-tk-kit .imm-tk-short {
+	display: none;
+}
+
+/* QR codes. */
+.imm-tk-kit .imm-tk-qr-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px 24px;
+	margin: 0 0 12px;
+}
+
+.imm-tk-kit .imm-tk-qr {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0;
+}
+
+.imm-tk-kit .imm-tk-qr img {
+	display: block;
+	width: 72px;
+	height: 72px;
+	background: #fff;
+	border: 1px solid var(--imm-line);
+}
+
+.imm-tk-kit .imm-tk-qr figcaption {
+	font-size: 0.8em;
+	line-height: 1.5;
+}
+
+@media (max-width: 782px) {
+	.imm-tk-kit .imm-tk-day {
+		grid-template-columns: 64px minmax(0, 1fr);
+		gap: 12px;
+	}
+
+	.imm-tk-kit .imm-tk-date {
+		flex-direction: column;
+		gap: 4px;
+		padding: 6px 4px;
+		text-align: center;
+	}
+
+	.imm-tk-kit .imm-tk-long {
+		display: none;
+	}
+
+	.imm-tk-kit .imm-tk-short {
+		display: inline;
+	}
+
+	.imm-tk-kit .imm-tk-share-pair {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.imm-tk-kit .imm-tk-share {
+		padding: 12px;
+	}
+
+	.imm-tk-kit .imm-tk-share-images img {
+		width: 108px;
+		height: 192px;
+	}
+
+	.imm-tk-kit .imm-tk-share-buttons .imm-tk-button {
+		flex: 1 1 auto;
+	}
+}

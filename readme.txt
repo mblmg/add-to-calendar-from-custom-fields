@@ -62,6 +62,12 @@ Once a week, a preview of what is coming up: the events of the next days, plus t
 
 * WhatsApp channels and Signal groups cannot be automated without costs or breaking their rules. The page "Share" has everything ready: the text to copy, the story images to download, and on phones a button that hands images and text to WhatsApp, Signal, Instagram or any other app.
 * Optional reminder mail at the time of the weekly preview.
+* The page "Share" has its own menu item for everyone who may write posts, and a "Share today" box on the dashboard.
+
+**Share on the website, without a login**
+
+* A share button for event pages (`[event_toolkit_share_button]`): on phones it hands the text with date, place and link, and a story image where the browser can, to WhatsApp, Signal, Telegram or any other app; on computers it copies text and link. Nothing loads from other services, and nothing is sent anywhere before someone taps.
+* The share page for members (`[event_toolkit_share_page]`): put it on a password-protected page, and members share the week's texts and images without a WordPress account.
 
 **Page builders**
 
@@ -146,6 +152,14 @@ The main fonts of your website: the plugin reads them from Breakdance or from th
 = Why can't the plugin post to WhatsApp or Signal? =
 
 WhatsApp has no interface for channels, and its business API charges per message and recipient in groups. Signal has no bot interface, and its terms forbid automated messages. Services that work around this break those rules and risk your number being blocked. The page "Share" makes posting by hand quick instead.
+
+= How do members share events without a WordPress account? =
+
+Create a page, protect it with a password (Visibility: Password protected) and add the shortcode `[event_toolkit_share_page]`. Give the link and the password to your members. The page is not cached and not shown to search engines. With Breakdance, use the element "Shortcode". The buttons take the classes of your theme with `button_class="…"` and `button_class_secondary="…"`.
+
+= How do I add a share button to event pages? =
+
+Add `[event_toolkit_share_button]` to the event template (in Breakdance with the element "Shortcode"). Attributes: `label` (default "Share"), `copy_label` (default "Copy text and link"), `class` for your theme's button class, `image="no"` to share the text only, and `id` for a specific event. After the event the button disappears.
 
 = How do I use the newsletter feed? =
 
@@ -232,7 +246,9 @@ The bundled fonts Syne (by Bonjour Monde) and Atkinson Hyperlegible Mono (by Bra
 * New: cancelled and postponed events, read from a status field, in search engines, calendars, the weekly preview, texts and story images; one notice on Telegram, Mastodon and Bluesky.
 * New: QR code of every event page (SVG and PNG).
 * The overview shows newsletter, Mastodon and Bluesky.
-* Share page: one "Copy text" button (plain text for every messenger); "Share images and text" only on phones, with the images loaded in advance so the share sheet opens reliably.
+* New: share button for event pages and share page for members on the website, without a login (shortcodes `[event_toolkit_share_button]` and `[event_toolkit_share_page]`).
+* New: own menu item "Share" for everyone who may write posts, "Share today" first, and a "Share today" box on the dashboard. The settings of the story images moved to their own tab.
+* Share page: one "Copy text" button (plain text for every messenger); "Share images and text" only on phones, with the images loaded in advance so the share sheet opens reliably; text only in browsers that cannot share images (Firefox on Android).
 
 = 2.1.0 =
 * New: story images (1080 × 1920) for the weekly preview and every event, in the fonts (including the heading weight) and colours of your website.

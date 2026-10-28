@@ -3,7 +3,8 @@
  * Story images (1080 × 1920 JPEG) for Instagram, WhatsApp status, Signal stories and the like.
  *
  * A frame is described by a spec:
- * - ['type' => 'event', 'variant' => 'today'|'tomorrow', 'id' => 123]
+ * - ['type' => 'event', 'variant' => 'today'|'tomorrow'|'date', 'id' => 123]
+ *   ('date' shows the date instead of "Today" / "Tomorrow": for sharing on any day)
  * - ['type' => 'list',  'variant' => 'week'|'new'|'today'|'tomorrow', 'ids' => [..], 'page' => 1, 'pages' => 2]
  *
  * Images are rendered with GD and cached in uploads/event-toolkit/stories. The file name contains
@@ -109,7 +110,7 @@ class IMM_TK_Sharepic
         if (!is_array($spec) || !isset($spec['type'], $spec['variant'])) {
             return null;
         }
-        if ($spec['type'] === 'event' && in_array($spec['variant'], ['today', 'tomorrow'], true) && !empty($spec['id'])) {
+        if ($spec['type'] === 'event' && in_array($spec['variant'], ['today', 'tomorrow', 'date'], true) && !empty($spec['id'])) {
             return ['type' => 'event', 'variant' => $spec['variant'], 'id' => absint($spec['id'])];
         }
         if ($spec['type'] === 'list' && in_array($spec['variant'], ['week', 'new', 'today', 'tomorrow'], true) && !empty($spec['ids']) && is_array($spec['ids'])) {
@@ -586,11 +587,25 @@ class IMM_TK_Sharepic
         $width = self::W - 2 * self::MARGIN;
 
         // "Today" / "Tomorrow", big.
-        // A cancelled or postponed event says so instead of "Today" / "Tomorrow".
-        $y = self::big_word($im, $variant, $p, $e->status_label());
+        // A cancelled or postponed event says so instead of "Today" / "Tomorrow";
+        // the variant "date" shows the short date.
+        $dated = $variant === 'date';
+        $word  = $e->status_label();
+        if ($word === '' && $dated) {
+            $word = self::short_date($e);
+        }
+        $y = self::big_word($im, $variant, $p, $word);
 
-        // When: today only the time, tomorrow day and time.
-        $when = $today && !$e->is_off() ? IMM_TK_Digest::time($e) : self::long_date($e) . ', ' . IMM_TK_Digest::time($e);
+        // When: today only the time, tomorrow day and time; with the date as big word the weekday and time.
+        if ($e->is_off()) {
+            $when = self::long_date($e) . ', ' . IMM_TK_Digest::time($e);
+        } elseif ($today) {
+            $when = IMM_TK_Digest::time($e);
+        } elseif ($dated) {
+            $when = wp_date('l', $e->start->getTimestamp(), $e->start->getTimezone()) . ', ' . IMM_TK_Digest::time($e);
+        } else {
+            $when = self::long_date($e) . ', ' . IMM_TK_Digest::time($e);
+        }
         [$px, $lines] = self::fit_short($f['text'], $when, $width, 42, 34, 30);
         $y = self::lines($im, $f['text'], $px, 1.3, self::MARGIN, $y + 18, $p['fg'], $lines);
 

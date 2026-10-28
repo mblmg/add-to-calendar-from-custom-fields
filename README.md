@@ -28,14 +28,16 @@ includes/class-digest.php                  weekly preview: issue times, event se
 includes/class-digest-feed.php             RSS feed of the weekly preview (one item per issue)
 includes/class-fonts.php                   fonts of the website for the story images (detection, Google Fonts download)
 includes/class-sharepic.php                story images with GD (frames, rendering, cache in uploads/event-toolkit/stories)
-includes/class-share.php                   share texts for messengers, image endpoint for the admin, reminder mail
+includes/class-share.php                   share texts for messengers, image endpoints (admin, signed public URLs), reminder mail
+includes/class-share-kit.php               the share kit (today, weekly preview, later), in the admin and on the website
+includes/class-front.php                   shortcodes for the website: share button on event pages, share page for members
 includes/telegram/                         Telegram: settings (imm_tg_settings), Bot API, weekly and "Today" schedule
 includes/instagram/                        Instagram: settings and API (imm_ig_settings), daily story schedule
 includes/social/                           Mastodon and Bluesky (imm_so_settings)
 includes/newsletter/                       direct sending through Brevo or Emailit (imm_nl_settings)
 includes/class-status.php                  cancelled / postponed events, one-time notices
 includes/class-qr.php                      QR encoder (SVG, PNG, cache in uploads/event-toolkit/qr)
-assets/                                    admin script and styles, bundled fonts (SIL OFL 1.1)
+assets/                                    share script, admin and website styles, bundled fonts (SIL OFL 1.1)
 includes/class-admin.php                   admin menu "Event Toolkit": overview and one page per area
 includes/class-abilities.php               abilities (WordPress Abilities API) for AI agents / MCP
 includes/shortcode.php                     [imm_calendar_link]
