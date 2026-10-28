@@ -8,10 +8,16 @@ Where the plugin stands and what comes next. Keep this file up to date when a fe
 
 ## Status
 
-- Current version: **2.1.0** (on GitHub `main`; not yet submitted to WordPress.org).
+- Current version: **2.2.0** (on GitHub `main`; not yet submitted to WordPress.org).
 - Releases: see [README.md](README.md#releasing). Deployment to WordPress.org runs from the Release workflow once the plugin is approved.
 
 ## Shipped
+
+**2.2.0**
+- Cancelled and postponed events from a status field: schema.org `eventStatus`, iCalendar `STATUS` and `SEQUENCE`, title prefix in calendars and all texts, story images say "Cancelled" with a grey picture, no reminder stories; one notice on Telegram, Mastodon and Bluesky (action `imm_tk_status_notice`).
+- Mastodon and Bluesky: weekly preview, optional "Today" post, cancellation notice, story images attached; texts fitted to 500 / 300 characters, Bluesky link facets.
+- QR code per event page: own encoder (byte mode, versions 1–40, error correction raised where it fits; checked with OpenCV and the `qrcode` reference library), SVG and PNG, share page, link types `qr_svg` / `qr_png`.
+- Page "Newsletter": guides for Brevo (RSS, `{{ item.CONTENT_ENCODED }}`), Mailchimp (`*|RSSITEM:CONTENT_FULL|*`), MailerLite (paid plans), other services; direct sending through Brevo (`emailCampaigns` + `sendNow`, `{{ unsubscribe }}`) or Emailit (`campaigns`, recipients, `send`, `{{unsubscribe_url}}`) at issue time, test mail, mail preview.
 
 **2.1.0**
 - Own admin menu "Event Toolkit" with an overview: plan of the next 7 days (events and everything that goes out) next to the state of all channels.
@@ -31,33 +37,17 @@ Where the plugin stands and what comes next. Keep this file up to date when a fe
 
 ## Needs verification
 
+All API clients below are tested against mocked APIs only.
+- **Brevo and Emailit direct sending** with real accounts: campaign creation, recipients, sending, test mail; Emailit response shape (`id` vs. `data.id`).
+- **Mastodon and Bluesky** with real accounts: media upload, image descriptions, Bluesky facets and aspect ratio.
 - **Instagram with a real account.** The API client is tested against a mocked API only. Needs a business account and a Meta app (development mode) with a long-lived token. Check: container creation with `media_type=STORIES`, status polling, publishing, token refresh after 7 days, behaviour when Instagram cannot fetch the image.
 
-## In progress (2.2.0)
+## Next
 
-Cancelled/postponed events, Mastodon and Bluesky, QR codes (see "Next" below), and a page "Newsletter":
-- Guides for RSS-to-email: Brevo (Integrations → RSS campaign; use `{{ item.CONTENT_ENCODED }}` for the whole preview, the default template only shows title, description and image; checks daily/weekly/monthly and creates no campaign when nothing is new), Mailchimp (RSS campaign, `*|RSSITEM:CONTENT_FULL|*`), MailerLite (RSS campaigns, paid feature).
-- Direct sending through the API for services without RSS-to-email:
-  - Emailit (EU, Prague): `POST https://api.emailit.com/v2/campaigns` (`name`, `subject`, `from_email`, `from_name`, `html`, `text`), then `POST /v2/campaigns/{id}` with `recipients: [{audience_id}]`, then `POST /v2/campaigns/{id}/send`. Bearer key with scope `full`. Unsubscribe merge tag `{{unsubscribe_url}}`. Costs 2 credits per recipient; no free plan for campaigns.
-  - Brevo: `POST https://api.brevo.com/v3/emailCampaigns` (`name`, `subject`, `sender{name,email}`, `htmlContent`, `recipients{listIds}`), then `POST /v3/emailCampaigns/{id}/sendNow`; header `api-key`. Custom HTML must contain `<a href="{{ unsubscribe }}">`, otherwise Brevo refuses the campaign. Free plan: 300 mails a day.
-  - Sent at the issue time of the weekly preview, honouring "only with news" and skipping empty weeks.
-
-
-### 1. Cancelled and postponed events (small)
-One status field per event (setting: which meta field, and which values mean "cancelled" / "postponed").
-- schema.org: `eventStatus` `EventCancelled` / `EventPostponed` / `EventRescheduled`.
-- iCalendar: `STATUS:CANCELLED`, so subscribed calendars show the cancellation; raise `SEQUENCE`.
-- Weekly preview, share texts and story images: mark the event as cancelled instead of advertising it.
-- Telegram: a short notice when an event is cancelled (sent once). This is information, not promotion, so it is exempt from the reminder rhythm.
-
-### 2. Mastodon and Bluesky (medium)
-Both have free, official APIs.
-- Mastodon: `POST /api/v1/statuses` with an access token of the account; media via `POST /api/v2/media`.
-- Bluesky: AT Protocol, `com.atproto.server.createSession` with an app password, `com.atproto.repo.createRecord` (`app.bsky.feed.post`); link cards and images need `uploadBlob`.
-- Same content as Telegram: the weekly preview at issue time, optionally a "Today" post. Reuse the share texts and story images.
-
-### 3. QR code per event (small)
-For posters and flyers, pointing to the event page. Generated on the own server (bundle a small GPL-compatible QR library or write a minimal encoder), offered as PNG/SVG download on the share page and as Breakdance dynamic data.
+Ideas, nothing decided yet. Same rule: nothing that costs money to run.
+- Newsletter signup form that adds contacts to Brevo or Emailit directly (double opt-in handled by the service), as shortcode and Breakdance element.
+- Instagram story for cancellations (currently: no promotion stories, notice only on Telegram, Mastodon and Bluesky).
+- Abilities for the new features (post to Mastodon/Bluesky, send newsletter test, QR code URL).
 
 ## Design decisions
 
