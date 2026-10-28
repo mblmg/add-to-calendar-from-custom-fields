@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       Event Toolkit for Custom Fields
  * Plugin URI:        https://github.com/mblmg/event-toolkit-for-custom-fields
- * Description:       Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for Telegram and an RSS feed for e-mail newsletters, Instagram stories and story images to share. Extra dynamic data fields for Breakdance and abilities for AI agents.
- * Version:           2.1.0
+ * Description:       Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for newsletters, Telegram, Mastodon and Bluesky, Instagram stories, story images and QR codes, and cancellations everywhere at once. Extra dynamic data fields for Breakdance and abilities for AI agents.
+ * Version:           2.2.0
  * Requires at least: 6.9
  * Requires PHP:      7.4
  * Author:            i-make.media
@@ -30,7 +30,7 @@ if (defined('IMM_TK_VERSION') || class_exists('IMM_TG_Settings')) {
     return;
 }
 
-define('IMM_TK_VERSION', '2.1.0');
+define('IMM_TK_VERSION', '2.2.0');
 define('IMM_TK_FILE', __FILE__);
 define('IMM_TK_DIR', plugin_dir_path(__FILE__));
 
@@ -53,6 +53,7 @@ require_once IMM_TK_DIR . 'includes/telegram/class-telegram-scheduler.php';
 require_once IMM_TK_DIR . 'includes/instagram/class-instagram.php';
 require_once IMM_TK_DIR . 'includes/instagram/class-instagram-scheduler.php';
 require_once IMM_TK_DIR . 'includes/social/class-social.php';
+require_once IMM_TK_DIR . 'includes/newsletter/class-newsletter.php';
 require_once IMM_TK_DIR . 'includes/class-admin.php';
 require_once IMM_TK_DIR . 'includes/class-abilities.php';
 require_once IMM_TK_DIR . 'includes/shortcode.php';
@@ -68,6 +69,7 @@ IMM_TK_Schema::init();
 IMM_TG_Scheduler::init();
 IMM_IG_Scheduler::init();
 IMM_SO_Social::init();
+IMM_NL_Newsletter::init();
 IMM_TK_Share::init();
 IMM_TK_Status::init();
 IMM_TK_Admin::init();
@@ -84,6 +86,7 @@ register_deactivation_hook(__FILE__, function () {
     IMM_TG_Scheduler::unschedule();
     IMM_IG_Scheduler::unschedule();
     IMM_SO_Social::unschedule();
+    IMM_NL_Newsletter::unschedule();
     IMM_TK_Share::unschedule();
     flush_rewrite_rules();
 });

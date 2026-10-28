@@ -312,16 +312,9 @@ class IMM_SO_Social
         $tail_len  = $link !== '' ? 2 + ($network === 'mastodon' ? 23 : self::length($link)) : 0;
         $text      = trim(implode("\n\n", $parts));
         $available = $limit - $tail_len;
-        if ($network === 'mastodon') {
-            // Links inside the text also count as 23.
-            $count = function (string $t): int {
-                return self::length((string) preg_replace('#https?://\S+#u', str_repeat('x', 23), $t));
-            };
-        } else {
-            $count = function (string $t): int {
-                return self::length($t);
-            };
-        }
+        $count     = function (string $t) use ($network): int {
+            return self::count($t, $network);
+        };
         if ($count($text) > $available) {
             $lines = explode("\n", $text);
             while (count($lines) > 1 && $count(implode("\n", $lines) . "\n…") > $available) {
@@ -336,6 +329,15 @@ class IMM_SO_Social
             }
         }
         return $text . $tail;
+    }
+
+    /** Length as the network counts it: Mastodon counts every link as 23 characters. */
+    public static function count(string $text, string $network): int
+    {
+        if ($network === 'mastodon') {
+            $text = (string) preg_replace('#https?://\S+#u', str_repeat('x', 23), $text);
+        }
+        return self::length($text);
     }
 
     /** Length in user-perceived characters (graphemes) where possible. */

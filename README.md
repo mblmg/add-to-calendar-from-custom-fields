@@ -31,6 +31,10 @@ includes/class-sharepic.php                story images with GD (frames, renderi
 includes/class-share.php                   share texts for messengers, image endpoint for the admin, reminder mail
 includes/telegram/                         Telegram: settings (imm_tg_settings), Bot API, weekly and "Today" schedule
 includes/instagram/                        Instagram: settings and API (imm_ig_settings), daily story schedule
+includes/social/                           Mastodon and Bluesky (imm_so_settings)
+includes/newsletter/                       direct sending through Brevo or Emailit (imm_nl_settings)
+includes/class-status.php                  cancelled / postponed events, one-time notices
+includes/class-qr.php                      QR encoder (SVG, PNG, cache in uploads/event-toolkit/qr)
 assets/                                    admin script and styles, bundled fonts (SIL OFL 1.1)
 includes/class-admin.php                   admin menu "Event Toolkit": overview and one page per area
 includes/class-abilities.php               abilities (WordPress Abilities API) for AI agents / MCP

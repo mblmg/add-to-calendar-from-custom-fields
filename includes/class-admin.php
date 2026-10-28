@@ -26,6 +26,11 @@ class IMM_TK_Admin
                 'sanitize_callback' => [IMM_IG_Instagram::class, 'sanitize'],
                 'default'           => IMM_IG_Instagram::defaults(),
             ]);
+            register_setting('imm_nl', IMM_NL_Newsletter::OPTION, [
+                'type'              => 'array',
+                'sanitize_callback' => [IMM_NL_Newsletter::class, 'sanitize'],
+                'default'           => IMM_NL_Newsletter::defaults(),
+            ]);
             register_setting('imm_so', IMM_SO_Social::OPTION, [
                 'type'              => 'array',
                 'sanitize_callback' => [IMM_SO_Social::class, 'sanitize'],
@@ -48,6 +53,8 @@ class IMM_TK_Admin
         add_action('admin_post_imm_ig_check', [self::class, 'handle_ig_check']);
         add_action('admin_post_imm_ig_post_now', [self::class, 'handle_ig_post_now']);
         add_action('admin_post_imm_so_check', [self::class, 'handle_so_check']);
+        add_action('admin_post_imm_nl_check', [self::class, 'handle_nl_check']);
+        add_action('admin_post_imm_nl_test', [self::class, 'handle_nl_test']);
         add_action('admin_post_imm_so_post_now', [self::class, 'handle_so_post_now']);
         add_action('admin_enqueue_scripts', function () {
             if (self::current_tab() === '') {
@@ -129,8 +136,9 @@ class IMM_TK_Admin
             'events'    => __('Events', 'event-toolkit-for-custom-fields'),
             'calendar'  => __('Calendar', 'event-toolkit-for-custom-fields'),
             'search'    => __('Search engines', 'event-toolkit-for-custom-fields'),
-            'digest'    => __('Weekly preview', 'event-toolkit-for-custom-fields'),
-            'share'     => __('Share', 'event-toolkit-for-custom-fields'),
+            'digest'     => __('Weekly preview', 'event-toolkit-for-custom-fields'),
+            'newsletter' => __('Newsletter', 'event-toolkit-for-custom-fields'),
+            'share'      => __('Share', 'event-toolkit-for-custom-fields'),
             'telegram'  => 'Telegram',
             'instagram' => 'Instagram',
             'social'    => 'Mastodon & Bluesky',
@@ -147,6 +155,7 @@ class IMM_TK_Admin
             'search'    => __('Event markup on every event page, so search engines can list date and place.', 'event-toolkit-for-custom-fields'),
             'digest'    => __('Once a week: the events of the coming days and what is new in the programme. Telegram, newsletter and Instagram use this schedule.', 'event-toolkit-for-custom-fields'),
             'share'     => __('Texts and story images for channels you post to by hand, like WhatsApp and Signal.', 'event-toolkit-for-custom-fields'),
+            'newsletter' => __('The weekly preview as e-mail: through the RSS feed of your newsletter service, or sent directly by Brevo or Emailit.', 'event-toolkit-for-custom-fields'),
             'telegram'  => __('A bot posts the weekly preview to your group, topic or channel.', 'event-toolkit-for-custom-fields'),
             'instagram' => __('Stories through the official Instagram API, free of charge: the week, the day before and the day itself.', 'event-toolkit-for-custom-fields'),
             'social'    => __('The weekly preview on Mastodon and Bluesky, through their free, official interfaces.', 'event-toolkit-for-custom-fields'),
@@ -279,6 +288,9 @@ class IMM_TK_Admin
                 case 'social':
                     self::render_social();
                     break;
+                case 'newsletter':
+                    self::render_newsletter();
+                    break;
                 case 'share':
                     self::render_share();
                     echo '<h2 class="imm-tk-section-title" id="imm-tk-share-settings">' . esc_html__('Design and reminder', 'event-toolkit-for-custom-fields') . '</h2>';
@@ -398,8 +410,15 @@ class IMM_TK_Admin
                 if (IMM_TG_Settings::get('enabled') && IMM_TG_Settings::is_ready()) {
                     $items[] = ['sort' => $issue, 'channel' => 'Telegram', 'label' => $label];
                 }
-                if (IMM_TK_Settings::get('digest_feed_enabled')) {
-                    $items[] = ['sort' => $issue, 'channel' => __('Newsletter', 'event-toolkit-for-custom-fields'), 'label' => $label];
+                if (IMM_NL_Newsletter::active()) {
+                    $items[] = ['sort' => $issue, 'channel' => IMM_NL_Newsletter::provider_name(), 'label' => $label];
+                } elseif (IMM_TK_Settings::get('digest_feed_enabled')) {
+                    $items[] = ['sort' => $issue, 'channel' => __('Newsletter feed', 'event-toolkit-for-custom-fields'), 'label' => $label];
+                }
+                if (IMM_SO_Social::get('weekly')) {
+                    foreach (IMM_SO_Social::active_networks() as $network) {
+                        $items[] = ['sort' => $issue, 'channel' => $network === 'bluesky' ? 'Bluesky' : 'Mastodon', 'label' => $label];
+                    }
                 }
                 if (IMM_TK_Settings::get('share_reminder') && !$empty) {
                     $items[] = ['sort' => $issue, 'channel' => __('Mail', 'event-toolkit-for-custom-fields'), 'label' => __('Reminder to share', 'event-toolkit-for-custom-fields')];
@@ -410,6 +429,14 @@ class IMM_TK_Admin
             $time = $at((string) IMM_TG_Settings::get('today_time'));
             if ($time > $now) {
                 $items[] = ['sort' => $time, 'channel' => 'Telegram', 'label' => __('"Today" message, silent', 'event-toolkit-for-custom-fields')];
+            }
+        }
+        if ($events && !$issue_day && IMM_SO_Social::get('today')) {
+            $time = $at((string) IMM_SO_Social::get('today_time'));
+            if ($time > $now) {
+                foreach (IMM_SO_Social::active_networks() as $network) {
+                    $items[] = ['sort' => $time, 'channel' => $network === 'bluesky' ? 'Bluesky' : 'Mastodon', 'label' => __('"Today" post', 'event-toolkit-for-custom-fields')];
+                }
             }
         }
         if (IMM_IG_Scheduler::active()) {
@@ -459,6 +486,13 @@ class IMM_TK_Admin
                 (string) IMM_IG_Instagram::get('username'),
                 (string) IMM_IG_Instagram::get('time')
             ) : ($ig_state === 'off' ? $off : $todo)],
+            ['newsletter', __('Newsletter, sent directly', 'event-toolkit-for-custom-fields'), IMM_NL_Newsletter::is_ready() ? (IMM_NL_Newsletter::get('enabled') ? 'on' : 'off') : 'off', IMM_NL_Newsletter::active() ? sprintf(
+                /* translators: %s: service name */
+                __('through %s, at the time of the weekly preview', 'event-toolkit-for-custom-fields'),
+                IMM_NL_Newsletter::provider_name()
+            ) : $off],
+            ['social', 'Mastodon', self::social_state('mastodon'), self::social_state('mastodon') === 'on' ? (string) wp_parse_url((string) IMM_SO_Social::get('mastodon_instance'), PHP_URL_HOST) : (self::social_state('mastodon') === 'off' ? $off : $todo)],
+            ['social', 'Bluesky', self::social_state('bluesky'), self::social_state('bluesky') === 'on' ? '@' . IMM_SO_Social::get('bluesky_handle') : (self::social_state('bluesky') === 'off' ? $off : $todo)],
             ['share', __('Reminder to share', 'event-toolkit-for-custom-fields'), IMM_TK_Settings::get('share_reminder') ? 'on' : 'off', IMM_TK_Settings::get('share_reminder') ? (string) IMM_TK_Settings::get('share_reminder_to') : $off],
         ];
         $labels = ['on' => __('On', 'event-toolkit-for-custom-fields'), 'off' => __('Off', 'event-toolkit-for-custom-fields'), 'todo' => __('To do', 'event-toolkit-for-custom-fields')];
@@ -472,6 +506,16 @@ class IMM_TK_Admin
         echo '</ul>';
         echo '<p class="imm-tk-feed"><label for="imm-tk-feed-url">' . esc_html__('Calendar subscription address', 'event-toolkit-for-custom-fields') . '</label>'
             . '<input id="imm-tk-feed-url" type="text" class="large-text code" readonly value="' . esc_attr(IMM_TK_Links::get('webcal')) . '" data-imm-select></p>';
+    }
+
+    /** 'on', 'off' or 'todo' for Mastodon or Bluesky. */
+    private static function social_state(string $network): string
+    {
+        $ready = $network === 'bluesky' ? IMM_SO_Social::bluesky_ready() : IMM_SO_Social::mastodon_ready();
+        if (!$ready) {
+            return 'todo';
+        }
+        return IMM_SO_Social::get($network . '_enabled') ? 'on' : 'off';
     }
 
     /** Runs a render function and wraps its output in a panel, unless it printed nothing. */
@@ -1424,7 +1468,7 @@ class IMM_TK_Admin
         foreach (['mastodon' => ['Mastodon', IMM_SO_Social::MASTODON_LIMIT], 'bluesky' => ['Bluesky', IMM_SO_Social::BLUESKY_LIMIT]] as $network => [$label, $limit]) {
             $text = IMM_SO_Social::week_text($selection, $limit, $network);
             /* translators: 1: network name, 2: length of the text, 3: maximum length */
-            echo '<h3>' . esc_html(sprintf(__('%1$s (%2$d of %3$d characters)', 'event-toolkit-for-custom-fields'), $label, IMM_SO_Social::length($text), $limit)) . '</h3>';
+            echo '<h3>' . esc_html(sprintf(__('%1$s (%2$d of %3$d characters)', 'event-toolkit-for-custom-fields'), $label, IMM_SO_Social::count($text, $network), $limit)) . '</h3>';
             echo '<div class="imm-tk-bubble">' . nl2br(esc_html($text)) . '</div>';
         }
     }
@@ -1485,6 +1529,208 @@ class IMM_TK_Admin
         }
         set_transient('imm_so_notice_' . get_current_user_id(), [$ok ? 'success' : 'error', implode(' – ', $lines)], 5 * MINUTE_IN_SECONDS);
         wp_safe_redirect(self::url('social'));
+        exit;
+    }
+    /* ------------------------------------------------------------------ Newsletter */
+
+    private static function render_newsletter(): void
+    {
+        $s     = IMM_NL_Newsletter::all();
+        $name  = IMM_NL_Newsletter::OPTION;
+        $field = function (string $key) use ($name): string {
+            return $name . '[' . $key . ']';
+        };
+        self::render_transient_notice('imm_nl');
+        $code = ['code' => []];
+        $link = ['a' => ['href' => [], 'target' => [], 'rel' => []], 'code' => []];
+
+        echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
+
+        // Two ways.
+        echo '<section class="imm-tk-panel"><h2>' . esc_html__('Two ways to send', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<dl class="imm-tk-ways">';
+        echo '<div><dt>' . esc_html__('RSS feed', 'event-toolkit-for-custom-fields') . '</dt><dd>' . esc_html__('Your newsletter service fetches the weekly preview from the feed and sends it on its own schedule. Works with every service that has RSS-to-email, for example Brevo, Mailchimp or MailerLite.', 'event-toolkit-for-custom-fields') . '</dd></div>';
+        echo '<div><dt>' . esc_html__('Direct', 'event-toolkit-for-custom-fields') . '</dt><dd>' . esc_html__('The plugin creates the campaign at the time of the weekly preview and sends it through the interface of Brevo or Emailit. Needed for Emailit, which has no RSS-to-email.', 'event-toolkit-for-custom-fields') . '</dd></div>';
+        echo '</dl>';
+        if (IMM_TK_Settings::get('digest_feed_enabled')) {
+            echo '<p><label for="imm-nl-feed">' . esc_html__('Feed address', 'event-toolkit-for-custom-fields') . '</label><input id="imm-nl-feed" type="text" class="large-text code" readonly data-imm-select value="' . esc_attr(IMM_TK_Digest_Feed::url()) . '"></p>';
+        }
+        echo '<p class="imm-tk-panel-note">' . wp_kses(sprintf(
+            /* translators: %s: link to the page "Weekly preview" */
+            __('Both ways send nothing in weeks without upcoming events. "Only with news" and the feed itself are set on the page %s.', 'event-toolkit-for-custom-fields'),
+            '<a href="' . esc_url(self::url('digest')) . '">' . esc_html__('Weekly preview', 'event-toolkit-for-custom-fields') . '</a>'
+        ), ['a' => ['href' => []]]) . '</p>';
+        echo '</section>';
+
+        // Guides.
+        echo '<h2 class="imm-tk-section-title">' . esc_html__('Connect your service', 'event-toolkit-for-custom-fields') . '</h2>';
+        $guides = [
+            'brevo-rss' => [
+                __('Brevo with the RSS feed', 'event-toolkit-for-custom-fields'),
+                [
+                    __('In Brevo, open Integrations and add "RSS campaign".', 'event-toolkit-for-custom-fields'),
+                    __('Paste the feed address and load the feed.', 'event-toolkit-for-custom-fields'),
+                    __('In the template, replace the description in the repeated block with <code>{{ item.CONTENT_ENCODED }}</code>. Without it, the mail only shows the title and the list of event names, not the whole preview.', 'event-toolkit-for-custom-fields'),
+                    __('Choose the contact list, subject and sender.', 'event-toolkit-for-custom-fields'),
+                    __('Schedule: weekly, on the day of the weekly preview, at least one hour after its time. Brevo creates no campaign when the feed has nothing new.', 'event-toolkit-for-custom-fields'),
+                    __('Save and activate.', 'event-toolkit-for-custom-fields'),
+                ],
+                '<a href="https://help.brevo.com/hc/en-us/articles/360013130059" target="_blank" rel="noopener">' . esc_html__('Brevo help: RSS campaign', 'event-toolkit-for-custom-fields') . '</a>',
+            ],
+            'brevo-api' => [
+                __('Brevo, sent directly', 'event-toolkit-for-custom-fields'),
+                [
+                    __('In Brevo, create an API key (account menu, "SMTP & API", tab "API keys").', 'event-toolkit-for-custom-fields'),
+                    __('Note the ID of the contact list (Contacts, Lists).', 'event-toolkit-for-custom-fields'),
+                    __('Use a sender address that is verified in Brevo (Senders, domains).', 'event-toolkit-for-custom-fields'),
+                    __('Enter everything below, choose "Brevo", send a test mail and switch on sending.', 'event-toolkit-for-custom-fields'),
+                ],
+                '',
+            ],
+            'emailit' => [
+                __('Emailit, sent directly', 'event-toolkit-for-custom-fields'),
+                [
+                    __('In Emailit, verify your sending domain.', 'event-toolkit-for-custom-fields'),
+                    __('Create an audience for the newsletter and note its ID (starts with <code>aud_</code>).', 'event-toolkit-for-custom-fields'),
+                    __('Create an API key with full access (scope "full"); campaigns need it.', 'event-toolkit-for-custom-fields'),
+                    __('Enter everything below, choose "Emailit", send a test mail and switch on sending.', 'event-toolkit-for-custom-fields'),
+                ],
+                '<a href="https://emailit.com/docs/api-reference/campaigns/create/" target="_blank" rel="noopener">' . esc_html__('Emailit documentation: campaigns', 'event-toolkit-for-custom-fields') . '</a>',
+            ],
+            'mailchimp' => [
+                'Mailchimp',
+                [
+                    __('Automations, Classic automations, "Share blog updates".', 'event-toolkit-for-custom-fields'),
+                    __('Enter the feed address and choose weekly sending on the day of the weekly preview.', 'event-toolkit-for-custom-fields'),
+                    __('In the content, use <code>*|RSSITEMS:|*</code> <code>*|RSSITEM:CONTENT_FULL|*</code> <code>*|END:RSSITEMS|*</code> for the whole preview.', 'event-toolkit-for-custom-fields'),
+                ],
+                '<a href="https://mailchimp.com/help/rss-merge-tags/" target="_blank" rel="noopener">' . esc_html__('Mailchimp help: RSS merge tags', 'event-toolkit-for-custom-fields') . '</a>',
+            ],
+            'mailerlite' => [
+                'MailerLite',
+                [
+                    __('Create a campaign of the type "RSS campaign" (only in paid plans).', 'event-toolkit-for-custom-fields'),
+                    __('Enter the feed address, choose weekly sending and "only new posts".', 'event-toolkit-for-custom-fields'),
+                    __('In the design, add an RSS block and choose the full content.', 'event-toolkit-for-custom-fields'),
+                ],
+                '<a href="https://www.mailerlite.com/help/how-to-create-an-rss-campaign" target="_blank" rel="noopener">' . esc_html__('MailerLite help: RSS campaign', 'event-toolkit-for-custom-fields') . '</a>',
+            ],
+            'other' => [
+                __('Other services', 'event-toolkit-for-custom-fields'),
+                [
+                    __('Look for "RSS-to-email" or "RSS campaign".', 'event-toolkit-for-custom-fields'),
+                    __('Send weekly, only new entries, with the full content of the entry (field content:encoded), not just the description.', 'event-toolkit-for-custom-fields'),
+                ],
+                '',
+            ],
+        ];
+        $open = $s['provider'] === 'emailit' ? 'emailit' : 'brevo-rss';
+        foreach ($guides as $id => [$title, $steps, $more]) {
+            echo '<details class="imm-tk-guide"' . ($id === $open ? ' open' : '') . '><summary>' . esc_html($title) . '</summary><ol class="imm-tk-steps">';
+            foreach ($steps as $step) {
+                echo '<li>' . wp_kses($step, $code) . '</li>';
+            }
+            echo '</ol>';
+            if ($more !== '') {
+                echo '<p>' . wp_kses($more, $link) . '</p>';
+            }
+            echo '</details>';
+        }
+        echo '<p class="imm-tk-panel-note">' . esc_html__('In the EU, newsletters need a double opt-in and the legal notice of the sender. Signup forms come from your newsletter service.', 'event-toolkit-for-custom-fields') . '</p>';
+
+        // Direct sending.
+        echo '<h2 class="imm-tk-section-title">' . esc_html__('Send directly', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<form method="post" action="options.php">';
+        settings_fields('imm_nl');
+        echo '<section class="imm-tk-panel"><table class="form-table" role="presentation">';
+        echo '<tr><th scope="row">' . esc_html__('Sending', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('enabled')) . '" value="1" ' . checked(!empty($s['enabled']), true, false) . '> ' . esc_html__('Send the weekly preview to the list at its time', 'event-toolkit-for-custom-fields') . '</label><p class="description">' . esc_html__('Leave this off if your service already uses the RSS feed, or subscribers get two mails.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-nl-provider">' . esc_html__('Service', 'event-toolkit-for-custom-fields') . '</label></th><td><select id="imm-nl-provider" name="' . esc_attr($field('provider')) . '"><option value="">' . esc_html__('Choose …', 'event-toolkit-for-custom-fields') . '</option><option value="brevo" ' . selected($s['provider'], 'brevo', false) . '>Brevo</option><option value="emailit" ' . selected($s['provider'], 'emailit', false) . '>Emailit</option></select></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-nl-key">' . esc_html__('API key', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="password" class="regular-text" id="imm-nl-key" name="' . esc_attr($field('api_key')) . '" value="" autocomplete="off" placeholder="' . esc_attr($s['api_key'] !== '' ? __('Saved. Leave empty to keep it.', 'event-toolkit-for-custom-fields') : '') . '">';
+        if ($s['api_key'] !== '') {
+            echo ' <label><input type="checkbox" name="' . esc_attr($field('delete_api_key')) . '" value="1"> ' . esc_html__('Delete', 'event-toolkit-for-custom-fields') . '</label>';
+        }
+        echo '</td></tr>';
+        echo '<tr><th scope="row"><label for="imm-nl-list">' . esc_html__('List or audience', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="imm-nl-list" name="' . esc_attr($field('list_id')) . '" value="' . esc_attr($s['list_id']) . '"><p class="description">' . wp_kses(__('Brevo: number of the contact list, e.g. <code>3</code>. Emailit: audience ID, e.g. <code>aud_…</code>.', 'event-toolkit-for-custom-fields'), $code) . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-nl-from-name">' . esc_html__('Sender name', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="imm-nl-from-name" name="' . esc_attr($field('from_name')) . '" value="' . esc_attr($s['from_name']) . '"></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-nl-from">' . esc_html__('Sender address', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="email" class="regular-text" id="imm-nl-from" name="' . esc_attr($field('from_email')) . '" value="' . esc_attr($s['from_email']) . '"><p class="description">' . esc_html__('Must be verified with the service.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-nl-subject">' . esc_html__('Subject', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="imm-nl-subject" name="' . esc_attr($field('subject')) . '" value="' . esc_attr($s['subject']) . '" placeholder="' . esc_attr(IMM_TK_Digest::issue_title(IMM_TK_Digest::next_issue())) . '"><p class="description">' . esc_html__('Empty = "Weekly preview" with the date.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-nl-footer">' . esc_html__('Footer', 'event-toolkit-for-custom-fields') . '</label></th><td><textarea class="large-text" rows="4" id="imm-nl-footer" name="' . esc_attr($field('footer')) . '">' . esc_textarea($s['footer']) . '</textarea><p class="description">' . esc_html__('Name and postal address of the sender (legal notice). The unsubscribe link is added automatically.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="imm-nl-test">' . esc_html__('Test address', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="email" class="regular-text" id="imm-nl-test" name="' . esc_attr($field('test_email')) . '" value="' . esc_attr($s['test_email']) . '"></td></tr>';
+        echo '</table></section>';
+        submit_button(__('Save settings', 'event-toolkit-for-custom-fields'));
+        echo '</form>';
+
+        if (IMM_NL_Newsletter::is_ready()) {
+            echo '<div class="imm-tk-actions">';
+            foreach (['imm_nl_check' => __('Check connection', 'event-toolkit-for-custom-fields'), 'imm_nl_test' => __('Send a test mail', 'event-toolkit-for-custom-fields')] as $action => $label) {
+                echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="' . esc_attr($action) . '">';
+                wp_nonce_field($action);
+                submit_button($label, 'secondary', 'submit', false);
+                echo '</form>';
+            }
+            echo '</div><p class="description">' . esc_html__('The test mail goes only to the test address, not to the list.', 'event-toolkit-for-custom-fields') . '</p>';
+        }
+
+        echo '</div><aside class="imm-tk-aside">';
+        self::panel(function () {
+            if (!IMM_TK_Settings::is_configured()) {
+                return;
+            }
+            $selection = self::live_selection();
+            echo '<h2>' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
+            echo '<p class="imm-tk-panel-note">' . esc_html(self::preview_note()) . '</p>';
+            if (IMM_TK_Digest::is_empty($selection)) {
+                echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
+                return;
+            }
+            $now  = new DateTimeImmutable('now', wp_timezone());
+            $html = IMM_NL_Newsletter::html($selection, IMM_NL_Newsletter::subject($now), '');
+            echo '<iframe class="imm-tk-mail-frame" title="' . esc_attr__('Preview', 'event-toolkit-for-custom-fields') . '" sandbox="" srcdoc="' . esc_attr($html) . '"></iframe>';
+        });
+        $log = IMM_NL_Newsletter::state()['log'];
+        if ($log) {
+            self::panel(function () use ($log) {
+                $format = get_option('date_format') . ' ' . get_option('time_format');
+                echo '<h2>' . esc_html__('Recent activity', 'event-toolkit-for-custom-fields') . '</h2><ul class="imm-tk-log">';
+                foreach (array_slice($log, 0, 15) as $entry) {
+                    echo '<li' . (empty($entry[2]) ? ' class="is-error"' : '') . '><time>' . esc_html(wp_date($format, (int) $entry[0])) . '</time> ' . esc_html((string) $entry[1]) . '</li>';
+                }
+                echo '</ul>';
+            });
+        }
+        echo '</aside></div>';
+    }
+
+    public static function handle_nl_check(): void
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
+        }
+        check_admin_referer('imm_nl_check');
+        $result = IMM_NL_Newsletter::check();
+        set_transient('imm_nl_notice_' . get_current_user_id(), is_wp_error($result) ? ['error', $result->get_error_message()] : ['success', $result], 5 * MINUTE_IN_SECONDS);
+        wp_safe_redirect(self::url('newsletter'));
+        exit;
+    }
+
+    public static function handle_nl_test(): void
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
+        }
+        check_admin_referer('imm_nl_test');
+        $now    = new DateTimeImmutable('now', wp_timezone());
+        $result = IMM_NL_Newsletter::send_test(self::live_selection(), $now);
+        if ($result === null) {
+            $notice = ['warning', __('Nothing to send: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields')];
+        } elseif (is_wp_error($result)) {
+            $notice = ['error', $result->get_error_message()];
+        } else {
+            /* translators: %s: e-mail address */
+            $notice = ['success', sprintf(__('Test mail sent to %s.', 'event-toolkit-for-custom-fields'), (string) IMM_NL_Newsletter::get('test_email'))];
+        }
+        set_transient('imm_nl_notice_' . get_current_user_id(), $notice, 5 * MINUTE_IN_SECONDS);
+        wp_safe_redirect(self::url('newsletter'));
         exit;
     }
 }

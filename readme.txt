@@ -1,10 +1,10 @@
 === Event Toolkit for Custom Fields ===
 Contributors: mblmg
-Tags: events, calendar, telegram, instagram, newsletter
+Tags: events, calendar, newsletter, instagram, telegram
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,6 +37,26 @@ Once a week, a preview of what is coming up: the events of the next days, plus t
 * Story images (1080 × 1920) in the look of your website: its fonts, your colours, the event picture as a polaroid
 * Posted automatically through the official Instagram API, free of charge: the weekly overview, and every event the day before and on the day
 * Built not to overwhelm followers: no extra story for tomorrow on the day of the weekly overview, and many events on one day share one story
+
+**Newsletter**
+
+* The weekly preview as RSS feed for the RSS campaigns of Brevo, Mailchimp, MailerLite and other services, with step-by-step guides
+* Or sent directly as campaign through the API of Brevo or Emailit, at the time of the weekly preview
+* Optionally only in weeks in which something was added
+
+**Mastodon and Bluesky**
+
+* The weekly preview and an optional "Today" post on event days, with the story images attached
+* Texts fitted to the length limits of both networks
+
+**Cancelled and postponed events**
+
+* One status field: search engines and subscribed calendars show the cancellation, the weekly preview and all texts mark the event, stories stop advertising it
+* One short notice on Telegram, Mastodon and Bluesky
+
+**QR codes**
+
+* A QR code of every event page for posters and flyers (SVG for print, PNG), on the page "Share", in Breakdance and as shortcode
 
 **Share by hand**
 
@@ -190,6 +210,14 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 
 **Google Fonts (optional).** Only when the story images use the fonts of your website and the theme does not ship them as .ttf or .otf file, the plugin downloads these font files once from Google Fonts (fonts.googleapis.com, fonts.gstatic.com), provided by Google LLC, and keeps them in the uploads folder. Only the font name and weight are sent. Choose "Bundled fonts" on the page "Share" to avoid this. [Privacy Policy](https://policies.google.com/privacy), [Google Fonts FAQ](https://developers.google.com/fonts/faq/privacy)
 
+**Mastodon (optional).** Only when you enter a server and an access token and switch it on, the plugin connects to that Mastodon server: at the time of the weekly preview, on event days (if switched on), for a cancellation notice, or when an administrator clicks "Post the weekly preview now" or "Check connection". It sends the post text (event titles, dates, times and links to your site) and the story images. The terms and privacy policy of the server you use apply; see its "About" page.
+
+**Bluesky (optional).** Only when you enter a handle and an app password and switch it on, the plugin connects to bsky.social (or the server you enter), provided by Bluesky Social PBC, at the same occasions as for Mastodon. It sends handle and app password to log in, then the post text and the story images. [Terms of Service](https://bsky.social/about/support/tos), [Privacy Policy](https://bsky.social/about/support/privacy-policy)
+
+**Brevo (optional).** Only when you choose Brevo for direct sending and enter an API key, the plugin connects to api.brevo.com, provided by Sendinblue SAS (Brevo): at the time of the weekly preview it creates and sends a campaign with the newsletter (event titles, dates, times, venues, images and links to your site) to the list you entered; "Check connection" reads the name of the list, "Send a test mail" sends one mail to the test address. [Terms of Use](https://www.brevo.com/legal/termsofuse/), [Privacy Policy](https://www.brevo.com/legal/privacypolicy/)
+
+**Emailit (optional).** Only when you choose Emailit for direct sending and enter an API key, the plugin connects to api.emailit.com, provided by Emailit, at the same occasions as for Brevo, with the same content. [Terms](https://emailit.com/terms/), [Privacy Policy](https://emailit.com/privacy/)
+
 **WhatsApp (optional).** The button "Open in WhatsApp" on the page "Share" opens wa.me with the text filled in. This only happens when an administrator clicks it. [Privacy Policy](https://www.whatsapp.com/legal/privacy-policy)
 
 **Google Rich Results Test.** The settings page contains a link to this Google tool. Clicking it opens the tool with the address of one of your event pages. Nothing is sent unless an administrator clicks the link.
@@ -199,6 +227,13 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 The bundled fonts Syne (by Bonjour Monde) and Atkinson Hyperlegible Mono (by Braille Institute) are licensed under the SIL Open Font License 1.1, see assets/fonts.
 
 == Changelog ==
+
+= 2.2.0 =
+* New: page "Newsletter" with guides for Brevo, Mailchimp, MailerLite and other services, and direct sending through Brevo or Emailit.
+* New: Mastodon and Bluesky: weekly preview, optional "Today" post, cancellation notice.
+* New: cancelled and postponed events, read from a status field, in search engines, calendars, the weekly preview, texts and story images; one notice on Telegram, Mastodon and Bluesky.
+* New: QR code of every event page (SVG and PNG).
+* The overview shows newsletter, Mastodon and Bluesky.
 
 = 2.1.0 =
 * New: story images (1080 × 1920) for the weekly preview and every event, in the fonts (including the heading weight) and colours of your website.
