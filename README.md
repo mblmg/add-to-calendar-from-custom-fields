@@ -12,7 +12,7 @@ WordPress plugin that spreads the events you keep in custom fields (ACF, ACPT or
 
 It replaces the earlier plugins "Add to Calendar from Custom Fields" and "Event Digest for Telegram" and takes over their settings.
 
-User documentation lives in [`readme.txt`](readme.txt), which is also what the WordPress.org plugin directory shows.
+User documentation lives in [`readme.txt`](readme.txt), which is also what the WordPress.org plugin directory shows. Plans and design decisions are in [`ROADMAP.md`](ROADMAP.md).
 
 ## Development
 
