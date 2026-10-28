@@ -26,6 +26,8 @@ class IMM_TK_Sharepic
     /** More events than this on one day are shown as one list instead of single frames. */
     const MAX_SINGLE = 3;
     const DIR = 'event-toolkit/stories';
+    /** Raise when the layout changes, so cached images are rendered again. */
+    const DESIGN = 2;
 
     /** Rendering needs GD with FreeType and JPEG support. */
     public static function available(): bool
@@ -177,7 +179,7 @@ class IMM_TK_Sharepic
     /** Everything the image depends on. */
     private static function fingerprint(array $spec, array $events): string
     {
-        $data = [$spec, IMM_TK_VERSION, self::style(), array_map('basename', self::fonts()), get_locale(), get_option('time_format')];
+        $data = [$spec, IMM_TK_VERSION, self::DESIGN, self::style(), array_map('basename', self::fonts()), get_locale(), get_option('time_format')];
         foreach ($events as $e) {
             $data[] = [$e->id, $e->title, $e->start->format('c'), $e->main_start->format('c'), $e->doors ? $e->doors->format('c') : '', $e->location, get_post_thumbnail_id($e->id), $e->modified->format('c')];
         }
@@ -322,6 +324,40 @@ class IMM_TK_Sharepic
         }
         $lines[count($lines) - 1] = rtrim($last) . '…';
         return [$min_px, $lines];
+    }
+
+    /**
+     * Short info line: one line if it fits at $min_one or larger, else up to two lines,
+     * so that no single word ends up alone on a second line.
+     *
+     * @return array{0: float, 1: string[]}
+     */
+    private static function fit_short(string $font, string $text, int $width, float $max_px, float $min_one, float $min_two): array
+    {
+        for ($px = $max_px; $px >= $min_one; $px -= 2) {
+            if (self::width($font, $px, $text) <= $width) {
+                return [$px, [$text]];
+            }
+        }
+        // Two lines, broken at the comma closest to the middle if there is one.
+        $parts = preg_split('/(?<=,)\s+/', $text);
+        if (count($parts) > 1) {
+            $best = null;
+            for ($i = 1; $i < count($parts); $i++) {
+                $a    = implode(' ', array_slice($parts, 0, $i));
+                $b    = implode(' ', array_slice($parts, $i));
+                $diff = abs(mb_strlen($a) - mb_strlen($b));
+                if ($best === null || $diff < $best[0]) {
+                    $best = [$diff, [$a, $b]];
+                }
+            }
+            for ($px = $max_px; $px >= $min_two; $px -= 2) {
+                if (self::width($font, $px, $best[1][0]) <= $width && self::width($font, $px, $best[1][1]) <= $width) {
+                    return [$px, $best[1]];
+                }
+            }
+        }
+        return self::fit($font, $text, $width, $max_px, $min_two, 2);
     }
 
     /**
@@ -551,7 +587,7 @@ class IMM_TK_Sharepic
 
         // When: today only the time, tomorrow day and time.
         $when = $today ? IMM_TK_Digest::time($e) : self::long_date($e) . ', ' . IMM_TK_Digest::time($e);
-        [$px, $lines] = self::fit($f['text'], $when, $width, 42, 32, 2);
+        [$px, $lines] = self::fit_short($f['text'], $when, $width, 42, 34, 30);
         $y = self::lines($im, $f['text'], $px, 1.3, self::MARGIN, $y + 18, $p['fg'], $lines);
 
         // Caption on the polaroid strip: the title.
@@ -608,7 +644,8 @@ class IMM_TK_Sharepic
 
         if ($day) {
             $y = self::big_word($im, $variant, $p);
-            $y = self::lines($im, $f['text'], 42, 1.3, self::MARGIN, $y + 18, $p['fg'], [self::long_date($events[0])]);
+            [$dpx, $dlines] = self::fit_short($f['text'], self::long_date($events[0]), $width, 42, 34, 30);
+            $y = self::lines($im, $f['text'], $dpx, 1.3, self::MARGIN, $y + 18, $p['fg'], $dlines);
         } else {
             $heading = $variant === 'week' ? IMM_TK_Digest::heading_week() : IMM_TK_Digest::heading_new();
             [$hpx, $hlines] = self::fit($f['display'], $heading, $width, 104, 64, 3);
@@ -619,9 +656,9 @@ class IMM_TK_Sharepic
         // Few events get bigger rows.
         $y     += 72;
         $space  = self::BOTTOM - 100 - $y;
-        $row    = min(330, (int) floor($space / max(1, count($events))));
-        $photo  = max(120, min(250, $row - 80));
-        $grow   = ($photo - 170) / 80; // 0 at the normal size, 1 at the largest.
+        $row    = min(400, (int) floor($space / max(1, count($events))));
+        $photo  = max(120, min(300, $row - 80));
+        $grow   = min(1, ($photo - 170) / 80); // 0 at the normal size, 1 from 250 px on.
         $text_x = self::MARGIN + $photo + 2 * 12 + 52;
         $text_w = self::W - self::MARGIN - $text_x;
         $none   = function () {
