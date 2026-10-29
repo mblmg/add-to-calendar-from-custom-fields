@@ -199,7 +199,7 @@ class ETCF_Instagram
             // Account ID entered by hand: only check that the token may use it.
             $ig = self::call('GET', $account_id, ['fields' => 'id,username'], $token);
             if (is_wp_error($ig)) {
-                return $ig;
+                return new WP_Error('etcf_ig_no_access', $ig->get_error_message() . ' ' . self::token_report($token));
             }
             return ['id' => (string) ($ig['id'] ?? $account_id), 'username' => (string) ($ig['username'] ?? ''), 'account_type' => ''];
         }
@@ -233,6 +233,14 @@ class ETCF_Instagram
             return ['id' => (string) $first['id'], 'username' => (string) ($first['username'] ?? ''), 'account_type' => ''];
         }
 
+        // The Instagram accounts the token's permissions are granted for.
+        foreach (self::token_info($token)['targets'] as $target) {
+            $ig = self::call('GET', $target, ['fields' => 'id,username'], $token);
+            if (!is_wp_error($ig) && !empty($ig['username'])) {
+                return ['id' => (string) $ig['id'], 'username' => (string) $ig['username'], 'account_type' => ''];
+            }
+        }
+
         // The Instagram accounts of the business portfolio the token belongs to.
         $business = self::call('GET', 'me', ['fields' => 'client_business_id'], $token);
         $business = is_wp_error($business) ? '' : (string) ($business['client_business_id'] ?? '');
@@ -255,12 +263,60 @@ class ETCF_Instagram
 
         $detail = trim((string) ($me['name'] ?? '') . ' ' . (string) ($me['id'] ?? ''));
         $detail .= ' – assigned_instagram_accounts: ' . (is_wp_error($list) ? $list->get_error_message() : count((array) ($list['data'] ?? [])));
-        $detail .= ' – business: ' . ($business !== '' ? $business : '–');
+        $detail .= ' – business: ' . ($business !== '' ? $business : '–') . ' – ' . self::token_report($token);
         return new WP_Error('etcf_ig_no_account', sprintf(
             /* translators: %s: name and ID of the object behind the token, as reported by Meta */
             __('The token works, but the plugin could not find the Instagram account. Enter the account ID below (in the Meta app under "Generate access tokens", below the account name) and save again. (Token belongs to: %s)', 'event-toolkit-for-custom-fields'),
             $detail !== '' ? $detail : '?'
         ));
+    }
+
+    /**
+     * What Meta says about a token: type, app, validity, permissions and the IDs they are granted for.
+     *
+     * @return array{type: string, app: string, valid: bool, expires: int, scopes: string[], targets: string[], error: string}
+     */
+    public static function token_info(string $token): array
+    {
+        $info = ['type' => '', 'app' => '', 'valid' => false, 'expires' => 0, 'scopes' => [], 'targets' => [], 'error' => ''];
+        $data = self::call('GET', 'debug_token', ['input_token' => $token], $token);
+        if (is_wp_error($data)) {
+            $info['error'] = $data->get_error_message();
+            return $info;
+        }
+        $data            = (array) ($data['data'] ?? []);
+        $info['type']    = (string) ($data['type'] ?? '');
+        $info['app']     = (string) ($data['application'] ?? $data['app_id'] ?? '');
+        $info['valid']   = !empty($data['is_valid']);
+        $info['expires'] = (int) ($data['expires_at'] ?? 0);
+        $info['scopes']  = array_map('strval', (array) ($data['scopes'] ?? []));
+        foreach ((array) ($data['granular_scopes'] ?? []) as $scope) {
+            if (strpos((string) ($scope['scope'] ?? ''), 'instagram') === 0) {
+                foreach ((array) ($scope['target_ids'] ?? []) as $id) {
+                    $info['targets'][] = (string) $id;
+                }
+            }
+        }
+        $info['targets'] = array_values(array_unique($info['targets']));
+        return $info;
+    }
+
+    /** One line about a token for error messages, without the token itself. */
+    private static function token_report(string $token): string
+    {
+        $info = self::token_info($token);
+        if ($info['error'] !== '') {
+            return '[debug_token: ' . $info['error'] . ']';
+        }
+        return sprintf(
+            '[%s, %s, %s, %s, %s: %s]',
+            $info['type'] !== '' ? $info['type'] : '?',
+            $info['app'] !== '' ? $info['app'] : '?',
+            $info['valid'] ? 'valid' : 'invalid',
+            $info['expires'] ? 'expires ' . wp_date('Y-m-d', $info['expires']) : 'no expiry',
+            $info['scopes'] ? implode(' ', $info['scopes']) : 'no scopes',
+            $info['targets'] ? implode(' ', $info['targets']) : 'no Instagram targets'
+        );
     }
 
     /**
