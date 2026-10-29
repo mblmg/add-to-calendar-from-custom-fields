@@ -1841,5 +1841,6 @@ msgid "Paste the token above and save. The plugin reads the account. Tokens of o
 msgstr "Füg den Token oben ein und speichere. Das Plugin liest das Konto aus. Tokens älterer Apps (beginnen mit IGAA) funktionieren auch und werden jede Woche verlängert."
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "The token works, but no Instagram account is shared with it. Generate the token again and select the Instagram account."
-msgstr "Der Token funktioniert, aber es ist kein Instagram-Konto damit freigegeben. Erzeug den Token neu und wähl dabei das Instagram-Konto aus."
+#, php-format
+msgid "The token works, but no Instagram account is shared with it. Generate the token again and select the Instagram account. (Token belongs to: %s)"
+msgstr "Der Token funktioniert, aber es ist kein Instagram-Konto damit freigegeben. Erzeug den Token neu und wähl dabei das Instagram-Konto aus. (Token gehört zu: %s)"

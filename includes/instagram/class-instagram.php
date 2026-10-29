@@ -201,16 +201,43 @@ class ETCF_Instagram
                 'account_type' => (string) ($me['account_type'] ?? ''),
             ];
         }
-        // System user token: /me is the system user; the shared Instagram accounts are listed separately.
+        // Which object the token stands for. With Unified Login this is a system user; a test token
+        // generated in the App Dashboard can also stand for the Instagram account itself.
+        $me = self::call('GET', 'me', ['fields' => 'id,name'], $token);
+        if (is_wp_error($me)) {
+            return $me;
+        }
+        // Only Instagram accounts have a username; for other objects Meta answers with an error.
+        $ig_me = self::call('GET', 'me', ['fields' => 'id,username'], $token);
+        if (!is_wp_error($ig_me) && !empty($ig_me['username']) && !empty($ig_me['id'])) {
+            return ['id' => (string) $ig_me['id'], 'username' => (string) $ig_me['username'], 'account_type' => ''];
+        }
+
+        // System user token: the shared Instagram accounts are listed separately.
         $list = self::call('GET', 'me/assigned_instagram_accounts', ['fields' => 'id,username'], $token);
+        $first = is_wp_error($list) ? null : ($list['data'][0] ?? null);
+        if (is_array($first) && !empty($first['id'])) {
+            return ['id' => (string) $first['id'], 'username' => (string) ($first['username'] ?? ''), 'account_type' => ''];
+        }
+
+        // Facebook user token: the Instagram account is linked to one of the person's Facebook Pages.
+        $pages = self::call('GET', 'me/accounts', ['fields' => 'instagram_business_account{id,username}'], $token);
+        foreach (is_wp_error($pages) ? [] : (array) ($pages['data'] ?? []) as $page) {
+            $ig = $page['instagram_business_account'] ?? null;
+            if (is_array($ig) && !empty($ig['id'])) {
+                return ['id' => (string) $ig['id'], 'username' => (string) ($ig['username'] ?? ''), 'account_type' => ''];
+            }
+        }
+
+        $detail = trim((string) ($me['name'] ?? '') . ' ' . (string) ($me['id'] ?? ''));
         if (is_wp_error($list)) {
-            return $list;
+            $detail .= ' – ' . $list->get_error_message();
         }
-        $first = $list['data'][0] ?? null;
-        if (!is_array($first) || empty($first['id'])) {
-            return new WP_Error('etcf_ig_no_account', __('The token works, but no Instagram account is shared with it. Generate the token again and select the Instagram account.', 'event-toolkit-for-custom-fields'));
-        }
-        return ['id' => (string) $first['id'], 'username' => (string) ($first['username'] ?? ''), 'account_type' => ''];
+        return new WP_Error('etcf_ig_no_account', sprintf(
+            /* translators: %s: name and ID of the object behind the token, as reported by Meta */
+            __('The token works, but no Instagram account is shared with it. Generate the token again and select the Instagram account. (Token belongs to: %s)', 'event-toolkit-for-custom-fields'),
+            $detail !== '' ? $detail : '?'
+        ));
     }
 
     /**

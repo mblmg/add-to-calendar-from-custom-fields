@@ -1841,5 +1841,6 @@ msgid "Paste the token above and save. The plugin reads the account. Tokens of o
 msgstr ""
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "The token works, but no Instagram account is shared with it. Generate the token again and select the Instagram account."
+#, php-format
+msgid "The token works, but no Instagram account is shared with it. Generate the token again and select the Instagram account. (Token belongs to: %s)"
 msgstr ""
