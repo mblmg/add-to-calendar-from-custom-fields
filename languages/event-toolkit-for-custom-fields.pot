@@ -1829,11 +1829,11 @@ msgid "In the app, open Use cases → Customize → \"API setup with Unified log
 msgstr ""
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "Accept the invitation on instagram.com with that account: Settings → Website permissions → Apps and websites → Tester invites."
+msgid "Accept the invitation with that account in a web browser on instagram.com (the Instagram app does not show tester invites): Settings → Website permissions → Apps and websites → Tester invites."
 msgstr ""
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "Back in the app, click \"Generate token\", log in and copy the token. It is shown only once. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it."
+msgid "Back in the app, click \"Generate token\", log in and copy the token. It is shown only once. The switch \"Webhook subscription\" is not needed. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it."
 msgstr ""
 
 #: includes/class-admin.php includes/instagram/class-instagram.php

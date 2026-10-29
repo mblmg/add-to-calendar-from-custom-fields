@@ -137,8 +137,8 @@ If another plugin already outputs event markup for the same posts, turn the opti
 1. Switch your Instagram account to a business account (free, in the Instagram app). Instagram only allows stories through the API for business accounts.
 2. On developers.facebook.com, create an app with the use case "Manage messaging & content on Instagram" and connect it to your business portfolio.
 3. In the app, open Use cases → Customize → "API setup with Unified login". Select a configuration with the permission instagram_content_publish. Under "Generate access tokens", click "Add account" and invite your Instagram account as Instagram tester.
-4. Accept the invitation on instagram.com: Settings → Website permissions → Apps and websites → Tester invites.
-5. Back in the app, click "Generate token" and copy it. The app can stay in development mode, because it only posts to your own account.
+4. Accept the invitation in a web browser on instagram.com (the Instagram app does not show tester invites): Settings → Website permissions → Apps and websites → Tester invites.
+5. Back in the app, click "Generate token" and copy it. The switch "Webhook subscription" is not needed. The app can stay in development mode, because it only posts to your own account.
 6. Paste the token on the page "Instagram", check the plan for the next days and turn on automatic stories.
 
 Tokens of older apps with "API setup with Instagram login" (starting with IGAA) work too; the plugin renews them every week. Instagram downloads the images from your site, so the uploads folder must be publicly reachable.

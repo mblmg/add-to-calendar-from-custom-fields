@@ -1829,12 +1829,12 @@ msgid "In the app, open Use cases → Customize → \"API setup with Unified log
 msgstr "Öffne in der App Anwendungsfälle → Anpassen → „API setup with Unified login“. Wähl eine Konfiguration aus (sie braucht die Berechtigung instagram_content_publish) und lade unter „Zugriffstokens generieren“ mit „Konto hinzufügen“ dein Instagram-Konto als Instagram-Tester ein."
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "Accept the invitation on instagram.com with that account: Settings → Website permissions → Apps and websites → Tester invites."
-msgstr "Nimm die Einladung auf instagram.com mit diesem Konto an: Einstellungen → Website-Berechtigungen → Apps und Websites → Tester-Einladungen."
+msgid "Accept the invitation with that account in a web browser on instagram.com (the Instagram app does not show tester invites): Settings → Website permissions → Apps and websites → Tester invites."
+msgstr "Nimm die Einladung mit diesem Konto im Webbrowser auf instagram.com an (die Instagram-App zeigt Tester-Einladungen nicht an): Einstellungen → Website-Berechtigungen → Apps und Websites → Tester-Einladungen."
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "Back in the app, click \"Generate token\", log in and copy the token. It is shown only once. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it."
-msgstr "Klick danach in der App auf „Token generieren“, melde dich an und kopier den Token. Er wird nur einmal angezeigt. Die App kann im Entwicklungsmodus bleiben; sie wird nur für dein eigenes Konto genutzt, deshalb muss Meta sie nicht prüfen."
+msgid "Back in the app, click \"Generate token\", log in and copy the token. It is shown only once. The switch \"Webhook subscription\" is not needed. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it."
+msgstr "Klick danach in der App auf „Token generieren“, melde dich an und kopier den Token. Er wird nur einmal angezeigt. Den Schalter „Webhook-Abonnement“ brauchst du nicht. Die App kann im Entwicklungsmodus bleiben; sie wird nur für dein eigenes Konto genutzt, deshalb muss Meta sie nicht prüfen."
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
 msgid "Paste the token above and save. The plugin reads the account. Tokens of older apps (starting with IGAA) work too and are renewed every week."
