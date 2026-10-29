@@ -318,7 +318,7 @@ class ETCF_Newsletter
             return new WP_Error('etcf_nl_emailit', __('Emailit did not create the campaign.', 'event-toolkit-for-custom-fields'));
         }
         $recipients = self::request('POST', self::EMAILIT . '/campaigns/' . rawurlencode($id), self::emailit_headers(), [
-            'recipients' => [['audience_id' => (string) self::get('list_id'), 'exclude' => false]],
+            'recipients' => [['audience_id' => (string) self::get('list_id'), 'exclude' => false]], // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- field of the Emailit API, not a WordPress query.
         ]);
         if (is_wp_error($recipients)) {
             return $recipients;
