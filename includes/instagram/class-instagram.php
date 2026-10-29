@@ -1,11 +1,17 @@
 <?php
 /**
- * Instagram: settings, state and the official Instagram API (Instagram Login, graph.instagram.com).
+ * Instagram: settings, state and the official Instagram API.
  *
  * Stories are published in two steps: create a media container from a public JPEG URL
  * (media_type=STORIES), then publish the container. The API is free of charge; the account
  * must be a professional (business) account, and the access token comes from the site owner's
- * own Meta app. Long-lived tokens expire after 60 days and are refreshed here regularly.
+ * own Meta app. Two kinds of token work:
+ *
+ * - Unified Login (all apps created since 2026): a system user access token of the business
+ *   portfolio (EAA…), on graph.facebook.com. It usually does not expire; the Instagram account
+ *   is read from /me/assigned_instagram_accounts.
+ * - Instagram Login (older apps): an Instagram user token (IGAA…), on graph.instagram.com.
+ *   It expires after 60 days and is renewed here every week.
  */
 
 defined('ABSPATH') || exit;
@@ -14,7 +20,10 @@ class ETCF_Instagram
 {
     const OPTION = 'etcf_ig_settings';
     const STATE  = 'etcf_ig_state';
-    const API    = 'https://graph.instagram.com/';
+    /** API host for Instagram user tokens (Instagram Login). */
+    const API_INSTAGRAM = 'https://graph.instagram.com/';
+    /** API host for system user tokens (Unified Login) and Facebook tokens. */
+    const API_FACEBOOK = 'https://graph.facebook.com/v26.0/';
 
     /** Set while the plugin itself saves the settings (token refresh), to skip the checks in sanitize(). */
     private static $internal = false;
@@ -71,18 +80,24 @@ class ETCF_Instagram
             $out['username'] = '';
             self::update_state(['token_saved' => 0, 'token_refreshed' => 0, 'token_expires' => 0]);
         } elseif ($token !== '' && $token !== $old['token']) {
-            $me = self::me($token);
-            if (is_wp_error($me)) {
+            $account = self::account($token);
+            if (is_wp_error($account)) {
                 self::settings_error(sprintf(
                     /* translators: %s: error message */
                     __('The access token was not saved: %s', 'event-toolkit-for-custom-fields'),
-                    $me->get_error_message()
+                    $account->get_error_message()
                 ));
             } else {
                 $out['token']    = $token;
-                $out['user_id']  = (string) ($me['user_id'] ?? $me['id'] ?? '');
-                $out['username'] = (string) ($me['username'] ?? '');
-                self::update_state(['token_saved' => time(), 'token_refreshed' => 0, 'token_expires' => time() + 60 * DAY_IN_SECONDS, 'account_type' => (string) ($me['account_type'] ?? '')]);
+                $out['user_id']  = $account['id'];
+                $out['username'] = $account['username'];
+                self::update_state([
+                    'token_saved'     => time(),
+                    'token_refreshed' => 0,
+                    // Instagram user tokens last 60 days; system user tokens usually do not expire.
+                    'token_expires'   => self::is_instagram_token($token) ? time() + 60 * DAY_IN_SECONDS : 0,
+                    'account_type'    => $account['account_type'],
+                ]);
             }
         }
         return $out;
@@ -135,8 +150,9 @@ class ETCF_Instagram
      */
     public static function call(string $method, string $path, array $params = [], string $token = '')
     {
-        $params['access_token'] = $token !== '' ? $token : (string) self::get('token');
-        $url  = self::API . ltrim($path, '/');
+        $token                  = $token !== '' ? $token : (string) self::get('token');
+        $params['access_token'] = $token;
+        $url  = (self::is_instagram_token($token) ? self::API_INSTAGRAM : self::API_FACEBOOK) . ltrim($path, '/');
         $args = ['timeout' => 30];
         if ($method === 'GET') {
             $response = wp_remote_get(add_query_arg(array_map('rawurlencode', $params), $url), $args);
@@ -160,14 +176,45 @@ class ETCF_Instagram
         return $body;
     }
 
-    /** Account behind a token. @return array|WP_Error */
-    public static function me(string $token = '')
+    /** An Instagram user token (Instagram Login) rather than a system user token (Unified Login). */
+    public static function is_instagram_token(string $token): bool
     {
-        return self::call('GET', 'me', ['fields' => 'user_id,username,account_type'], $token);
+        return strncmp($token, 'IG', 2) === 0;
     }
 
     /**
-     * Refreshes the long-lived token (possible once it is 24 hours old, until it expires).
+     * The Instagram account a token posts to.
+     *
+     * @return array|WP_Error ['id' => …, 'username' => …, 'account_type' => … (empty if unknown)]
+     */
+    public static function account(string $token = '')
+    {
+        $token = $token !== '' ? $token : (string) self::get('token');
+        if (self::is_instagram_token($token)) {
+            $me = self::call('GET', 'me', ['fields' => 'user_id,username,account_type'], $token);
+            if (is_wp_error($me)) {
+                return $me;
+            }
+            return [
+                'id'           => (string) ($me['user_id'] ?? $me['id'] ?? ''),
+                'username'     => (string) ($me['username'] ?? ''),
+                'account_type' => (string) ($me['account_type'] ?? ''),
+            ];
+        }
+        // System user token: /me is the system user; the shared Instagram accounts are listed separately.
+        $list = self::call('GET', 'me/assigned_instagram_accounts', ['fields' => 'id,username'], $token);
+        if (is_wp_error($list)) {
+            return $list;
+        }
+        $first = $list['data'][0] ?? null;
+        if (!is_array($first) || empty($first['id'])) {
+            return new WP_Error('etcf_ig_no_account', __('The token works, but no Instagram account is shared with it. Generate the token again and select the Instagram account.', 'event-toolkit-for-custom-fields'));
+        }
+        return ['id' => (string) $first['id'], 'username' => (string) ($first['username'] ?? ''), 'account_type' => ''];
+    }
+
+    /**
+     * Refreshes a long-lived Instagram user token (possible once it is 24 hours old, until it expires).
      *
      * @return true|WP_Error
      */
@@ -197,7 +244,7 @@ class ETCF_Instagram
     {
         $state = self::state();
         $last  = max((int) $state['token_saved'], (int) $state['token_refreshed']);
-        if (!self::is_ready() || !$last || time() - $last < 7 * DAY_IN_SECONDS) {
+        if (!self::is_ready() || !self::is_instagram_token((string) self::get('token')) || !$last || time() - $last < 7 * DAY_IN_SECONDS) {
             return;
         }
         $result = self::refresh_token();

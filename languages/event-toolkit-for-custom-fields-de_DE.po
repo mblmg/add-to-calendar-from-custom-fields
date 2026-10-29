@@ -1054,18 +1054,6 @@ msgstr "Letzte Aktivitäten"
 msgid "In the Instagram app, switch the account to a business account (Settings → Account type and tools). This is free."
 msgstr "Stell das Konto in der Instagram-App auf ein Unternehmenskonto um (Einstellungen → Kontotyp und Tools). Das kostet nichts."
 
-#: includes/class-admin.php:1265
-msgid "On <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a>, create an app of the type \"Business\" and add the product \"Instagram\" with \"API setup with Instagram login\"."
-msgstr "Leg auf <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a> eine App vom Typ „Business“ an und füge das Produkt „Instagram“ mit „API-Einrichtung mit Instagram-Login“ hinzu."
-
-#: includes/class-admin.php:1266
-msgid "Under \"Generate access tokens\", add your Instagram account and generate a token. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it."
-msgstr "Füge unter „Zugriffstokens generieren“ dein Instagram-Konto hinzu und erzeuge einen Token. Die App kann im Entwicklungsmodus bleiben. Sie läuft nur für dein eigenes Konto, deshalb muss Meta sie nicht prüfen."
-
-#: includes/class-admin.php:1267
-msgid "Paste the token above and save. The plugin reads the account and renews the token every week. If the site is unreachable for more than 60 days, generate a new token."
-msgstr "Füg den Token oben ein und speichere. Das Plugin liest das Konto aus und verlängert den Token jede Woche. War die Seite länger als 60 Tage nicht erreichbar, erzeug einen neuen Token."
-
 #: includes/class-admin.php:1269
 msgid "Instagram downloads the story images from your site, so the uploads folder must be publicly reachable (no maintenance mode or password protection)."
 msgstr "Instagram lädt die Story-Bilder von deiner Seite. Der Uploads-Ordner muss deshalb öffentlich erreichbar sein (kein Wartungsmodus, kein Passwortschutz)."
@@ -1831,3 +1819,27 @@ msgstr "Telegram war nicht erreichbar."
 #: includes/telegram/class-telegram.php:33
 msgid "Telegram reports: %s"
 msgstr "Telegram meldet: %s"
+
+#: includes/class-admin.php includes/instagram/class-instagram.php
+msgid "On <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a>, create an app with the use case \"Manage messaging & content on Instagram\" and connect it to your business portfolio."
+msgstr "Leg auf <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a> eine App mit dem Anwendungsfall „Messaging und Content auf Instagram verwalten“ an und verknüpfe sie mit deinem Business-Portfolio."
+
+#: includes/class-admin.php includes/instagram/class-instagram.php
+msgid "In the app, open Use cases → Customize → \"API setup with Unified login\". Select a configuration (it needs the permission instagram_content_publish) and, under \"Generate access tokens\", click \"Add account\" and invite your Instagram account as Instagram tester."
+msgstr "Öffne in der App Anwendungsfälle → Anpassen → „API setup with Unified login“. Wähl eine Konfiguration aus (sie braucht die Berechtigung instagram_content_publish) und lade unter „Zugriffstokens generieren“ mit „Konto hinzufügen“ dein Instagram-Konto als Instagram-Tester ein."
+
+#: includes/class-admin.php includes/instagram/class-instagram.php
+msgid "Accept the invitation on instagram.com with that account: Settings → Website permissions → Apps and websites → Tester invites."
+msgstr "Nimm die Einladung auf instagram.com mit diesem Konto an: Einstellungen → Website-Berechtigungen → Apps und Websites → Tester-Einladungen."
+
+#: includes/class-admin.php includes/instagram/class-instagram.php
+msgid "Back in the app, click \"Generate token\", log in and copy the token. It is shown only once. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it."
+msgstr "Klick danach in der App auf „Token generieren“, melde dich an und kopier den Token. Er wird nur einmal angezeigt. Die App kann im Entwicklungsmodus bleiben; sie wird nur für dein eigenes Konto genutzt, deshalb muss Meta sie nicht prüfen."
+
+#: includes/class-admin.php includes/instagram/class-instagram.php
+msgid "Paste the token above and save. The plugin reads the account. Tokens of older apps (starting with IGAA) work too and are renewed every week."
+msgstr "Füg den Token oben ein und speichere. Das Plugin liest das Konto aus. Tokens älterer Apps (beginnen mit IGAA) funktionieren auch und werden jede Woche verlängert."
+
+#: includes/class-admin.php includes/instagram/class-instagram.php
+msgid "The token works, but no Instagram account is shared with it. Generate the token again and select the Instagram account."
+msgstr "Der Token funktioniert, aber es ist kein Instagram-Konto damit freigegeben. Erzeug den Token neu und wähl dabei das Instagram-Konto aus."

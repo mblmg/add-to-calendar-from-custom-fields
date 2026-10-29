@@ -1146,7 +1146,7 @@ class ETCF_Admin
             __('Account', 'event-toolkit-for-custom-fields')     => $s['username'] !== '' ? '@' . $s['username'] : __('not connected', 'event-toolkit-for-custom-fields'),
             __('Next stories', 'event-toolkit-for-custom-fields') => $next ? wp_date($format, $next) : __('not scheduled (turn on automatic stories and save an access token)', 'event-toolkit-for-custom-fields'),
         ];
-        if ($s['token'] !== '' && $state['token_expires']) {
+        if ($s['token'] !== '' && ETCF_Instagram::is_instagram_token($s['token']) && $state['token_expires']) {
             $rows[__('Access token', 'event-toolkit-for-custom-fields')] = sprintf(
                 /* translators: %s: date */
                 __('valid until about %s, renewed automatically every week', 'event-toolkit-for-custom-fields'),
@@ -1175,7 +1175,7 @@ class ETCF_Admin
                     <th scope="row"><label for="etcf-ig-token"><?php esc_html_e('Access token', 'event-toolkit-for-custom-fields'); ?></label></th>
                     <td>
                         <input type="password" class="regular-text" id="etcf-ig-token" name="<?php echo esc_attr($field('token')); ?>" value="" autocomplete="off"
-                               placeholder="<?php echo $s['token'] !== '' ? esc_attr__('Saved. Leave empty to keep it.', 'event-toolkit-for-custom-fields') : 'IGAA…'; ?>">
+                               placeholder="<?php echo $s['token'] !== '' ? esc_attr__('Saved. Leave empty to keep it.', 'event-toolkit-for-custom-fields') : 'EAA…'; ?>">
                         <?php if ($s['token'] !== '') : ?>
                             <label style="margin-left:1em"><input type="checkbox" name="<?php echo esc_attr($field('delete_token')); ?>" value="1"> <?php esc_html_e('Delete token', 'event-toolkit-for-custom-fields'); ?></label>
                         <?php endif; ?>
@@ -1245,9 +1245,11 @@ class ETCF_Admin
     {
         echo '<h2>' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</h2><ol class="etcf-steps">';
         echo '<li>' . esc_html__('In the Instagram app, switch the account to a business account (Settings → Account type and tools). This is free.', 'event-toolkit-for-custom-fields') . '</li>';
-        echo '<li>' . wp_kses(__('On <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">developers.facebook.com</a>, create an app of the type "Business" and add the product "Instagram" with "API setup with Instagram login".', 'event-toolkit-for-custom-fields'), ['a' => ['href' => [], 'target' => [], 'rel' => []]]) . '</li>';
-        echo '<li>' . esc_html__('Under "Generate access tokens", add your Instagram account and generate a token. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it.', 'event-toolkit-for-custom-fields') . '</li>';
-        echo '<li>' . esc_html__('Paste the token above and save. The plugin reads the account and renews the token every week. If the site is unreachable for more than 60 days, generate a new token.', 'event-toolkit-for-custom-fields') . '</li>';
+        echo '<li>' . wp_kses(__('On <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">developers.facebook.com</a>, create an app with the use case "Manage messaging & content on Instagram" and connect it to your business portfolio.', 'event-toolkit-for-custom-fields'), ['a' => ['href' => [], 'target' => [], 'rel' => []]]) . '</li>';
+        echo '<li>' . esc_html__('In the app, open Use cases → Customize → "API setup with Unified login". Select a configuration (it needs the permission instagram_content_publish) and, under "Generate access tokens", click "Add account" and invite your Instagram account as Instagram tester.', 'event-toolkit-for-custom-fields') . '</li>';
+        echo '<li>' . esc_html__('Accept the invitation on instagram.com with that account: Settings → Website permissions → Apps and websites → Tester invites.', 'event-toolkit-for-custom-fields') . '</li>';
+        echo '<li>' . esc_html__('Back in the app, click "Generate token", log in and copy the token. It is shown only once. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it.', 'event-toolkit-for-custom-fields') . '</li>';
+        echo '<li>' . esc_html__('Paste the token above and save. The plugin reads the account. Tokens of older apps (starting with IGAA) work too and are renewed every week.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '</ol>';
         echo '<p class="etcf-panel-note">' . esc_html__('Instagram downloads the story images from your site, so the uploads folder must be publicly reachable (no maintenance mode or password protection).', 'event-toolkit-for-custom-fields') . '</p>';
     }
@@ -1307,11 +1309,11 @@ class ETCF_Admin
             wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
         }
         check_admin_referer('etcf_ig_check');
-        $me = ETCF_Instagram::me();
+        $me = ETCF_Instagram::account();
         if (is_wp_error($me)) {
             $notice = ['error', $me->get_error_message()];
         } else {
-            ETCF_Instagram::update_state(['account_type' => (string) ($me['account_type'] ?? '')]);
+            ETCF_Instagram::update_state(['account_type' => $me['account_type']]);
             $limit  = ETCF_Instagram::call('GET', ETCF_Instagram::get('user_id') . '/content_publishing_limit', ['fields' => 'quota_usage,config']);
             $used   = is_wp_error($limit) ? '' : (string) ($limit['data'][0]['quota_usage'] ?? '');
             $notice = ['success', sprintf(

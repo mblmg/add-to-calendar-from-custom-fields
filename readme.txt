@@ -135,11 +135,13 @@ If another plugin already outputs event markup for the same posts, turn the opti
 = How do I connect Instagram? =
 
 1. Switch your Instagram account to a business account (free, in the Instagram app). Instagram only allows stories through the API for business accounts.
-2. On developers.facebook.com, create an app of the type "Business" and add the product "Instagram" with "API setup with Instagram login".
-3. Under "Generate access tokens", add your account and generate a token. The app can stay in development mode, because it only posts to your own account.
-4. Paste the token on the page "Instagram", check the plan for the next days and turn on automatic stories.
+2. On developers.facebook.com, create an app with the use case "Manage messaging & content on Instagram" and connect it to your business portfolio.
+3. In the app, open Use cases → Customize → "API setup with Unified login". Select a configuration with the permission instagram_content_publish. Under "Generate access tokens", click "Add account" and invite your Instagram account as Instagram tester.
+4. Accept the invitation on instagram.com: Settings → Website permissions → Apps and websites → Tester invites.
+5. Back in the app, click "Generate token" and copy it. The app can stay in development mode, because it only posts to your own account.
+6. Paste the token on the page "Instagram", check the plan for the next days and turn on automatic stories.
 
-The plugin renews the token every week. Instagram downloads the images from your site, so the uploads folder must be publicly reachable.
+Tokens of older apps with "API setup with Instagram login" (starting with IGAA) work too; the plugin renews them every week. Instagram downloads the images from your site, so the uploads folder must be publicly reachable.
 
 = Can the stories contain a link? =
 
@@ -210,11 +212,11 @@ If you do not want to offer these services, simply do not place these links on y
 
 No data about visitors of your site is sent. [Terms of Service](https://telegram.org/tos), [Bot Developer Terms](https://telegram.org/tos/bot-developers), [Privacy Policy](https://telegram.org/privacy)
 
-**Instagram (optional).** Only when you save an Instagram access token, the plugin connects to the Instagram API (graph.instagram.com), provided by Meta Platforms:
+**Instagram (optional).** Only when you save an Instagram access token, the plugin connects to the Instagram API (graph.facebook.com, or graph.instagram.com for tokens of older apps), provided by Meta Platforms:
 
 * When you save the token or click "Check connection", it asks for the account name and type.
 * At the set time of day, or when an administrator clicks "Post today's stories now", it sends the address of a story image on your site; Instagram then downloads the image (event title, date, time, venue and picture) and publishes it as story.
-* Once a week it renews the access token.
+* Once a week it renews access tokens of older apps (Instagram Login), which otherwise expire after 60 days.
 
 No data about visitors of your site is sent. [Terms of Use](https://help.instagram.com/581066165581870), [Platform Terms](https://developers.facebook.com/terms/), [Privacy Policy](https://privacycenter.instagram.com/policy)
 
@@ -238,6 +240,7 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 * Breakdance dynamic data fields renamed to `etcf_*`; select them again in elements that use calendar links.
 * Abilities renamed to `etcf/list-events`, `etcf/get-event`, `etcf/get-weekly-preview` and `etcf/post-weekly-preview-to-telegram`.
 * Translations now come from translate.wordpress.org; the plugin no longer ships language files.
+* Instagram: tokens of the "API setup with Unified login" that Meta uses for all new apps (graph.facebook.com). Tokens of older apps keep working. Updated connection guide.
 
 = 2.2.0 =
 * New: page "Newsletter" with guides for Brevo, Mailchimp, MailerLite and other services, and direct sending through Brevo or Emailit.
