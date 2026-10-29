@@ -14,10 +14,6 @@ msgstr ""
 msgid "Spreads the events you keep in custom fields (ACF, ACPT or plain post meta): add-to-calendar links and .ics files, a subscribable calendar feed, schema.org markup for search engines, a weekly preview for newsletters, Telegram, Mastodon and Bluesky, Instagram stories, story images and QR codes, and cancellations everywhere at once. Extra dynamic data fields for Breakdance and abilities for AI agents."
 msgstr ""
 
-#: event-toolkit-for-custom-fields.php:27
-msgid "Event Toolkit for Custom Fields replaces the plugins \"Add to Calendar from Custom Fields\" and \"Event Digest for Telegram\". Please deactivate them; all settings are taken over."
-msgstr ""
-
 #: includes/breakdance-field.php:29
 msgid "Add to Calendar"
 msgstr ""

@@ -169,10 +169,6 @@ Create an RSS campaign in your newsletter service and enter the feed address sho
 
 WordPress runs scheduled tasks when someone visits the site. On sites with few visitors, set up a real cron job at your host that calls `wp-cron.php` every 15 minutes.
 
-= I used "Add to Calendar from Custom Fields" or "Event Digest for Telegram". =
-
-This plugin replaces both. Install it, then deactivate the old plugins: all settings, the calendar addresses and the Breakdance fields are taken over. While an old plugin is still active, this plugin waits and shows a notice.
-
 = Which abilities are there for AI agents? =
 
 * `etcf/list-events`: upcoming events in a period, with date, time (doors and start), venue, image, ticket link and calendar links
@@ -237,7 +233,7 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 == Changelog ==
 
 = 2.3.0 =
-* All names the plugin uses now start with "etcf": settings, schedules, hooks, filters, shortcodes, abilities and CSS classes. Settings and schedules of earlier versions are moved over automatically.
+* All names the plugin uses now start with "etcf": settings, schedules, hooks, filters, shortcodes, abilities, CSS classes and the event IDs in calendar files.
 * Shortcodes renamed: `[etcf_calendar_link]`, `[etcf_share_button]` and `[etcf_share_page]`. Please update them on your pages.
 * Breakdance dynamic data fields renamed to `etcf_*`; select them again in elements that use calendar links.
 * Abilities renamed to `etcf/list-events`, `etcf/get-event`, `etcf/get-weekly-preview` and `etcf/post-weekly-preview-to-telegram`.

@@ -11,8 +11,6 @@ class ETCF_Admin
     const PAGE = 'etcf';
     /** Who may use the share page: everyone who can write posts. */
     const SHARE_CAP = 'edit_posts';
-    /** Slug of the former page under Settings, redirected to the new menu. */
-    const OLD_PAGE = 'event-toolkit-for-custom-fields';
 
     public static function init(): void
     {
@@ -106,12 +104,6 @@ class ETCF_Admin
             'dashicons-share',
             3
         );
-        // The former page under Settings stays registered, but hidden, and only redirects.
-        $old = add_options_page(__('Event Toolkit', 'event-toolkit-for-custom-fields'), __('Event Toolkit', 'event-toolkit-for-custom-fields'), 'manage_options', self::OLD_PAGE, '__return_null');
-        remove_submenu_page('options-general.php', self::OLD_PAGE);
-        if ($old) {
-            add_action('load-' . $old, [self::class, 'redirect_old_page']);
-        }
     }
 
     /** Dashboard widget "Share today", placed first. */
@@ -150,15 +142,6 @@ class ETCF_Admin
             echo '<p>' . esc_html__('No events today or tomorrow. The weekly preview can be shared any time.', 'event-toolkit-for-custom-fields') . '</p>';
         }
         echo '<p><a class="button button-primary" href="' . esc_url(self::url('share')) . '">' . esc_html__('Open texts and images', 'event-toolkit-for-custom-fields') . '</a></p></div>';
-    }
-
-    /** Bookmarks and links to the former page under Settings keep working. */
-    public static function redirect_old_page(): void
-    {
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only redirect.
-        $tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'events';
-        wp_safe_redirect(self::url($tab === 'share' || isset(self::tabs()[$tab]) ? $tab : 'events'));
-        exit;
     }
 
     private static function slug(string $tab): string

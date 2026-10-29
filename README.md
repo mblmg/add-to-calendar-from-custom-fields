@@ -10,15 +10,12 @@ WordPress plugin that spreads the events you keep in custom fields (ACF, ACPT or
 - all calendar links as Breakdance dynamic data and as a shortcode
 - abilities for AI agents (WordPress Abilities API, exposed by MCP adapters)
 
-It replaces the earlier plugins "Add to Calendar from Custom Fields" and "Event Digest for Telegram" and takes over their settings.
-
 User documentation lives in [`readme.txt`](readme.txt), which is also what the WordPress.org plugin directory shows. Plans and design decisions are in [`ROADMAP.md`](ROADMAP.md).
 
 ## Development
 
 ```
-event-toolkit-for-custom-fields.php        bootstrap, waits while a predecessor plugin is active
-includes/class-upgrade.php                 one-time migration after updates (former imm_* names)
+event-toolkit-for-custom-fields.php        bootstrap
 includes/class-settings.php                core settings (option etcf_settings), saved per tab
 includes/class-event.php                   reads an event from post meta, start/end/doors rules
 includes/class-ics.php                     iCalendar output (RFC 5545)
@@ -46,7 +43,7 @@ includes/breakdance*.php                   Breakdance dynamic data fields
 languages/                                 .pot template and German translation (not shipped, see Translations)
 ```
 
-Everything global uses the prefix `etcf` (WordPress.org requires a distinct prefix of at least four characters): classes `ETCF_*`, constants `ETCF_*`, options, hooks, filters, cron events, nonces, admin-post actions and transients `etcf_*`, shortcodes `etcf_*`, Breakdance fields `etcf_*`, abilities `etcf/*`, script and style handles, CSS classes and custom properties `etcf-*`. Up to 2.2.0 the prefixes were `imm_tk`, `imm_tg`, `imm_ig`, `imm_so` and `imm_nl`; `ETCF_Upgrade` moves options, schedules and post meta over once. Shortcodes and Breakdance fields in page content have to be switched by hand. Two old names stay on purpose: the check for the predecessor plugins (`IMM_TK_VERSION`, `IMM_TG_Settings`) and the iCalendar UID `imm-tk-{ID}@host`, so subscribed calendars do not list events twice.
+Everything global uses the prefix `etcf` (WordPress.org requires a distinct prefix of at least four characters): classes `ETCF_*`, constants `ETCF_*`, options, hooks, filters, cron events, nonces, admin-post actions and transients `etcf_*`, shortcodes `etcf_*`, Breakdance fields `etcf_*`, abilities `etcf/*`, script and style handles, CSS classes and custom properties `etcf-*`. The iCalendar UID of an event is `etcf-{ID}@host`; it must not change once calendars subscribe, or they list the events twice.
 
 ### Weekly preview
 

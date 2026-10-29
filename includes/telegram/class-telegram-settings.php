@@ -29,7 +29,6 @@ class ETCF_Telegram_Settings
     {
         $saved = get_option(self::OPTION, []);
         $saved = is_array($saved) ? $saved : [];
-        // Only the Telegram keys; older versions also stored schedule settings here.
         return array_intersect_key(wp_parse_args($saved, self::defaults()), self::defaults());
     }
 
@@ -59,11 +58,7 @@ class ETCF_Telegram_Settings
             $token = '';
         }
 
-        // Keep the schedule settings of older versions until the core has taken them over.
-        $legacy = get_option(self::OPTION, []);
-        $legacy = is_array($legacy) ? array_diff_key($legacy, self::defaults()) : [];
-
-        return array_merge($legacy, [
+        return [
             'enabled'      => empty($input['enabled']) ? 0 : 1,
             'token'        => $token,
             'chat_id'      => preg_replace('/[^0-9\-@A-Za-z_]/', '', (string) ($input['chat_id'] ?? '')),
@@ -72,7 +67,7 @@ class ETCF_Telegram_Settings
             'today'        => empty($input['today']) ? 0 : 1,
             'notify_status' => empty($input['notify_status']) ? 0 : 1,
             'today_time'   => preg_match('/^([01]?\d|2[0-3]):([0-5]\d)$/', trim((string) ($input['today_time'] ?? '')), $m) ? sprintf('%02d:%02d', $m[1], $m[2]) : '12:00',
-        ]);
+        ];
     }
 
     /** Token and chat are set. */

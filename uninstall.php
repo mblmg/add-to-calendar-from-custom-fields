@@ -6,7 +6,7 @@
 
 defined('WP_UNINSTALL_PLUGIN') || exit;
 
-foreach (['etcf_settings', 'etcf_tg_settings', 'etcf_tg_state', 'etcf_ig_settings', 'etcf_ig_state', 'etcf_so_settings', 'etcf_so_state', 'etcf_nl_settings', 'etcf_nl_state', 'etcf_version'] as $etcf_option) {
+foreach (['etcf_settings', 'etcf_tg_settings', 'etcf_tg_state', 'etcf_ig_settings', 'etcf_ig_state', 'etcf_so_settings', 'etcf_so_state', 'etcf_nl_settings', 'etcf_nl_state'] as $etcf_option) {
     delete_option($etcf_option);
 }
 foreach (['etcf_tg_weekly_digest', 'etcf_tg_today', 'etcf_ig_daily', 'etcf_ig_retry', 'etcf_share_reminder', 'etcf_so_weekly', 'etcf_so_today', 'etcf_nl_send'] as $etcf_hook) {

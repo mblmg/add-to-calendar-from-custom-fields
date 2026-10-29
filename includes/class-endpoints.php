@@ -26,7 +26,7 @@ class ETCF_Endpoints
             return (get_query_var('etcf_event') || get_query_var('etcf_feed') || get_query_var('etcf_digest')) ? false : $redirect;
         });
         // Rebuild the rewrite rules if ours are missing, e.g. after an update or after another
-        // plugin rebuilt them without ours (such as the predecessor plugins on deactivation).
+        // plugin rebuilt them without ours.
         add_action('init', [self::class, 'ensure_rewrite_rules'], 99);
     }
 

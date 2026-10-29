@@ -72,8 +72,7 @@ class ETCF_Event
         // Soft hyphens help line breaks on the website, but are noise in calendars, feeds and search results.
         $event->title = str_replace("\u{00AD}", '', html_entity_decode(wp_strip_all_tags(get_the_title($post)), ENT_QUOTES, 'UTF-8'));
         $event->url   = get_permalink($post);
-        // Unchanged since the first version, so subscribed calendars recognise the events and do not list them twice.
-        $event->uid   = 'imm-tk-' . $post->ID . '@' . wp_parse_url(home_url(), PHP_URL_HOST);
+        $event->uid   = 'etcf-' . $post->ID . '@' . wp_parse_url(home_url(), PHP_URL_HOST);
         $event->modified = new DateTimeImmutable($post->post_modified_gmt ?: 'now', new DateTimeZone('UTC'));
 
         $doors_keys = ETCF_Settings::key_list('doors_key');

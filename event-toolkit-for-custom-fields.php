@@ -15,25 +15,10 @@
 
 defined('ABSPATH') || exit;
 
-// This plugin replaces "Add to Calendar from Custom Fields" and "Event Digest for Telegram".
-// While one of them is still active, stay inactive and ask to deactivate them; the settings are taken over.
-if (defined('IMM_TK_VERSION') || class_exists('IMM_TG_Settings')) {
-    add_action('admin_notices', function () {
-        if (!current_user_can('activate_plugins')) {
-            return;
-        }
-        echo '<div class="notice notice-warning"><p>'
-            . esc_html__('Event Toolkit for Custom Fields replaces the plugins "Add to Calendar from Custom Fields" and "Event Digest for Telegram". Please deactivate them; all settings are taken over.', 'event-toolkit-for-custom-fields')
-            . '</p></div>';
-    });
-    return;
-}
-
 define('ETCF_VERSION', '2.3.0');
 define('ETCF_FILE', __FILE__);
 define('ETCF_DIR', plugin_dir_path(__FILE__));
 
-require_once ETCF_DIR . 'includes/class-upgrade.php';
 require_once ETCF_DIR . 'includes/class-settings.php';
 require_once ETCF_DIR . 'includes/class-event.php';
 require_once ETCF_DIR . 'includes/class-ics.php';
@@ -61,7 +46,6 @@ require_once ETCF_DIR . 'includes/class-abilities.php';
 require_once ETCF_DIR . 'includes/shortcode.php';
 require_once ETCF_DIR . 'includes/breakdance.php';
 
-ETCF_Upgrade::init();
 ETCF_Endpoints::init();
 ETCF_Schema::init();
 ETCF_Telegram_Scheduler::init();

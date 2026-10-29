@@ -78,10 +78,6 @@ class ETCF_Settings
 
     public static function defaults(): array
     {
-        // Weekly preview settings used to live in the separate Telegram plugin; take them over.
-        $tg = get_option('etcf_tg_settings', []);
-        $tg = is_array($tg) ? $tg : [];
-
         return [
             'post_type'        => '',
             'date_key'         => '',
@@ -111,14 +107,14 @@ class ETCF_Settings
             'organizer_name'   => get_bloginfo('name'),
             'organizer_url'    => home_url('/'),
 
-            'digest_weekday'      => (int) ($tg['weekday'] ?? 1), // 1 = Monday … 7 = Sunday (ISO-8601).
-            'digest_time'         => (string) ($tg['time'] ?? '10:00'),
-            'digest_days_ahead'   => (int) ($tg['days_ahead'] ?? 7),
-            'digest_include_new'  => (int) ($tg['include_new'] ?? 1),
-            'digest_intro'        => (string) ($tg['intro'] ?? ''),
-            'digest_heading_week' => (string) ($tg['heading_week'] ?? ''), // Empty = translated default.
-            'digest_heading_new'  => (string) ($tg['heading_new'] ?? ''),
-            'digest_program_url'  => (string) ($tg['program_url'] ?? home_url('/')),
+            'digest_weekday'      => 1, // 1 = Monday … 7 = Sunday (ISO-8601).
+            'digest_time'         => '10:00',
+            'digest_days_ahead'   => 7,
+            'digest_include_new'  => 1,
+            'digest_intro'        => '',
+            'digest_heading_week' => '', // Empty = translated default.
+            'digest_heading_new'  => '',
+            'digest_program_url'  => home_url('/'),
             'digest_feed_enabled' => 1,
             'digest_feed_slug'    => 'weekly',
             'digest_feed_only_new' => 0,
