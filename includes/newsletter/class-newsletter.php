@@ -2,7 +2,7 @@
 /**
  * Newsletter: sends the weekly preview as e-mail campaign through the API of Brevo or Emailit,
  * at the issue time. Services with RSS-to-email (Brevo, Mailchimp, MailerLite …) can use the
- * newsletter feed instead (IMM_TK_Digest_Feed); the admin page explains both ways.
+ * newsletter feed instead (ETCF_Digest_Feed); the admin page explains both ways.
  *
  * Brevo:   POST /v3/emailCampaigns, then POST /v3/emailCampaigns/{id}/sendNow (header api-key).
  *          The HTML must contain an unsubscribe link with {{ unsubscribe }}.
@@ -12,11 +12,11 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_NL_Newsletter
+class ETCF_Newsletter
 {
-    const OPTION = 'imm_nl_settings';
-    const STATE  = 'imm_nl_state';
-    const HOOK   = 'imm_nl_send';
+    const OPTION = 'etcf_nl_settings';
+    const STATE  = 'etcf_nl_state';
+    const HOOK   = 'etcf_nl_send';
 
     const BREVO   = 'https://api.brevo.com/v3';
     const EMAILIT = 'https://api.emailit.com/v2';
@@ -83,7 +83,7 @@ class IMM_NL_Newsletter
 
     public static function active(): bool
     {
-        return IMM_TK_Settings::is_configured() && self::get('enabled') && self::is_ready();
+        return ETCF_Settings::is_configured() && self::get('enabled') && self::is_ready();
     }
 
     public static function provider_name(): string
@@ -115,7 +115,7 @@ class IMM_NL_Newsletter
     {
         add_action(self::HOOK, [self::class, 'run']);
         add_action('init', [self::class, 'ensure_scheduled']);
-        foreach ([self::OPTION, IMM_TK_Settings::OPTION] as $option) {
+        foreach ([self::OPTION, ETCF_Settings::OPTION] as $option) {
             add_action('update_option_' . $option, [self::class, 'reschedule']);
             add_action('add_option_' . $option, [self::class, 'reschedule']);
         }
@@ -125,7 +125,7 @@ class IMM_NL_Newsletter
     {
         $next = wp_next_scheduled(self::HOOK);
         if (self::active() && !$next) {
-            wp_schedule_single_event(IMM_TK_Digest::next_issue()->getTimestamp(), self::HOOK);
+            wp_schedule_single_event(ETCF_Digest::next_issue()->getTimestamp(), self::HOOK);
         } elseif (!self::active() && $next) {
             self::unschedule();
         }
@@ -146,7 +146,7 @@ class IMM_NL_Newsletter
     {
         self::unschedule();
         $now   = new DateTimeImmutable('now', wp_timezone());
-        $issue = IMM_TK_Digest::current_issue($now->modify('+1 minute'));
+        $issue = ETCF_Digest::current_issue($now->modify('+1 minute'));
         if (self::active() && self::state()['sent_issue'] !== $issue->format('Y-m-d')) {
             self::update_state(['sent_issue' => $issue->format('Y-m-d')]);
             self::send_issue($issue, $now);
@@ -161,8 +161,8 @@ class IMM_NL_Newsletter
      */
     public static function send_issue(DateTimeImmutable $issue, DateTimeImmutable $now)
     {
-        $selection = IMM_TK_Digest::select($issue, $now);
-        if (IMM_TK_Digest::is_empty($selection) || (IMM_TK_Settings::get('digest_feed_only_new') && !IMM_TK_Digest::has_new($selection, $issue))) {
+        $selection = ETCF_Digest::select($issue, $now);
+        if (ETCF_Digest::is_empty($selection) || (ETCF_Settings::get('digest_feed_only_new') && !ETCF_Digest::has_new($selection, $issue))) {
             self::log(__('Nothing sent: no events in the coming days, or nothing new.', 'event-toolkit-for-custom-fields'));
             return null;
         }
@@ -185,7 +185,7 @@ class IMM_NL_Newsletter
     public static function subject(DateTimeImmutable $issue): string
     {
         $subject = trim((string) self::get('subject'));
-        return $subject !== '' ? $subject : IMM_TK_Digest::issue_title($issue);
+        return $subject !== '' ? $subject : ETCF_Digest::issue_title($issue);
     }
 
     /** Unsubscribe placeholder of the service. */
@@ -202,15 +202,15 @@ class IMM_NL_Newsletter
      */
     public static function html(array $selection, string $subject, string $provider): string
     {
-        $style  = IMM_TK_Sharepic::style();
+        $style  = ETCF_Sharepic::style();
         $paper  = esc_attr($style['paper']);
         $ink    = esc_attr($style['ink']);
         $accent = esc_attr($style['accent']);
-        $fonts  = IMM_TK_Fonts::families();
+        $fonts  = ETCF_Fonts::families();
         $head   = esc_attr(trim(($fonts['heading'] !== '' ? "'" . $fonts['heading'] . "', " : '') . 'Arial, Helvetica, sans-serif'));
         $body   = esc_attr(trim(($fonts['text'] !== '' ? "'" . $fonts['text'] . "', " : '') . 'Arial, Helvetica, sans-serif'));
 
-        $content = IMM_TK_Digest::email_html($selection);
+        $content = ETCF_Digest::email_html($selection);
         // Links in the accent colour, headings in the heading font.
         $content = preg_replace('/<a (?![^>]*style=)/', '<a style="color:' . $accent . '" ', $content);
         $content = preg_replace('/<h([23])(?: style="([^"]*)")?>/', '<h$1 style="font-family:' . $head . ';color:' . $ink . ';$2">', (string) $content);
@@ -239,7 +239,7 @@ class IMM_NL_Newsletter
     public static function text(array $selection, string $provider): string
     {
         $footer = trim((string) self::get('footer'));
-        return IMM_TK_Share::week_text($selection, true)
+        return ETCF_Share::week_text($selection, true)
             . ($footer !== '' ? "\n\n--\n" . $footer : '')
             /* translators: %s: unsubscribe link */
             . "\n\n" . sprintf(__('Unsubscribe: %s', 'event-toolkit-for-custom-fields'), $provider !== '' ? self::unsubscribe($provider) : '');
@@ -264,7 +264,7 @@ class IMM_NL_Newsletter
         if ($code >= 300) {
             $message = is_array($data) ? (string) ($data['message'] ?? $data['error']['message'] ?? $data['error'] ?? '') : '';
             /* translators: 1: HTTP status code, 2: error message */
-            return new WP_Error('imm_nl_http', trim(sprintf(__('HTTP %1$d %2$s', 'event-toolkit-for-custom-fields'), $code, $message)));
+            return new WP_Error('etcf_nl_http', trim(sprintf(__('HTTP %1$d %2$s', 'event-toolkit-for-custom-fields'), $code, $message)));
         }
         return is_array($data) ? $data : [];
     }
@@ -293,7 +293,7 @@ class IMM_NL_Newsletter
             return $campaign;
         }
         if (empty($campaign['id'])) {
-            return new WP_Error('imm_nl_brevo', __('Brevo did not create the campaign.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('etcf_nl_brevo', __('Brevo did not create the campaign.', 'event-toolkit-for-custom-fields'));
         }
         $sent = self::request('POST', self::BREVO . '/emailCampaigns/' . (int) $campaign['id'] . '/sendNow', self::brevo_headers());
         return is_wp_error($sent) ? $sent : true;
@@ -315,7 +315,7 @@ class IMM_NL_Newsletter
         }
         $id = (string) ($campaign['id'] ?? $campaign['data']['id'] ?? '');
         if ($id === '') {
-            return new WP_Error('imm_nl_emailit', __('Emailit did not create the campaign.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('etcf_nl_emailit', __('Emailit did not create the campaign.', 'event-toolkit-for-custom-fields'));
         }
         $recipients = self::request('POST', self::EMAILIT . '/campaigns/' . rawurlencode($id), self::emailit_headers(), [
             'recipients' => [['audience_id' => (string) self::get('list_id'), 'exclude' => false]],
@@ -360,9 +360,9 @@ class IMM_NL_Newsletter
     {
         $to = (string) self::get('test_email');
         if (!is_email($to)) {
-            return new WP_Error('imm_nl_test', __('Enter a valid test address first.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('etcf_nl_test', __('Enter a valid test address first.', 'event-toolkit-for-custom-fields'));
         }
-        if (IMM_TK_Digest::is_empty($selection)) {
+        if (ETCF_Digest::is_empty($selection)) {
             return null;
         }
         /* translators: %s: subject */

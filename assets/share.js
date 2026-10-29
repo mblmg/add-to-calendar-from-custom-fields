@@ -42,7 +42,7 @@
 						return new File([blob], 'story-' + (i + 1) + '.jpg', { type: 'image/jpeg' });
 					});
 			})).then(function (list) {
-				card.immFiles = list;
+				card.etcfFiles = list;
 				return list;
 			}));
 		}
@@ -66,16 +66,16 @@
 	}
 
 	if (mode !== '') {
-		document.querySelectorAll('[data-imm-share-hint="' + mode + '"]').forEach(function (el) {
+		document.querySelectorAll('[data-etcf-share-hint="' + mode + '"]').forEach(function (el) {
 			el.hidden = false;
 		});
-		document.querySelectorAll('[data-imm-desktop]').forEach(function (el) {
+		document.querySelectorAll('[data-etcf-desktop]').forEach(function (el) {
 			el.hidden = true;
 		});
 	}
 
-	document.querySelectorAll('[data-imm-share]').forEach(function (button) {
-		var card = button.closest('.imm-tk-share');
+	document.querySelectorAll('[data-etcf-share]').forEach(function (button) {
+		var card = button.closest('.etcf-share');
 		var optional = card.hasAttribute('data-files-optional');
 		if (mode === '') {
 			return;
@@ -91,7 +91,7 @@
 		if (optional) {
 			whenVisible(card, function () {
 				loadFiles(card).catch(function () {
-					card.immFiles = [];
+					card.etcfFiles = [];
 				});
 			});
 			return;
@@ -105,7 +105,7 @@
 	});
 
 	function showError(card, error) {
-		var box = card.querySelector('.imm-tk-share-error');
+		var box = card.querySelector('.etcf-share-error');
 		if (!box) {
 			return;
 		}
@@ -138,24 +138,24 @@
 
 	// Read-only address fields: select everything on focus, ready to copy.
 	document.addEventListener('focusin', function (event) {
-		if (event.target.matches && event.target.matches('[data-imm-select]')) {
+		if (event.target.matches && event.target.matches('[data-etcf-select]')) {
 			event.target.select();
 		}
 	});
 
 	document.addEventListener('click', function (event) {
-		var button = event.target.closest('[data-imm-copy], [data-imm-share]');
+		var button = event.target.closest('[data-etcf-copy], [data-etcf-share]');
 		if (!button) {
 			return;
 		}
-		var card = button.closest('.imm-tk-share');
+		var card = button.closest('.etcf-share');
 		var text = card.querySelector('textarea').value;
-		var box  = card.querySelector('.imm-tk-share-error');
+		var box  = card.querySelector('.etcf-share-error');
 		if (box) {
 			box.hidden = true;
 		}
 
-		if (button.hasAttribute('data-imm-copy')) {
+		if (button.hasAttribute('data-etcf-copy')) {
 			copy(text).then(function () {
 				flash(button, card);
 			}).catch(function (error) {
@@ -165,7 +165,7 @@
 		}
 
 		// Share: called directly in the tap, with the images loaded beforehand.
-		var list = mode === 'files' ? card.immFiles : null;
+		var list = mode === 'files' ? card.etcfFiles : null;
 		var data = { text: text };
 		if (list && list.length) {
 			data = { files: list, text: text };

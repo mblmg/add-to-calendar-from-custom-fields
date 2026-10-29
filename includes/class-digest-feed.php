@@ -12,31 +12,31 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Digest_Feed
+class ETCF_Digest_Feed
 {
     public static function url(): string
     {
-        $base = IMM_TK_Settings::get('base_path');
-        $slug = IMM_TK_Settings::get('digest_feed_slug');
+        $base = ETCF_Settings::get('base_path');
+        $slug = ETCF_Settings::get('digest_feed_slug');
         if (get_option('permalink_structure')) {
             return home_url('/' . $base . '/' . $slug . '.xml');
         }
-        return add_query_arg('imm_tk_digest', '1', home_url('/'));
+        return add_query_arg('etcf_digest', '1', home_url('/'));
     }
 
     public static function serve(): void
     {
         if (!defined('DONOTCACHEPAGE')) {
-            define('DONOTCACHEPAGE', true);
+            define('DONOTCACHEPAGE', true); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- convention of caching plugins.
         }
-        if (!IMM_TK_Settings::get('digest_feed_enabled')) {
+        if (!ETCF_Settings::get('digest_feed_enabled')) {
             status_header(404);
             nocache_headers();
             exit;
         }
 
-        $issue     = IMM_TK_Digest::current_issue();
-        $selection = IMM_TK_Digest::select($issue);
+        $issue     = ETCF_Digest::current_issue();
+        $selection = ETCF_Digest::select($issue);
 
         status_header(200);
         header('Content-Type: application/rss+xml; charset=utf-8');
@@ -48,9 +48,9 @@ class IMM_TK_Digest_Feed
 
     public static function render(DateTimeImmutable $issue, array $selection): string
     {
-        $site  = (string) IMM_TK_Settings::get('feed_title') ?: get_bloginfo('name');
-        $link  = IMM_TK_Digest::program_url();
-        $title = IMM_TK_Digest::issue_title($issue);
+        $site  = (string) ETCF_Settings::get('feed_title') ?: get_bloginfo('name');
+        $link  = ETCF_Digest::program_url();
+        $title = ETCF_Digest::issue_title($issue);
 
         $xml   = [];
         $xml[] = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -65,14 +65,14 @@ class IMM_TK_Digest_Feed
         $xml[] = '<lastBuildDate>' . esc_xml($issue->format(DATE_RSS)) . '</lastBuildDate>';
         $xml[] = '<ttl>360</ttl>';
 
-        $send = !IMM_TK_Digest::is_empty($selection);
-        if ($send && IMM_TK_Settings::get('digest_feed_only_new')) {
-            $send = IMM_TK_Digest::has_new($selection, $issue);
+        $send = !ETCF_Digest::is_empty($selection);
+        if ($send && ETCF_Settings::get('digest_feed_only_new')) {
+            $send = ETCF_Digest::has_new($selection, $issue);
         }
         if ($send) {
-            $lead  = IMM_TK_Digest::lead_event($selection);
+            $lead  = ETCF_Digest::lead_event($selection);
             $image = $lead ? get_the_post_thumbnail_url($lead->id, 'large') : '';
-            $names = array_map([IMM_TK_Digest::class, 'title'], array_merge($selection['week'], $selection['new']));
+            $names = array_map([ETCF_Digest::class, 'title'], array_merge($selection['week'], $selection['new']));
 
             $xml[] = '<item>';
             $xml[] = '<title>' . esc_xml($title) . '</title>';
@@ -80,7 +80,7 @@ class IMM_TK_Digest_Feed
             $xml[] = '<guid isPermaLink="false">' . esc_xml(home_url('/') . '#weekly-preview-' . $issue->format('Y-m-d')) . '</guid>';
             $xml[] = '<pubDate>' . esc_xml($issue->format(DATE_RSS)) . '</pubDate>';
             $xml[] = '<description>' . esc_xml(implode(' · ', $names)) . '</description>';
-            $xml[] = '<content:encoded>' . self::cdata(IMM_TK_Digest::email_html($selection)) . '</content:encoded>';
+            $xml[] = '<content:encoded>' . self::cdata(ETCF_Digest::email_html($selection)) . '</content:encoded>';
             if ($image) {
                 $xml[] = '<media:content url="' . esc_url($image) . '" medium="image"/>';
             }

@@ -5,7 +5,7 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TG_Telegram
+class ETCF_Telegram
 {
     /**
      * Calls a Bot API method.
@@ -14,9 +14,9 @@ class IMM_TG_Telegram
      */
     public static function call(string $method, array $params = [], string $token = '')
     {
-        $token = $token !== '' ? $token : (string) IMM_TG_Settings::get('token');
+        $token = $token !== '' ? $token : (string) ETCF_Telegram_Settings::get('token');
         if ($token === '') {
-            return new WP_Error('imm_tg_no_token', __('No bot token saved.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('etcf_tg_no_token', __('No bot token saved.', 'event-toolkit-for-custom-fields'));
         }
         $response = wp_remote_post('https://api.telegram.org/bot' . $token . '/' . $method, [
             'timeout' => 20,
@@ -24,13 +24,13 @@ class IMM_TG_Telegram
         ]);
         if (is_wp_error($response)) {
             // Never pass on the request URL: it contains the token.
-            return new WP_Error('imm_tg_http', __('Telegram could not be reached.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('etcf_tg_http', __('Telegram could not be reached.', 'event-toolkit-for-custom-fields'));
         }
         $body = json_decode(wp_remote_retrieve_body($response), true);
         if (!is_array($body) || empty($body['ok'])) {
             $description = is_array($body) && !empty($body['description']) ? $body['description'] : wp_remote_retrieve_response_message($response);
             /* translators: %s: error message from Telegram */
-            return new WP_Error('imm_tg_api', sprintf(__('Telegram reports: %s', 'event-toolkit-for-custom-fields'), $description));
+            return new WP_Error('etcf_tg_api', sprintf(__('Telegram reports: %s', 'event-toolkit-for-custom-fields'), $description));
         }
         return $body['result'];
     }
@@ -43,7 +43,7 @@ class IMM_TG_Telegram
      */
     public static function send(string $html, string $preview_url = '', bool $silent = false)
     {
-        $position = (string) IMM_TG_Settings::get('link_preview');
+        $position = (string) ETCF_Telegram_Settings::get('link_preview');
         if ($preview_url !== '' && $position !== 'none') {
             $preview = [
                 'url'                => $preview_url,
@@ -54,7 +54,7 @@ class IMM_TG_Telegram
             $preview = ['is_disabled' => true];
         }
         $params = [
-            'chat_id'              => IMM_TG_Settings::get('chat_id'),
+            'chat_id'              => ETCF_Telegram_Settings::get('chat_id'),
             'text'                 => $html,
             'parse_mode'           => 'HTML',
             'link_preview_options' => wp_json_encode($preview),
@@ -62,7 +62,7 @@ class IMM_TG_Telegram
         if ($silent) {
             $params['disable_notification'] = 'true';
         }
-        $thread = (string) IMM_TG_Settings::get('thread_id');
+        $thread = (string) ETCF_Telegram_Settings::get('thread_id');
         if ($thread !== '') {
             $params['message_thread_id'] = $thread;
         }
@@ -114,24 +114,24 @@ class IMM_TG_Telegram
      */
     public static function post(DateTimeImmutable $issue, ?DateTimeImmutable $now = null)
     {
-        $selection = IMM_TK_Digest::select($issue, $now);
+        $selection = ETCF_Digest::select($issue, $now);
         $message   = self::message($selection);
         if ($message === '') {
             return null;
         }
-        $lead = IMM_TK_Digest::lead_event($selection);
+        $lead = ETCF_Digest::lead_event($selection);
         return self::send($message, $lead ? $lead->url : '');
     }
 
     /** The digest in Telegram HTML. Empty string if there is nothing to post. */
     public static function message(array $selection): string
     {
-        if (IMM_TK_Digest::is_empty($selection)) {
+        if (ETCF_Digest::is_empty($selection)) {
             return '';
         }
 
         $blocks = [];
-        $intro  = trim((string) IMM_TK_Settings::get('digest_intro'));
+        $intro  = trim((string) ETCF_Settings::get('digest_intro'));
         if ($intro !== '') {
             $blocks[] = self::esc($intro);
         }
@@ -139,27 +139,27 @@ class IMM_TG_Telegram
         if ($selection['week']) {
             $items = [];
             foreach ($selection['week'] as $event) {
-                $lines   = ['<b>' . self::esc(IMM_TK_Digest::date($event)) . '</b>', self::link($event)];
-                $details = array_filter([IMM_TK_Digest::time($event), IMM_TK_Digest::venue($event)]);
+                $lines   = ['<b>' . self::esc(ETCF_Digest::date($event)) . '</b>', self::link($event)];
+                $details = array_filter([ETCF_Digest::time($event), ETCF_Digest::venue($event)]);
                 if ($details) {
                     $lines[] = self::esc(implode(', ', $details));
                 }
                 $items[] = implode("\n", $lines);
             }
-            $blocks[] = '<b>' . self::esc(IMM_TK_Digest::heading_week()) . "</b>\n\n" . implode("\n\n", $items);
+            $blocks[] = '<b>' . self::esc(ETCF_Digest::heading_week()) . "</b>\n\n" . implode("\n\n", $items);
         }
 
         if ($selection['new']) {
             $items = [];
             foreach ($selection['new'] as $event) {
-                $items[] = self::esc(IMM_TK_Digest::date($event)) . ': ' . self::link($event);
+                $items[] = self::esc(ETCF_Digest::date($event)) . ': ' . self::link($event);
             }
-            $blocks[] = '<b>' . self::esc(IMM_TK_Digest::heading_new()) . "</b>\n" . implode("\n", $items);
+            $blocks[] = '<b>' . self::esc(ETCF_Digest::heading_new()) . "</b>\n" . implode("\n", $items);
         }
 
-        $url      = IMM_TK_Digest::program_url();
+        $url      = ETCF_Digest::program_url();
         $label    = preg_replace('#^https?://(www\.)?#', '', untrailingslashit($url));
-        $blocks[] = sprintf(self::esc(IMM_TK_Digest::footer_text()), '<a href="' . esc_url($url) . '">' . self::esc($label) . '</a>');
+        $blocks[] = sprintf(self::esc(ETCF_Digest::footer_text()), '<a href="' . esc_url($url) . '">' . self::esc($label) . '</a>');
 
         $message = implode("\n\n", $blocks);
 
@@ -173,7 +173,7 @@ class IMM_TG_Telegram
             return self::message($selection);
         }
 
-        return (string) apply_filters('imm_tg_message', $message, $selection);
+        return (string) apply_filters('etcf_tg_message', $message, $selection);
     }
 
     /**
@@ -183,7 +183,7 @@ class IMM_TG_Telegram
      */
     public static function post_today(DateTimeImmutable $now)
     {
-        $events  = array_values(array_filter(IMM_TK_Share::events_on($now), function (IMM_TK_Event $e) use ($now) {
+        $events  = array_values(array_filter(ETCF_Share::events_on($now), function (ETCF_Event $e) use ($now) {
             return $e->end > $now;
         }));
         $message = self::today_message($events);
@@ -202,20 +202,20 @@ class IMM_TG_Telegram
         $items = [];
         foreach ($events as $event) {
             $lines   = [self::link($event)];
-            $details = array_filter([IMM_TK_Digest::time($event), IMM_TK_Digest::venue($event)]);
+            $details = array_filter([ETCF_Digest::time($event), ETCF_Digest::venue($event)]);
             if ($details) {
                 $lines[] = self::esc(implode(', ', $details));
             }
             $items[] = implode("\n", $lines);
         }
         $message = '<b>' . self::esc(__('Today', 'event-toolkit-for-custom-fields')) . "</b>\n\n" . implode("\n\n", $items);
-        return (string) apply_filters('imm_tg_today_message', $message, $events);
+        return (string) apply_filters('etcf_tg_today_message', $message, $events);
     }
 
     /** Link to the event; $status adds "Cancelled: " / "Postponed: " to the title. */
-    public static function link(IMM_TK_Event $event, bool $status = true): string
+    public static function link(ETCF_Event $event, bool $status = true): string
     {
-        $title = $status ? IMM_TK_Digest::title($event) : str_replace("\u{00AD}", '', $event->title);
+        $title = $status ? ETCF_Digest::title($event) : str_replace("\u{00AD}", '', $event->title);
         return '<a href="' . esc_url($event->url) . '">' . self::esc($title) . '</a>';
     }
 

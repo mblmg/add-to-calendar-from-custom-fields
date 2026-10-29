@@ -5,17 +5,17 @@
  * MCP adapters expose these abilities as tools, so agents get the events ready-made
  * (dates, doors and start, venue, image, links) instead of reading raw custom fields.
  *
- * - event-toolkit/list-events                (read, public like the website)
- * - event-toolkit/get-event                  (read, public like the website)
- * - event-toolkit/get-weekly-preview         (read, public like the website)
- * - event-toolkit/post-weekly-preview-to-telegram (posts to Telegram, administrators only)
+ * - etcf/list-events                (read, public like the website)
+ * - etcf/get-event                  (read, public like the website)
+ * - etcf/get-weekly-preview         (read, public like the website)
+ * - etcf/post-weekly-preview-to-telegram (posts to Telegram, administrators only)
  */
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Abilities
+class ETCF_Abilities
 {
-    const CATEGORY = 'event-toolkit';
+    const CATEGORY = 'etcf';
 
     public static function init(): void
     {
@@ -39,10 +39,10 @@ class IMM_TK_Abilities
             'public'       => true,
         ];
         $public = function (): bool {
-            return IMM_TK_Settings::is_configured();
+            return ETCF_Settings::is_configured();
         };
 
-        wp_register_ability('event-toolkit/list-events', [
+        wp_register_ability('etcf/list-events', [
             'label'               => __('List upcoming events', 'event-toolkit-for-custom-fields'),
             'description'         => __('Lists the published events in a period, sorted by start, with date, time (doors and start), venue, image, ticket link and calendar links. Returns the same information visitors see on the website.', 'event-toolkit-for-custom-fields'),
             'category'            => self::CATEGORY,
@@ -66,7 +66,7 @@ class IMM_TK_Abilities
             'meta'                => $read,
         ]);
 
-        wp_register_ability('event-toolkit/get-event', [
+        wp_register_ability('etcf/get-event', [
             'label'               => __('Get event details', 'event-toolkit-for-custom-fields'),
             'description'         => __('Returns one published event by post ID or page URL: date, time (doors and start), venue and address, description, image, ticket link and calendar links.', 'event-toolkit-for-custom-fields'),
             'category'            => self::CATEGORY,
@@ -84,7 +84,7 @@ class IMM_TK_Abilities
             'meta'                => $read,
         ]);
 
-        wp_register_ability('event-toolkit/get-weekly-preview', [
+        wp_register_ability('etcf/get-weekly-preview', [
             'label'               => __('Get the weekly preview', 'event-toolkit-for-custom-fields'),
             'description'         => __('Returns the weekly preview: the events of the coming days and the events newly added to the programme, as structured data, as Telegram text and as e-mail HTML. "now" shows it as if it went out now, "current" is the latest issue, "next" the upcoming one.', 'event-toolkit-for-custom-fields'),
             'category'            => self::CATEGORY,
@@ -117,7 +117,7 @@ class IMM_TK_Abilities
             'meta'                => $read,
         ]);
 
-        wp_register_ability('event-toolkit/post-weekly-preview-to-telegram', [
+        wp_register_ability('etcf/post-weekly-preview-to-telegram', [
             'label'               => __('Post the weekly preview to Telegram', 'event-toolkit-for-custom-fields'),
             'description'         => __('Posts the weekly preview, as it would look now, to the configured Telegram chat. Visible to all members of that chat. Does not change the weekly schedule. Ask the person before using it.', 'event-toolkit-for-custom-fields'),
             'category'            => self::CATEGORY,
@@ -149,13 +149,13 @@ class IMM_TK_Abilities
     {
         $input = is_array($input) ? $input : [];
         $tz    = wp_timezone();
-        $from  = !empty($input['from']) ? IMM_TK_Event::parse_date($input['from'], $tz) : null;
+        $from  = !empty($input['from']) ? ETCF_Event::parse_date($input['from'], $tz) : null;
         $from  = $from ?: new DateTimeImmutable('today', $tz);
         $until = $from->modify('+' . min(366, max(1, (int) ($input['days'] ?? 60))) . ' days');
         $limit = min(100, max(1, (int) ($input['limit'] ?? 20)));
 
         $events = [];
-        foreach (IMM_TK_Endpoints::feed_events() as $event) {
+        foreach (ETCF_Endpoints::feed_events() as $event) {
             if ($event->end <= $from || $event->start >= $until) {
                 continue;
             }
@@ -178,9 +178,9 @@ class IMM_TK_Abilities
         if (!$id && !empty($input['url'])) {
             $id = url_to_postid(esc_url_raw((string) $input['url']));
         }
-        $event = $id ? IMM_TK_Event::from_post($id) : null;
+        $event = $id ? ETCF_Event::from_post($id) : null;
         if (!$event) {
-            return new WP_Error('imm_tk_not_found', __('No published event found with this ID or URL.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('etcf_not_found', __('No published event found with this ID or URL.', 'event-toolkit-for-custom-fields'));
         }
         return self::event_data($event);
     }
@@ -192,31 +192,31 @@ class IMM_TK_Abilities
         $now   = new DateTimeImmutable('now', wp_timezone());
         switch ($input['issue'] ?? 'now') {
             case 'current':
-                $issue = IMM_TK_Digest::current_issue($now);
-                $selection = IMM_TK_Digest::select($issue);
+                $issue = ETCF_Digest::current_issue($now);
+                $selection = ETCF_Digest::select($issue);
                 break;
             case 'next':
-                $issue = IMM_TK_Digest::next_issue($now);
-                $selection = IMM_TK_Digest::select($issue);
+                $issue = ETCF_Digest::next_issue($now);
+                $selection = ETCF_Digest::select($issue);
                 break;
             default:
                 $issue = $now;
-                $selection = IMM_TK_Digest::select($now, $now);
+                $selection = ETCF_Digest::select($now, $now);
         }
 
         return [
-            'title'         => IMM_TK_Digest::issue_title($issue),
+            'title'         => ETCF_Digest::issue_title($issue),
             'issue_time'    => $issue->format(DATE_ATOM),
-            'next_issue'    => IMM_TK_Digest::next_issue($now)->format(DATE_ATOM),
-            'is_empty'      => IMM_TK_Digest::is_empty($selection),
-            'heading_week'  => IMM_TK_Digest::heading_week(),
+            'next_issue'    => ETCF_Digest::next_issue($now)->format(DATE_ATOM),
+            'is_empty'      => ETCF_Digest::is_empty($selection),
+            'heading_week'  => ETCF_Digest::heading_week(),
             'week'          => array_map([self::class, 'event_data'], $selection['week']),
-            'heading_new'   => IMM_TK_Digest::heading_new(),
+            'heading_new'   => ETCF_Digest::heading_new(),
             'new'           => array_map([self::class, 'event_data'], $selection['new']),
-            'telegram_text' => IMM_TG_Telegram::message($selection),
-            'email_html'    => IMM_TK_Digest::is_empty($selection) ? '' : IMM_TK_Digest::email_html($selection),
-            'feed_url'      => IMM_TK_Settings::get('digest_feed_enabled') ? IMM_TK_Digest_Feed::url() : '',
-            'program_url'   => IMM_TK_Digest::program_url(),
+            'telegram_text' => ETCF_Telegram::message($selection),
+            'email_html'    => ETCF_Digest::is_empty($selection) ? '' : ETCF_Digest::email_html($selection),
+            'feed_url'      => ETCF_Settings::get('digest_feed_enabled') ? ETCF_Digest_Feed::url() : '',
+            'program_url'   => ETCF_Digest::program_url(),
         ];
     }
 
@@ -226,12 +226,12 @@ class IMM_TK_Abilities
      */
     public static function post_to_telegram($input = null)
     {
-        if (!IMM_TG_Settings::is_ready()) {
-            return new WP_Error('imm_tg_not_ready', __('Telegram is not set up: enter bot token and chat ID on the page "Telegram".', 'event-toolkit-for-custom-fields'));
+        if (!ETCF_Telegram_Settings::is_ready()) {
+            return new WP_Error('etcf_tg_not_ready', __('Telegram is not set up: enter bot token and chat ID on the page "Telegram".', 'event-toolkit-for-custom-fields'));
         }
         $now       = new DateTimeImmutable('now', wp_timezone());
-        $selection = IMM_TK_Digest::select($now, $now);
-        $result    = IMM_TG_Telegram::post($now, $now);
+        $selection = ETCF_Digest::select($now, $now);
+        $result    = ETCF_Telegram::post($now, $now);
         if ($result === null) {
             return ['posted' => false, 'events' => 0, 'reason' => __('Nothing to post: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields')];
         }
@@ -247,36 +247,36 @@ class IMM_TK_Abilities
 
     /* ------------------------------------------------------------------ helpers */
 
-    public static function event_data(IMM_TK_Event $event): array
+    public static function event_data(ETCF_Event $event): array
     {
         $links = [];
         foreach (['ics', 'google', 'outlook', 'office365'] as $type) {
-            $links[$type] = IMM_TK_Links::get($type, $event->id);
+            $links[$type] = ETCF_Links::get($type, $event->id);
         }
         $parts   = $event->location_parts;
-        $ticket  = trim((string) IMM_TK_Event::first_meta($event->id, IMM_TK_Settings::key_list('ticket_url_key')));
-        $price   = IMM_TK_Schema::price(IMM_TK_Event::first_meta($event->id, IMM_TK_Settings::key_list('price_key')));
+        $ticket  = trim((string) ETCF_Event::first_meta($event->id, ETCF_Settings::key_list('ticket_url_key')));
+        $price   = ETCF_Schema::price(ETCF_Event::first_meta($event->id, ETCF_Settings::key_list('price_key')));
         $image   = get_the_post_thumbnail_url($event->id, 'large');
         $end     = $event->all_day ? $event->end->modify('-1 day') : $event->end;
         $format  = $event->all_day ? 'Y-m-d' : DATE_ATOM;
 
         return [
             'id'          => $event->id,
-            'title'       => IMM_TK_Digest::title($event),
+            'title'       => ETCF_Digest::title($event),
             'url'         => $event->url,
             'all_day'     => $event->all_day,
             'start'       => $event->main_start->format($format),
             'end'         => $end->format($format),
             'doors'       => ($event->doors && !$event->all_day) ? $event->doors->format(DATE_ATOM) : null,
-            'date_text'   => IMM_TK_Digest::date($event),
-            'time_text'   => IMM_TK_Digest::time($event),
+            'date_text'   => ETCF_Digest::date($event),
+            'time_text'   => ETCF_Digest::time($event),
             'venue'       => $parts[0] ?? '',
             'address'     => count($parts) > 1 ? implode(', ', array_slice($parts, 1)) : '',
             'description' => $event->summary,
             'image'       => $image ?: null,
             'ticket_url'  => $ticket !== '' ? esc_url_raw($ticket) : null,
             'price'       => $price,
-            'currency'    => $price !== null ? (string) IMM_TK_Settings::get('currency') : null,
+            'currency'    => $price !== null ? (string) ETCF_Settings::get('currency') : null,
             'published'   => (string) get_post_time(DATE_ATOM, false, $event->id),
             'calendar'    => $links,
         ];

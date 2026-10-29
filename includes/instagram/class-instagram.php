@@ -10,10 +10,10 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_IG_Instagram
+class ETCF_Instagram
 {
-    const OPTION = 'imm_ig_settings';
-    const STATE  = 'imm_ig_state';
+    const OPTION = 'etcf_ig_settings';
+    const STATE  = 'etcf_ig_state';
     const API    = 'https://graph.instagram.com/';
 
     /** Set while the plugin itself saves the settings (token refresh), to skip the checks in sanitize(). */
@@ -91,7 +91,7 @@ class IMM_IG_Instagram
     private static function settings_error(string $message): void
     {
         if (function_exists('add_settings_error')) {
-            add_settings_error(self::OPTION, 'imm_ig', $message);
+            add_settings_error(self::OPTION, 'etcf_ig', $message);
         }
     }
 
@@ -150,12 +150,12 @@ class IMM_IG_Instagram
         $body = json_decode(wp_remote_retrieve_body($response), true);
         if (!is_array($body)) {
             /* translators: %d: HTTP status code */
-            return new WP_Error('imm_ig_api', sprintf(__('Instagram answered with HTTP status %d.', 'event-toolkit-for-custom-fields'), wp_remote_retrieve_response_code($response)));
+            return new WP_Error('etcf_ig_api', sprintf(__('Instagram answered with HTTP status %d.', 'event-toolkit-for-custom-fields'), wp_remote_retrieve_response_code($response)));
         }
         if (isset($body['error'])) {
             $message = (string) ($body['error']['error_user_msg'] ?? $body['error']['message'] ?? 'unknown error');
             /* translators: %s: error message from Instagram */
-            return new WP_Error('imm_ig_api', sprintf(__('Instagram reports: %s', 'event-toolkit-for-custom-fields'), $message), $body['error']);
+            return new WP_Error('etcf_ig_api', sprintf(__('Instagram reports: %s', 'event-toolkit-for-custom-fields'), $message), $body['error']);
         }
         return $body;
     }
@@ -178,7 +178,7 @@ class IMM_IG_Instagram
             return $result;
         }
         if (empty($result['access_token'])) {
-            return new WP_Error('imm_ig_refresh', __('Instagram did not return a new token.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('etcf_ig_refresh', __('Instagram did not return a new token.', 'event-toolkit-for-custom-fields'));
         }
         $settings          = self::all();
         $settings['token'] = (string) $result['access_token'];
@@ -221,7 +221,7 @@ class IMM_IG_Instagram
         }
         $id = (string) ($container['id'] ?? '');
         if ($id === '') {
-            return new WP_Error('imm_ig_container', __('Instagram did not create the story.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('etcf_ig_container', __('Instagram did not create the story.', 'event-toolkit-for-custom-fields'));
         }
 
         // Images are usually ready at once; wait a little if not.
@@ -233,7 +233,7 @@ class IMM_IG_Instagram
             }
             if (in_array($code, ['ERROR', 'EXPIRED'], true)) {
                 /* translators: %s: status reported by Instagram */
-                return new WP_Error('imm_ig_status', sprintf(__('Instagram could not process the image (%s).', 'event-toolkit-for-custom-fields'), $code));
+                return new WP_Error('etcf_ig_status', sprintf(__('Instagram could not process the image (%s).', 'event-toolkit-for-custom-fields'), $code));
             }
             sleep(5);
         }

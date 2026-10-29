@@ -6,7 +6,7 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Breakdance_Field extends \Breakdance\DynamicData\StringField
+class ETCF_Breakdance_Field extends \Breakdance\DynamicData\StringField
 {
     /** @var string */
     private $type;
@@ -31,7 +31,7 @@ class IMM_TK_Breakdance_Field extends \Breakdance\DynamicData\StringField
 
     public function slug()
     {
-        return 'imm_tk_' . $this->type;
+        return 'etcf_' . $this->type;
     }
 
     public function returnTypes()
@@ -46,6 +46,6 @@ class IMM_TK_Breakdance_Field extends \Breakdance\DynamicData\StringField
 
     public function handler($attributes): \Breakdance\DynamicData\StringData
     {
-        return \Breakdance\DynamicData\StringData::fromString(IMM_TK_Links::get($this->type));
+        return \Breakdance\DynamicData\StringData::fromString(ETCF_Links::get($this->type));
     }
 }

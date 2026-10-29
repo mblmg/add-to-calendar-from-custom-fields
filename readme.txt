@@ -4,7 +4,7 @@ Tags: events, calendar, newsletter, instagram, telegram
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,8 +66,8 @@ Once a week, a preview of what is coming up: the events of the next days, plus t
 
 **Share on the website, without a login**
 
-* A share button for event pages (`[event_toolkit_share_button]`): on phones it hands the text with date, place and link, and a story image where the browser can, to WhatsApp, Signal, Telegram or any other app; on computers it copies text and link. Nothing loads from other services, and nothing is sent anywhere before someone taps.
-* The share page for members (`[event_toolkit_share_page]`): put it on a password-protected page, and members share the week's texts and images without a WordPress account.
+* A share button for event pages (`[etcf_share_button]`): on phones it hands the text with date, place and link, and a story image where the browser can, to WhatsApp, Signal, Telegram or any other app; on computers it copies text and link. Nothing loads from other services, and nothing is sent anywhere before someone taps.
+* The share page for members (`[etcf_share_page]`): put it on a password-protected page, and members share the week's texts and images without a WordPress account.
 
 **Page builders**
 
@@ -102,7 +102,7 @@ Base path and file names can be changed in the settings.
 3. On the page "Events", enter the post type of your events and the names of your date, time and location fields. The page lists the field names of a sample event and shows a preview of the next events, so you can check the result right away.
 4. Add the calendar links to your event template:
    * Breakdance: choose the dynamic data category "Add to Calendar" in the link field of a button or text link.
-   * Any other theme or builder: use the shortcode, e.g. `[imm_calendar_link type="ics" text="Add to calendar"]`.
+   * Any other theme or builder: use the shortcode, e.g. `[etcf_calendar_link type="ics" text="Add to calendar"]`.
 5. Optional: set day and time of the weekly preview, connect a Telegram bot, enter the newsletter feed address in your newsletter service, and connect Instagram.
 
 == Frequently Asked Questions ==
@@ -155,11 +155,11 @@ WhatsApp has no interface for channels, and its business API charges per message
 
 = How do members share events without a WordPress account? =
 
-Create a page, protect it with a password (Visibility: Password protected) and add the shortcode `[event_toolkit_share_page]`. Give the link and the password to your members. The page is not cached and not shown to search engines. With Breakdance, use the element "Shortcode". The buttons take the classes of your theme with `button_class="…"` and `button_class_secondary="…"`.
+Create a page, protect it with a password (Visibility: Password protected) and add the shortcode `[etcf_share_page]`. Give the link and the password to your members. The page is not cached and not shown to search engines. With Breakdance, use the element "Shortcode". The buttons take the classes of your theme with `button_class="…"` and `button_class_secondary="…"`.
 
 = How do I add a share button to event pages? =
 
-Add `[event_toolkit_share_button]` to the event template (in Breakdance with the element "Shortcode"). Attributes: `label` (default "Share"), `copy_label` (default "Copy text and link"), `class` for your theme's button class, `image="no"` to share the text only, and `id` for a specific event. After the event the button disappears.
+Add `[etcf_share_button]` to the event template (in Breakdance with the element "Shortcode"). Attributes: `label` (default "Share"), `copy_label` (default "Copy text and link"), `class` for your theme's button class, `image="no"` to share the text only, and `id` for a specific event. After the event the button disappears.
 
 = How do I use the newsletter feed? =
 
@@ -175,26 +175,26 @@ This plugin replaces both. Install it, then deactivate the old plugins: all sett
 
 = Which abilities are there for AI agents? =
 
-* `event-toolkit/list-events`: upcoming events in a period, with date, time (doors and start), venue, image, ticket link and calendar links
-* `event-toolkit/get-event`: one event by post ID or URL
-* `event-toolkit/get-weekly-preview`: the weekly preview as data, as Telegram text and as e-mail HTML
-* `event-toolkit/post-weekly-preview-to-telegram`: posts the weekly preview to the configured chat
+* `etcf/list-events`: upcoming events in a period, with date, time (doors and start), venue, image, ticket link and calendar links
+* `etcf/get-event`: one event by post ID or URL
+* `etcf/get-weekly-preview`: the weekly preview as data, as Telegram text and as e-mail HTML
+* `etcf/post-weekly-preview-to-telegram`: posts the weekly preview to the configured chat
 
 The first three only return what visitors can see on the website anyway. Posting to Telegram is limited to administrators. The abilities appear for AI agents once an MCP adapter is installed (for example the MCP Adapter plugin).
 
 = Developer hooks =
 
-* Filter `imm_tk_event` ($event, $post): change the event data before output.
-* Filter `imm_tk_feed_query_args` ($args): change the query for the subscription feed and the weekly preview.
-* Filter `imm_tk_schema` ($data, $event, $post): change the structured data, e.g. add performers. Return an empty array to output nothing.
-* Filter `imm_tk_digest_events` ($selection, $issue): change the events of a weekly preview (`week` and `new`).
-* Filter `imm_tk_digest_email_html` ($html, $selection): change the newsletter HTML.
-* Filter `imm_tg_message` ($message, $selection): change the Telegram message (Telegram HTML).
-* Filter `imm_tg_today_message` ($message, $events): change the silent "Today" message.
-* Filter `imm_tk_share_text` ($text): change the texts on the page "Share".
-* Filter `imm_tk_sharepic_fonts` ($files): font files of the story images (`display`, `text`, `bold`).
-* Filter `imm_tk_site_fonts` ($fonts): the detected fonts of the website (`heading`, `text`).
-* Filter `imm_ig_plan` ($items, $now): change the stories planned for a day.
+* Filter `etcf_event` ($event, $post): change the event data before output.
+* Filter `etcf_feed_query_args` ($args): change the query for the subscription feed and the weekly preview.
+* Filter `etcf_schema` ($data, $event, $post): change the structured data, e.g. add performers. Return an empty array to output nothing.
+* Filter `etcf_digest_events` ($selection, $issue): change the events of a weekly preview (`week` and `new`).
+* Filter `etcf_digest_email_html` ($html, $selection): change the newsletter HTML.
+* Filter `etcf_tg_message` ($message, $selection): change the Telegram message (Telegram HTML).
+* Filter `etcf_tg_today_message` ($message, $events): change the silent "Today" message.
+* Filter `etcf_share_text` ($text): change the texts on the page "Share".
+* Filter `etcf_sharepic_fonts` ($files): font files of the story images (`display`, `text`, `bold`).
+* Filter `etcf_site_fonts` ($fonts): the detected fonts of the website (`heading`, `text`).
+* Filter `etcf_ig_plan` ($items, $now): change the stories planned for a day.
 
 == External services ==
 
@@ -235,6 +235,13 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 **Google Rich Results Test.** The settings page contains a link to this Google tool. Clicking it opens the tool with the address of one of your event pages. Nothing is sent unless an administrator clicks the link.
 
 == Changelog ==
+
+= 2.3.0 =
+* All names the plugin uses now start with "etcf": settings, schedules, hooks, filters, shortcodes, abilities and CSS classes. Settings and schedules of earlier versions are moved over automatically.
+* Shortcodes renamed: `[etcf_calendar_link]`, `[etcf_share_button]` and `[etcf_share_page]`. Please update them on your pages.
+* Breakdance dynamic data fields renamed to `etcf_*`; select them again in elements that use calendar links.
+* Abilities renamed to `etcf/list-events`, `etcf/get-event`, `etcf/get-weekly-preview` and `etcf/post-weekly-preview-to-telegram`.
+* Translations now come from translate.wordpress.org; the plugin no longer ships language files.
 
 = 2.2.0 =
 * New: page "Newsletter" with guides for Brevo, Mailchimp, MailerLite and other services, and direct sending through Brevo or Emailit.

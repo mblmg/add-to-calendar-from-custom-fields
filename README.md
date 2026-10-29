@@ -18,7 +18,8 @@ User documentation lives in [`readme.txt`](readme.txt), which is also what the W
 
 ```
 event-toolkit-for-custom-fields.php        bootstrap, waits while a predecessor plugin is active
-includes/class-settings.php                core settings (option imm_tk_settings), saved per tab
+includes/class-upgrade.php                 one-time migration after updates (former imm_* names)
+includes/class-settings.php                core settings (option etcf_settings), saved per tab
 includes/class-event.php                   reads an event from post meta, start/end/doors rules
 includes/class-ics.php                     iCalendar output (RFC 5545)
 includes/class-links.php                   .ics, Google, Outlook and feed URLs
@@ -31,21 +32,21 @@ includes/class-sharepic.php                story images with GD (frames, renderi
 includes/class-share.php                   share texts for messengers, image endpoints (admin, signed public URLs), reminder mail
 includes/class-share-kit.php               the share kit (today, weekly preview, later), in the admin and on the website
 includes/class-front.php                   shortcodes for the website: share button on event pages, share page for members
-includes/telegram/                         Telegram: settings (imm_tg_settings), Bot API, weekly and "Today" schedule
-includes/instagram/                        Instagram: settings and API (imm_ig_settings), daily story schedule
-includes/social/                           Mastodon and Bluesky (imm_so_settings)
-includes/newsletter/                       direct sending through Brevo or Emailit (imm_nl_settings)
+includes/telegram/                         Telegram: settings (etcf_tg_settings), Bot API, weekly and "Today" schedule
+includes/instagram/                        Instagram: settings and API (etcf_ig_settings), daily story schedule
+includes/social/                           Mastodon and Bluesky (etcf_so_settings)
+includes/newsletter/                       direct sending through Brevo or Emailit (etcf_nl_settings)
 includes/class-status.php                  cancelled / postponed events, one-time notices
 includes/class-qr.php                      QR encoder (SVG, PNG, cache in uploads/event-toolkit/qr)
 assets/                                    share script, admin and website styles
 includes/class-admin.php                   admin menu "Event Toolkit": overview and one page per area
 includes/class-abilities.php               abilities (WordPress Abilities API) for AI agents / MCP
-includes/shortcode.php                     [imm_calendar_link]
+includes/shortcode.php                     [etcf_calendar_link]
 includes/breakdance*.php                   Breakdance dynamic data fields
-languages/                                 .pot template and bundled German translation
+languages/                                 .pot template and German translation (not shipped, see Translations)
 ```
 
-The internal prefixes `imm_tk` / `IMM_TK_` and `imm_tg` / `IMM_TG_` are kept on purpose: existing sites store their settings under `imm_tk_settings` and `imm_tg_settings` and reference the Breakdance fields as `imm_tk_*`.
+Everything global uses the prefix `etcf` (WordPress.org requires a distinct prefix of at least four characters): classes `ETCF_*`, constants `ETCF_*`, options, hooks, filters, cron events, nonces, admin-post actions and transients `etcf_*`, shortcodes `etcf_*`, Breakdance fields `etcf_*`, abilities `etcf/*`, script and style handles, CSS classes and custom properties `etcf-*`. Up to 2.2.0 the prefixes were `imm_tk`, `imm_tg`, `imm_ig`, `imm_so` and `imm_nl`; `ETCF_Upgrade` moves options, schedules and post meta over once. Shortcodes and Breakdance fields in page content have to be switched by hand. Two old names stay on purpose: the check for the predecessor plugins (`IMM_TK_VERSION`, `IMM_TG_Settings`) and the iCalendar UID `imm-tk-{ID}@host`, so subscribed calendars do not list events twice.
 
 ### Weekly preview
 
@@ -57,11 +58,11 @@ Channels differ in how intrusive they are, so they get different rhythms (see th
 
 ### Translations
 
-English is the source language. After changing strings, update `languages/event-toolkit-for-custom-fields.pot` and the German `.po`, then compile the `.mo` and `.l10n.php` (e.g. with `wp i18n make-mo languages` and `wp i18n make-php languages`).
+English is the source language. WordPress.org delivers translations from translate.wordpress.org, so the plugin ships no language files and does not call `load_plugin_textdomain()` (`languages/` is in `.distignore`). The folder stays in the repository: the German `.po` can be imported on translate.wordpress.org, and for test sites the compiled `.mo` and `.l10n.php` go to `wp-content/languages/plugins/`. After changing strings, update the `.pot` and the German `.po`, then compile with `wp i18n make-mo languages` and `wp i18n make-php languages`.
 
 ## Releasing
 
-1. Bump the version in three places: the plugin header (`Version:`), the `IMM_TK_VERSION` constant and `Stable tag:` in `readme.txt`. Add a changelog entry.
+1. Bump the version in three places: the plugin header (`Version:`), the `ETCF_VERSION` constant and `Stable tag:` in `readme.txt`. Add a changelog entry.
 2. Publish a GitHub release with the version as new tag (e.g. `2.0.1`).
 3. The **Release** workflow checks the version numbers, builds the zip and attaches it to the release.
 4. Once the plugin is approved on WordPress.org, the same workflow also deploys it there, and sites get updates through WordPress.org. Enable it by adding:

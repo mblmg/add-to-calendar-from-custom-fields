@@ -9,9 +9,9 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Settings
+class ETCF_Settings
 {
-    const OPTION = 'imm_tk_settings';
+    const OPTION = 'etcf_settings';
 
     /** Fields per settings tab, with their type (key, keys, text, int, check, url, time, weekday, textarea, color, email, choice). */
     public static function tabs(): array
@@ -79,7 +79,7 @@ class IMM_TK_Settings
     public static function defaults(): array
     {
         // Weekly preview settings used to live in the separate Telegram plugin; take them over.
-        $tg = get_option('imm_tg_settings', []);
+        $tg = get_option('etcf_tg_settings', []);
         $tg = is_array($tg) ? $tg : [];
 
         return [

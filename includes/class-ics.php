@@ -5,21 +5,21 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_ICS
+class ETCF_ICS
 {
-    /** @param IMM_TK_Event[] $events */
+    /** @param ETCF_Event[] $events */
     public static function calendar(array $events, bool $is_feed): string
     {
         $lines = [
             'BEGIN:VCALENDAR',
             'VERSION:2.0',
-            'PRODID:-//i-make.media//Event Toolkit for Custom Fields ' . IMM_TK_VERSION . '//EN',
+            'PRODID:-//i-make.media//Event Toolkit for Custom Fields ' . ETCF_VERSION . '//EN',
             'CALSCALE:GREGORIAN',
             'METHOD:PUBLISH',
         ];
 
         if ($is_feed) {
-            $title    = (string) IMM_TK_Settings::get('feed_title');
+            $title    = (string) ETCF_Settings::get('feed_title');
             $lines[]  = 'X-WR-CALNAME:' . self::escape($title);
             $lines[]  = 'NAME:' . self::escape($title);
             $lines[]  = 'X-WR-TIMEZONE:' . wp_timezone_string();
@@ -43,7 +43,7 @@ class IMM_TK_ICS
             }
             // SEQUENCE grows with every change, so calendars take over updates such as a cancellation.
             $lines[] = 'SEQUENCE:' . max(0, (int) floor(($event->modified->getTimestamp() - 1704067200) / 60));
-            $lines[] = 'SUMMARY:' . self::escape(IMM_TK_Digest::title($event));
+            $lines[] = 'SUMMARY:' . self::escape(ETCF_Digest::title($event));
             if ($event->description !== '') {
                 $lines[] = 'DESCRIPTION:' . self::escape($event->description);
             }

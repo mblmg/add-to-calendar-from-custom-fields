@@ -8,7 +8,7 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Schema
+class ETCF_Schema
 {
     public static function init(): void
     {
@@ -17,14 +17,14 @@ class IMM_TK_Schema
 
     public static function output(): void
     {
-        if (!IMM_TK_Settings::get('schema_enabled') || !IMM_TK_Settings::is_configured()) {
+        if (!ETCF_Settings::get('schema_enabled') || !ETCF_Settings::is_configured()) {
             return;
         }
-        if (!is_singular(IMM_TK_Settings::get('post_type'))) {
+        if (!is_singular(ETCF_Settings::get('post_type'))) {
             return;
         }
         $post  = get_queried_object();
-        $event = IMM_TK_Event::from_post($post);
+        $event = ETCF_Event::from_post($post);
         if (!$event) {
             return;
         }
@@ -39,9 +39,9 @@ class IMM_TK_Schema
 
     /**
      * Builds the schema.org Event for an event. Returns an empty array if the event
-     * should not be marked up (filter "imm_tk_schema" returned something empty).
+     * should not be marked up (filter "etcf_schema" returned something empty).
      */
-    public static function build(IMM_TK_Event $event): array
+    public static function build(ETCF_Event $event): array
     {
         $post = get_post($event->id);
 
@@ -83,12 +83,12 @@ class IMM_TK_Schema
             $data['offers'] = $offers;
         }
 
-        $organizer_name = (string) IMM_TK_Settings::get('organizer_name');
+        $organizer_name = (string) ETCF_Settings::get('organizer_name');
         if ($organizer_name !== '') {
             $data['organizer'] = array_filter([
                 '@type' => 'Organization',
                 'name'  => $organizer_name,
-                'url'   => (string) IMM_TK_Settings::get('organizer_url'),
+                'url'   => (string) ETCF_Settings::get('organizer_url'),
             ]);
         }
 
@@ -96,10 +96,10 @@ class IMM_TK_Schema
          * Filters the schema.org Event before output. Return an empty array to output nothing.
          *
          * @param array        $data  JSON-LD data.
-         * @param IMM_TK_Event $event Event with calculated start and end.
+         * @param ETCF_Event $event Event with calculated start and end.
          * @param WP_Post      $post  Event post.
          */
-        $data = apply_filters('imm_tk_schema', $data, $event, $post);
+        $data = apply_filters('etcf_schema', $data, $event, $post);
 
         return is_array($data) ? $data : [];
     }
@@ -113,15 +113,15 @@ class IMM_TK_Schema
      * Place: the first location field is the venue name, the others form the address.
      * With only one filled field it serves as both. Without any, the default venue is used.
      */
-    private static function location(IMM_TK_Event $event): array
+    private static function location(ETCF_Event $event): array
     {
         $parts = $event->location_parts;
         if ($parts) {
             $name    = $parts[0];
             $address = count($parts) > 1 ? implode(', ', array_slice($parts, 1)) : $parts[0];
         } else {
-            $name    = (string) IMM_TK_Settings::get('venue_name');
-            $address = (string) IMM_TK_Settings::get('venue_address');
+            $name    = (string) ETCF_Settings::get('venue_name');
+            $address = (string) ETCF_Settings::get('venue_address');
             if ($name === '' && $address === '') {
                 return [];
             }
@@ -146,7 +146,7 @@ class IMM_TK_Schema
      */
     public static function postal_address(string $text): array
     {
-        $country = (string) IMM_TK_Settings::get('country');
+        $country = (string) ETCF_Settings::get('country');
         $address = ['@type' => 'PostalAddress'];
 
         if (preg_match('/^(.+?),\s*(\d{4,5})\s+([^,]+?)(?:,\s*(.+))?$/u', $text, $m)) {
@@ -163,10 +163,10 @@ class IMM_TK_Schema
     }
 
     /** Offer from the ticket link and price fields. Empty if neither is filled. */
-    private static function offers(IMM_TK_Event $event): array
+    private static function offers(ETCF_Event $event): array
     {
-        $url   = trim((string) IMM_TK_Event::first_meta($event->id, IMM_TK_Settings::key_list('ticket_url_key')));
-        $price = self::price(IMM_TK_Event::first_meta($event->id, IMM_TK_Settings::key_list('price_key')));
+        $url   = trim((string) ETCF_Event::first_meta($event->id, ETCF_Settings::key_list('ticket_url_key')));
+        $price = self::price(ETCF_Event::first_meta($event->id, ETCF_Settings::key_list('price_key')));
 
         if ($url === '' && $price === null) {
             return [];
@@ -177,7 +177,7 @@ class IMM_TK_Schema
         ];
         if ($price !== null) {
             $offer['price']         = $price;
-            $offer['priceCurrency'] = (string) IMM_TK_Settings::get('currency');
+            $offer['priceCurrency'] = (string) ETCF_Settings::get('currency');
         }
         return $offer;
     }

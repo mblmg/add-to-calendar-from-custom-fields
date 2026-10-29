@@ -6,7 +6,7 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Breakdance
+class ETCF_Breakdance
 {
     public static function init(): void
     {
@@ -19,8 +19,8 @@ class IMM_TK_Breakdance
             return;
         }
         require_once __DIR__ . '/breakdance-field.php';
-        foreach (IMM_TK_Links::types() as $type => $label) {
-            \Breakdance\DynamicData\registerField(new IMM_TK_Breakdance_Field($type, $label));
+        foreach (ETCF_Links::types() as $type => $label) {
+            \Breakdance\DynamicData\registerField(new ETCF_Breakdance_Field($type, $label));
         }
     }
 }

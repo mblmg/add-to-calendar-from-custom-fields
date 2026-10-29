@@ -7,11 +7,11 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Status
+class ETCF_Status
 {
-    const HOOK = 'imm_tk_status_check';
+    const HOOK = 'etcf_status_check';
     /** Post meta: the status a notice was sent for. */
-    const NOTIFIED = '_imm_tk_status_notified';
+    const NOTIFIED = '_etcf_status_notified';
 
     public static function init(): void
     {
@@ -23,7 +23,7 @@ class IMM_TK_Status
     /** A status field was saved: check a little later, when all fields of the post are saved. */
     public static function meta_changed($meta_id, $post_id, $meta_key): void
     {
-        if (!in_array($meta_key, IMM_TK_Settings::key_list('status_key'), true)) {
+        if (!in_array($meta_key, ETCF_Settings::key_list('status_key'), true)) {
             return;
         }
         $args = [(int) $post_id];
@@ -34,7 +34,7 @@ class IMM_TK_Status
 
     public static function check(int $post_id): void
     {
-        $event = IMM_TK_Event::from_post($post_id);
+        $event = ETCF_Event::from_post($post_id);
         if (!$event) {
             return;
         }
@@ -51,22 +51,22 @@ class IMM_TK_Status
         }
         update_post_meta($post_id, self::NOTIFIED, $event->status);
 
-        if (IMM_TG_Settings::is_ready() && IMM_TG_Settings::get('notify_status')) {
-            IMM_TG_Telegram::send(self::telegram_text($event), $event->url);
+        if (ETCF_Telegram_Settings::is_ready() && ETCF_Telegram_Settings::get('notify_status')) {
+            ETCF_Telegram::send(self::telegram_text($event), $event->url);
         }
-        do_action('imm_tk_status_notice', $event, self::text($event));
+        do_action('etcf_status_notice', $event, self::text($event));
     }
 
     /** "Cancelled: Title" with date and link, as plain text. */
-    public static function text(IMM_TK_Event $event): string
+    public static function text(ETCF_Event $event): string
     {
-        $when = IMM_TK_Sharepic::long_date($event) . ', ' . IMM_TK_Digest::time($event);
-        return IMM_TK_Digest::title($event) . "\n" . $when . "\n" . $event->url;
+        $when = ETCF_Sharepic::long_date($event) . ', ' . ETCF_Digest::time($event);
+        return ETCF_Digest::title($event) . "\n" . $when . "\n" . $event->url;
     }
 
-    public static function telegram_text(IMM_TK_Event $event): string
+    public static function telegram_text(ETCF_Event $event): string
     {
-        $when = IMM_TK_Sharepic::long_date($event) . ', ' . IMM_TK_Digest::time($event);
-        return '<b>' . IMM_TG_Telegram::esc($event->status_label()) . '</b>: ' . IMM_TG_Telegram::link($event, false) . "\n" . IMM_TG_Telegram::esc($when);
+        $when = ETCF_Sharepic::long_date($event) . ', ' . ETCF_Digest::time($event);
+        return '<b>' . ETCF_Telegram::esc($event->status_label()) . '</b>: ' . ETCF_Telegram::link($event, false) . "\n" . ETCF_Telegram::esc($when);
     }
 }

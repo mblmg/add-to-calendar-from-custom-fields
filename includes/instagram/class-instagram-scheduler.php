@@ -10,10 +10,10 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_IG_Scheduler
+class ETCF_Instagram_Scheduler
 {
-    const HOOK  = 'imm_ig_daily';
-    const RETRY = 'imm_ig_retry';
+    const HOOK  = 'etcf_ig_daily';
+    const RETRY = 'etcf_ig_retry';
     /** Retries per day after an error (every 30 minutes). */
     const MAX_RETRIES = 3;
 
@@ -22,7 +22,7 @@ class IMM_IG_Scheduler
         add_action(self::HOOK, [self::class, 'run']);
         add_action(self::RETRY, [self::class, 'retry']);
         add_action('init', [self::class, 'ensure_scheduled']);
-        foreach ([IMM_IG_Instagram::OPTION, IMM_TK_Settings::OPTION] as $option) {
+        foreach ([ETCF_Instagram::OPTION, ETCF_Settings::OPTION] as $option) {
             add_action('update_option_' . $option, [self::class, 'reschedule']);
             add_action('add_option_' . $option, [self::class, 'reschedule']);
         }
@@ -30,14 +30,14 @@ class IMM_IG_Scheduler
 
     public static function active(): bool
     {
-        return IMM_TK_Settings::is_configured() && IMM_IG_Instagram::get('enabled') && IMM_IG_Instagram::is_ready();
+        return ETCF_Settings::is_configured() && ETCF_Instagram::get('enabled') && ETCF_Instagram::is_ready();
     }
 
     /** Next daily run after $now. */
     public static function next_run(?DateTimeImmutable $now = null): DateTimeImmutable
     {
         $now = $now ?? new DateTimeImmutable('now', wp_timezone());
-        [$hour, $minute] = array_map('intval', explode(':', (string) IMM_IG_Instagram::get('time')));
+        [$hour, $minute] = array_map('intval', explode(':', (string) ETCF_Instagram::get('time')));
         $run = $now->setTime($hour, $minute);
         return $run <= $now ? $run->modify('+1 day') : $run;
     }
@@ -71,51 +71,51 @@ class IMM_IG_Scheduler
      */
     public static function plan(DateTimeImmutable $now): array
     {
-        if (!IMM_TK_Settings::is_configured()) {
+        if (!ETCF_Settings::is_configured()) {
             return [];
         }
         $day    = $now->setTime(0, 0);
         $date   = $day->format('Y-m-d');
-        $issue  = (int) $day->format('N') === (int) IMM_TK_Settings::get('digest_weekday');
-        $weekly = $issue && IMM_IG_Instagram::get('weekly');
+        $issue  = (int) $day->format('N') === (int) ETCF_Settings::get('digest_weekday');
+        $weekly = $issue && ETCF_Instagram::get('weekly');
         $items  = [];
 
         if ($weekly) {
-            [$hour, $minute] = array_map('intval', explode(':', (string) IMM_TK_Settings::get('digest_time')));
-            $selection = IMM_TK_Digest::select($day->setTime($hour, $minute), $now);
-            foreach (IMM_TK_Sharepic::week_frames($selection) as $i => $spec) {
+            [$hour, $minute] = array_map('intval', explode(':', (string) ETCF_Settings::get('digest_time')));
+            $selection = ETCF_Digest::select($day->setTime($hour, $minute), $now);
+            foreach (ETCF_Sharepic::week_frames($selection) as $i => $spec) {
                 $items[] = [
                     'key'   => 'week-' . $date . '-' . $i,
                     'spec'  => $spec,
-                    'label' => $spec['variant'] === 'week' ? IMM_TK_Digest::heading_week() : IMM_TK_Digest::heading_new(),
+                    'label' => $spec['variant'] === 'week' ? ETCF_Digest::heading_week() : ETCF_Digest::heading_new(),
                 ];
             }
         }
-        if (IMM_IG_Instagram::get('today')) {
-            $events = array_values(array_filter(IMM_TK_Share::events_on($day), function (IMM_TK_Event $e) use ($now) {
+        if (ETCF_Instagram::get('today')) {
+            $events = array_values(array_filter(ETCF_Share::events_on($day), function (ETCF_Event $e) use ($now) {
                 return $e->end > $now;
             }));
             $items  = array_merge($items, self::day_items($events, 'today', $date));
         }
         // The weekly overview of the issue day already shows tomorrow's events.
-        if (IMM_IG_Instagram::get('tomorrow') && !$weekly) {
-            $items = array_merge($items, self::day_items(IMM_TK_Share::events_on($day->modify('+1 day')), 'tomorrow', $date));
+        if (ETCF_Instagram::get('tomorrow') && !$weekly) {
+            $items = array_merge($items, self::day_items(ETCF_Share::events_on($day->modify('+1 day')), 'tomorrow', $date));
         }
-        return (array) apply_filters('imm_ig_plan', $items, $now);
+        return (array) apply_filters('etcf_ig_plan', $items, $now);
     }
 
     private static function day_items(array $events, string $variant, string $date): array
     {
         // Cancelled or postponed events get no "tomorrow" / "today" story.
-        $events = array_values(array_filter($events, function (IMM_TK_Event $e) {
+        $events = array_values(array_filter($events, function (ETCF_Event $e) {
             return !$e->is_off();
         }));
         $items  = [];
         $titles = [];
         foreach ($events as $e) {
-            $titles[$e->id] = IMM_TK_Digest::title($e);
+            $titles[$e->id] = ETCF_Digest::title($e);
         }
-        foreach (IMM_TK_Sharepic::day_frames($events, $variant) as $i => $spec) {
+        foreach (ETCF_Sharepic::day_frames($events, $variant) as $i => $spec) {
             $label = $spec['type'] === 'event'
                 ? self::label($variant, $titles[$spec['id']] ?? '')
                 /* translators: %d: number of events (always more than three) */
@@ -160,10 +160,10 @@ class IMM_IG_Scheduler
         if (!self::active()) {
             return $result;
         }
-        IMM_IG_Instagram::maybe_refresh_token();
+        ETCF_Instagram::maybe_refresh_token();
 
         $now    = new DateTimeImmutable('now', wp_timezone());
-        $state  = IMM_IG_Instagram::state();
+        $state  = ETCF_Instagram::state();
         $posted = array_filter((array) $state['posted'], function ($time) {
             return $time > time() - 14 * DAY_IN_SECONDS;
         });
@@ -172,29 +172,29 @@ class IMM_IG_Scheduler
             if (isset($posted[$item['key']])) {
                 continue;
             }
-            $file = IMM_TK_Sharepic::file($item['spec']);
-            $id   = is_wp_error($file) ? $file : IMM_IG_Instagram::publish_story($file['url']);
+            $file = ETCF_Sharepic::file($item['spec']);
+            $id   = is_wp_error($file) ? $file : ETCF_Instagram::publish_story($file['url']);
             if (is_wp_error($id)) {
                 $result['errors']++;
                 /* translators: 1: story label, 2: error message */
-                IMM_IG_Instagram::log(sprintf(__('%1$s – not posted: %2$s', 'event-toolkit-for-custom-fields'), $item['label'], $id->get_error_message()), false);
+                ETCF_Instagram::log(sprintf(__('%1$s – not posted: %2$s', 'event-toolkit-for-custom-fields'), $item['label'], $id->get_error_message()), false);
                 break; // Keep the order; the rest follows with the retry.
             }
             $posted[$item['key']] = time();
-            IMM_IG_Instagram::update_state(['posted' => $posted]);
+            ETCF_Instagram::update_state(['posted' => $posted]);
             /* translators: %s: story label */
-            IMM_IG_Instagram::log(sprintf(__('%s – posted.', 'event-toolkit-for-custom-fields'), $item['label']));
+            ETCF_Instagram::log(sprintf(__('%s – posted.', 'event-toolkit-for-custom-fields'), $item['label']));
             $result['posted']++;
         }
-        IMM_IG_Instagram::update_state(['posted' => $posted]);
+        ETCF_Instagram::update_state(['posted' => $posted]);
 
         if ($result['errors']) {
             $date    = $now->format('Y-m-d');
-            $retries = (array) IMM_IG_Instagram::state()['retries'];
+            $retries = (array) ETCF_Instagram::state()['retries'];
             $count   = (int) ($retries[$date] ?? 0);
             if ($count < self::MAX_RETRIES && !wp_next_scheduled(self::RETRY)) {
                 wp_schedule_single_event(time() + 30 * MINUTE_IN_SECONDS, self::RETRY);
-                IMM_IG_Instagram::update_state(['retries' => [$date => $count + 1]]);
+                ETCF_Instagram::update_state(['retries' => [$date => $count + 1]]);
             }
         }
         return $result;

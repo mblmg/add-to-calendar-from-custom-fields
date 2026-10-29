@@ -7,16 +7,16 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Share
+class ETCF_Share
 {
-    const HOOK = 'imm_tk_share_reminder';
+    const HOOK = 'etcf_share_reminder';
 
     public static function init(): void
     {
         add_action(self::HOOK, [self::class, 'send_reminder']);
         add_action('init', [self::class, 'ensure_schedule']);
-        add_action('update_option_' . IMM_TK_Settings::OPTION, [self::class, 'reschedule']);
-        add_action('admin_post_imm_tk_sharepic', [self::class, 'handle_image']);
+        add_action('update_option_' . ETCF_Settings::OPTION, [self::class, 'reschedule']);
+        add_action('admin_post_etcf_sharepic', [self::class, 'handle_image']);
         add_action('init', [self::class, 'handle_public_image'], 20);
     }
 
@@ -28,26 +28,26 @@ class IMM_TK_Share
     public static function week_text(array $selection, bool $plain = false): string
     {
         $out   = [];
-        $intro = trim((string) IMM_TK_Settings::get('digest_intro'));
+        $intro = trim((string) ETCF_Settings::get('digest_intro'));
         if ($intro !== '') {
             $out[] = $intro;
         }
         if ($selection['week']) {
-            $out[] = '*' . IMM_TK_Digest::heading_week() . '*';
+            $out[] = '*' . ETCF_Digest::heading_week() . '*';
             foreach ($selection['week'] as $e) {
-                $details = implode(', ', array_filter([IMM_TK_Digest::date($e), IMM_TK_Digest::time($e), IMM_TK_Digest::venue($e)]));
-                $out[]   = '*' . IMM_TK_Digest::title($e) . "*\n" . $details . "\n" . $e->url;
+                $details = implode(', ', array_filter([ETCF_Digest::date($e), ETCF_Digest::time($e), ETCF_Digest::venue($e)]));
+                $out[]   = '*' . ETCF_Digest::title($e) . "*\n" . $details . "\n" . $e->url;
             }
         }
         if ($selection['new']) {
-            $out[] = '*' . IMM_TK_Digest::heading_new() . '*';
+            $out[] = '*' . ETCF_Digest::heading_new() . '*';
             $lines = [];
             foreach ($selection['new'] as $e) {
-                $lines[] = IMM_TK_Digest::date($e) . ': ' . IMM_TK_Digest::title($e) . "\n" . $e->url;
+                $lines[] = ETCF_Digest::date($e) . ': ' . ETCF_Digest::title($e) . "\n" . $e->url;
             }
             $out[] = implode("\n\n", $lines);
         }
-        $out[] = sprintf(IMM_TK_Digest::footer_text(), IMM_TK_Digest::program_url());
+        $out[] = sprintf(ETCF_Digest::footer_text(), ETCF_Digest::program_url());
         return self::finish(implode("\n\n", $out), $plain);
     }
 
@@ -55,26 +55,26 @@ class IMM_TK_Share
      * Text announcing one event: the day before ("tomorrow"), on the day ("today"),
      * or with its date ("date", for sharing on any day).
      */
-    public static function event_text(IMM_TK_Event $e, string $variant, bool $plain = false): string
+    public static function event_text(ETCF_Event $e, string $variant, bool $plain = false): string
     {
-        $title = IMM_TK_Digest::title($e);
+        $title = ETCF_Digest::title($e);
         if ($e->is_off()) {
             // No "Today:" for a cancelled event: the status leads.
             $head = $title;
-            $when = IMM_TK_Sharepic::long_date($e) . ', ' . IMM_TK_Digest::time($e);
+            $when = ETCF_Sharepic::long_date($e) . ', ' . ETCF_Digest::time($e);
         } elseif ($variant === 'date') {
             $head = $title;
-            $when = IMM_TK_Sharepic::long_date($e) . ', ' . IMM_TK_Digest::time($e);
+            $when = ETCF_Sharepic::long_date($e) . ', ' . ETCF_Digest::time($e);
         } elseif ($variant === 'today') {
             /* translators: %s: event title */
             $head = sprintf(__('Today: %s', 'event-toolkit-for-custom-fields'), $title);
-            $when = IMM_TK_Digest::time($e);
+            $when = ETCF_Digest::time($e);
         } else {
             /* translators: %s: event title */
             $head = sprintf(__('Tomorrow: %s', 'event-toolkit-for-custom-fields'), $title);
-            $when = IMM_TK_Sharepic::long_date($e) . ', ' . IMM_TK_Digest::time($e);
+            $when = ETCF_Sharepic::long_date($e) . ', ' . ETCF_Digest::time($e);
         }
-        $parts = ['*' . $head . '*', implode(', ', array_filter([$when, IMM_TK_Sharepic::venue_name($e)]))];
+        $parts = ['*' . $head . '*', implode(', ', array_filter([$when, ETCF_Sharepic::venue_name($e)]))];
         if ($e->summary !== '') {
             $parts[] = '';
             $parts[] = wp_trim_words($e->summary, 30, '…');
@@ -86,14 +86,14 @@ class IMM_TK_Share
 
     private static function finish(string $text, bool $plain): string
     {
-        $text = (string) apply_filters('imm_tk_share_text', $text);
+        $text = (string) apply_filters('etcf_share_text', $text);
         return $plain ? str_replace('*', '', $text) : $text;
     }
 
 
     /* ------------------------------------------------------------ what to share */
 
-    /** Upcoming events grouped by day, for the share overview: [Y-m-d => IMM_TK_Event[]]. */
+    /** Upcoming events grouped by day, for the share overview: [Y-m-d => ETCF_Event[]]. */
     public static function upcoming_days(int $days = 14): array
     {
         $tz    = wp_timezone();
@@ -101,7 +101,7 @@ class IMM_TK_Share
         $until = $today->modify('+' . $days . ' days');
         $now   = new DateTimeImmutable('now', $tz);
         $out   = [];
-        foreach (IMM_TK_Endpoints::feed_events() as $e) {
+        foreach (ETCF_Endpoints::feed_events() as $e) {
             if ($e->end <= $now || $e->start >= $until) {
                 continue;
             }
@@ -116,7 +116,7 @@ class IMM_TK_Share
     {
         $key = $day->format('Y-m-d');
         $out = [];
-        foreach (IMM_TK_Endpoints::feed_events() as $e) {
+        foreach (ETCF_Endpoints::feed_events() as $e) {
             if ($e->start->format('Y-m-d') === $key) {
                 $out[] = $e;
             }
@@ -132,23 +132,23 @@ class IMM_TK_Share
     /** URL that renders a story image for logged-in admins (no need to render on page load). */
     public static function image_url(array $spec, bool $download = false): string
     {
-        $args = ['action' => 'imm_tk_sharepic', 'spec' => rawurlencode(base64_encode((string) wp_json_encode($spec)))];
+        $args = ['action' => 'etcf_sharepic', 'spec' => rawurlencode(base64_encode((string) wp_json_encode($spec)))];
         if ($download) {
             $args['download'] = 1;
         }
-        return wp_nonce_url(add_query_arg($args, admin_url('admin-post.php')), 'imm_tk_sharepic');
+        return wp_nonce_url(add_query_arg($args, admin_url('admin-post.php')), 'etcf_sharepic');
     }
 
     public static function handle_image(): void
     {
-        if (!current_user_can(IMM_TK_Admin::SHARE_CAP)) {
+        if (!current_user_can(ETCF_Admin::SHARE_CAP)) {
             wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'), '', ['response' => 403]);
         }
-        check_admin_referer('imm_tk_sharepic');
+        check_admin_referer('etcf_sharepic');
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- decoded and validated by clean_spec().
         $raw  = isset($_GET['spec']) ? base64_decode(rawurldecode(wp_unslash($_GET['spec'])), true) : '';
-        $spec = IMM_TK_Sharepic::clean_spec(json_decode((string) $raw, true));
-        $file = $spec ? IMM_TK_Sharepic::file($spec) : new WP_Error('imm_tk_sharepic_spec', __('Unknown image.', 'event-toolkit-for-custom-fields'));
+        $spec = ETCF_Sharepic::clean_spec(json_decode((string) $raw, true));
+        $file = $spec ? ETCF_Sharepic::file($spec) : new WP_Error('etcf_sharepic_spec', __('Unknown image.', 'event-toolkit-for-custom-fields'));
         if (is_wp_error($file)) {
             wp_die(esc_html($file->get_error_message()), '', ['response' => 404]);
         }
@@ -170,12 +170,12 @@ class IMM_TK_Share
      */
     public static function public_image_url(array $spec, bool $download = false): string
     {
-        $spec = IMM_TK_Sharepic::clean_spec($spec);
+        $spec = ETCF_Sharepic::clean_spec($spec);
         if (!$spec) {
             return '';
         }
         $data = rtrim(strtr(base64_encode((string) wp_json_encode($spec)), '+/', '-_'), '=');
-        $args = ['imm_tk_story' => $data, 'sig' => self::sign($data)];
+        $args = ['etcf_story' => $data, 'sig' => self::sign($data)];
         if ($download) {
             $args['download'] = 1;
         }
@@ -184,17 +184,17 @@ class IMM_TK_Share
 
     private static function sign(string $data): string
     {
-        return substr(hash_hmac('sha256', 'imm_tk_story|' . $data, wp_salt('auth')), 0, 24);
+        return substr(hash_hmac('sha256', 'etcf_story|' . $data, wp_salt('auth')), 0, 24);
     }
 
     /** Streams a story image for a signed public URL. Renders it on the first request. */
     public static function handle_public_image(): void
     {
         // phpcs:disable WordPress.Security.NonceVerification.Recommended -- public, read-only, signed with an HMAC instead.
-        if (!isset($_GET['imm_tk_story'], $_GET['sig'])) {
+        if (!isset($_GET['etcf_story'], $_GET['sig'])) {
             return;
         }
-        $data = sanitize_text_field(wp_unslash($_GET['imm_tk_story']));
+        $data = sanitize_text_field(wp_unslash($_GET['etcf_story']));
         $sig  = sanitize_text_field(wp_unslash($_GET['sig']));
         $down = !empty($_GET['download']);
         // phpcs:enable
@@ -202,7 +202,7 @@ class IMM_TK_Share
             status_header(403);
             exit;
         }
-        $spec = IMM_TK_Sharepic::clean_spec(json_decode((string) base64_decode(strtr($data, '-_', '+/'), true), true));
+        $spec = ETCF_Sharepic::clean_spec(json_decode((string) base64_decode(strtr($data, '-_', '+/'), true), true));
         if (!$spec) {
             status_header(404);
             exit;
@@ -214,7 +214,7 @@ class IMM_TK_Share
                 exit;
             }
         }
-        $file = IMM_TK_Sharepic::file($spec);
+        $file = ETCF_Sharepic::file($spec);
         if (is_wp_error($file)) {
             status_header(404);
             exit;
@@ -235,10 +235,10 @@ class IMM_TK_Share
 
     public static function ensure_schedule(): void
     {
-        $enabled = IMM_TK_Settings::is_configured() && IMM_TK_Settings::get('share_reminder') && is_email((string) IMM_TK_Settings::get('share_reminder_to'));
+        $enabled = ETCF_Settings::is_configured() && ETCF_Settings::get('share_reminder') && is_email((string) ETCF_Settings::get('share_reminder_to'));
         $next    = wp_next_scheduled(self::HOOK);
         if ($enabled && !$next) {
-            wp_schedule_single_event(IMM_TK_Digest::next_issue()->getTimestamp(), self::HOOK);
+            wp_schedule_single_event(ETCF_Digest::next_issue()->getTimestamp(), self::HOOK);
         } elseif (!$enabled && $next) {
             wp_clear_scheduled_hook(self::HOOK);
         }
@@ -259,19 +259,19 @@ class IMM_TK_Share
     public static function send_reminder(): void
     {
         $now   = new DateTimeImmutable('now', wp_timezone());
-        $issue = IMM_TK_Digest::current_issue($now->modify('+1 minute'));
+        $issue = ETCF_Digest::current_issue($now->modify('+1 minute'));
         wp_clear_scheduled_hook(self::HOOK);
         self::ensure_schedule();
 
-        $to = (string) IMM_TK_Settings::get('share_reminder_to');
-        if (!IMM_TK_Settings::get('share_reminder') || !is_email($to)) {
+        $to = (string) ETCF_Settings::get('share_reminder_to');
+        if (!ETCF_Settings::get('share_reminder') || !is_email($to)) {
             return;
         }
-        $selection = IMM_TK_Digest::select($issue, $now);
-        if (IMM_TK_Digest::is_empty($selection)) {
+        $selection = ETCF_Digest::select($issue, $now);
+        if (ETCF_Digest::is_empty($selection)) {
             return;
         }
-        $link    = IMM_TK_Admin::url('share');
+        $link    = ETCF_Admin::url('share');
         $body    = [
             __('The weekly preview is out. To share it in WhatsApp or Signal, copy the text below, or open the share page for the story images and the announcements of the single events:', 'event-toolkit-for-custom-fields'),
             $link,

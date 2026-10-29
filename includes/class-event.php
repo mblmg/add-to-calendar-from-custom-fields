@@ -11,7 +11,7 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Event
+class ETCF_Event
 {
     /** @var int */
     public $id;
@@ -53,33 +53,34 @@ class IMM_TK_Event
     public static function from_post($post): ?self
     {
         $post = get_post($post);
-        if (!$post || !IMM_TK_Settings::is_configured()) {
+        if (!$post || !ETCF_Settings::is_configured()) {
             return null;
         }
-        if ($post->post_type !== IMM_TK_Settings::get('post_type') || $post->post_status !== 'publish') {
+        if ($post->post_type !== ETCF_Settings::get('post_type') || $post->post_status !== 'publish') {
             return null;
         }
 
         $tz   = wp_timezone();
-        $date = self::parse_date(self::first_meta($post->ID, IMM_TK_Settings::key_list('date_key')), $tz);
+        $date = self::parse_date(self::first_meta($post->ID, ETCF_Settings::key_list('date_key')), $tz);
         if (!$date) {
             return null;
         }
-        $end_date = self::parse_date(self::first_meta($post->ID, IMM_TK_Settings::key_list('end_date_key')), $tz);
+        $end_date = self::parse_date(self::first_meta($post->ID, ETCF_Settings::key_list('end_date_key')), $tz);
 
         $event        = new self();
         $event->id    = $post->ID;
         // Soft hyphens help line breaks on the website, but are noise in calendars, feeds and search results.
         $event->title = str_replace("\u{00AD}", '', html_entity_decode(wp_strip_all_tags(get_the_title($post)), ENT_QUOTES, 'UTF-8'));
         $event->url   = get_permalink($post);
+        // Unchanged since the first version, so subscribed calendars recognise the events and do not list them twice.
         $event->uid   = 'imm-tk-' . $post->ID . '@' . wp_parse_url(home_url(), PHP_URL_HOST);
         $event->modified = new DateTimeImmutable($post->post_modified_gmt ?: 'now', new DateTimeZone('UTC'));
 
-        $doors_keys = IMM_TK_Settings::key_list('doors_key');
+        $doors_keys = ETCF_Settings::key_list('doors_key');
         $doors_time = self::parse_time(self::first_meta($post->ID, $doors_keys));
         $start_time = null;
         $main_time  = null;
-        foreach (IMM_TK_Settings::key_list('start_keys') as $key) {
+        foreach (ETCF_Settings::key_list('start_keys') as $key) {
             $time = self::parse_time(get_post_meta($post->ID, $key, true));
             if (!$time) {
                 continue;
@@ -110,7 +111,7 @@ class IMM_TK_Event
             if ($doors_time) {
                 $event->doors = $date->setTime($doors_time[0], $doors_time[1]);
             }
-            $end_time     = self::parse_time(self::first_meta($post->ID, IMM_TK_Settings::key_list('end_time_key')));
+            $end_time     = self::parse_time(self::first_meta($post->ID, ETCF_Settings::key_list('end_time_key')));
             if ($end_time) {
                 $end_base   = ($end_date && $end_date >= $date) ? $end_date : $date;
                 $event->end = $end_base->setTime($end_time[0], $end_time[1]);
@@ -118,13 +119,13 @@ class IMM_TK_Event
                     $event->end = $event->end->modify('+1 day');
                 }
             } else {
-                $minutes    = (int) IMM_TK_Settings::get('default_duration');
+                $minutes    = (int) ETCF_Settings::get('default_duration');
                 $event->end = $event->start->modify('+' . $minutes . ' minutes');
             }
         }
 
         $parts = [];
-        foreach (IMM_TK_Settings::key_list('location_keys') as $key) {
+        foreach (ETCF_Settings::key_list('location_keys') as $key) {
             $value = trim(wp_strip_all_tags((string) get_post_meta($post->ID, $key, true)));
             if ($value !== '' && !in_array($value, $parts, true)) {
                 $parts[] = $value;
@@ -134,7 +135,7 @@ class IMM_TK_Event
         $event->location       = implode(', ', $parts);
 
         $description = '';
-        foreach (IMM_TK_Settings::key_list('description_key') as $key) {
+        foreach (ETCF_Settings::key_list('description_key') as $key) {
             $description = trim(wp_strip_all_tags((string) get_post_meta($post->ID, $key, true)));
             if ($description !== '') {
                 break;
@@ -152,13 +153,13 @@ class IMM_TK_Event
         $event->summary     = html_entity_decode($description, ENT_QUOTES, 'UTF-8');
         $event->description = trim($event->summary . "\n\n" . $event->url);
 
-        return apply_filters('imm_tk_event', $event, $post);
+        return apply_filters('etcf_event', $event, $post);
     }
 
     /** Status from the status field: values are compared case-insensitively with the configured lists. */
     public static function read_status(int $post_id): string
     {
-        $keys = IMM_TK_Settings::key_list('status_key');
+        $keys = ETCF_Settings::key_list('status_key');
         if (!$keys) {
             return 'scheduled';
         }
@@ -171,7 +172,7 @@ class IMM_TK_Event
             return 'scheduled';
         }
         foreach (['cancelled' => 'status_cancelled', 'postponed' => 'status_postponed'] as $status => $setting) {
-            $list = array_map('strtolower', array_map('trim', explode(',', (string) IMM_TK_Settings::get($setting))));
+            $list = array_map('strtolower', array_map('trim', explode(',', (string) ETCF_Settings::get($setting))));
             if (in_array($value, array_filter($list, 'strlen'), true)) {
                 return $status;
             }

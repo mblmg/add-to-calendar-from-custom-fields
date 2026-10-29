@@ -6,30 +6,30 @@
  * through the shortcode attributes.
  */
 
-.imm-tk-kit,
-.imm-tk-sharebutton {
-	--imm-accent: currentColor;
-	--imm-line: color-mix(in srgb, currentColor 20%, transparent);
-	--imm-soft: color-mix(in srgb, currentColor 6%, transparent);
-	--imm-muted: color-mix(in srgb, currentColor 68%, transparent);
-	--imm-radius: 4px;
+.etcf-kit,
+.etcf-sharebutton {
+	--etcf-accent: currentColor;
+	--etcf-line: color-mix(in srgb, currentColor 20%, transparent);
+	--etcf-soft: color-mix(in srgb, currentColor 6%, transparent);
+	--etcf-muted: color-mix(in srgb, currentColor 68%, transparent);
+	--etcf-radius: 4px;
 }
 
-.imm-tk-kit [hidden],
-.imm-tk-sharebutton [hidden] {
+.etcf-kit [hidden],
+.etcf-sharebutton [hidden] {
 	display: none !important;
 }
 
 /* ---------------------------------------------------------------- buttons */
 
-.imm-tk-button {
+.etcf-button {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	min-height: 44px;
 	padding: 0.55em 1.2em;
 	border: 1px solid currentColor;
-	border-radius: var(--imm-radius);
+	border-radius: var(--etcf-radius);
 	background: transparent;
 	color: inherit;
 	font: inherit;
@@ -37,23 +37,23 @@
 	cursor: pointer;
 }
 
-.imm-tk-button:hover,
-.imm-tk-button:focus-visible {
-	background: var(--imm-soft);
+.etcf-button:hover,
+.etcf-button:focus-visible {
+	background: var(--etcf-soft);
 }
 
-.imm-tk-button[disabled] {
+.etcf-button[disabled] {
 	opacity: 0.55;
 	cursor: progress;
 }
 
 /* The main button: stronger outline, since the theme's colours are unknown. */
-.imm-tk-button-primary {
+.etcf-button-primary {
 	border-width: 2px;
 	font-weight: 600;
 }
 
-.imm-tk-sharebutton {
+.etcf-sharebutton {
 	display: inline-flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -62,52 +62,52 @@
 
 /* ---------------------------------------------------------------- share page */
 
-.imm-tk-kit {
+.etcf-kit {
 	max-width: 1100px;
 }
 
-.imm-tk-kit .imm-tk-section-title {
+.etcf-kit .etcf-section-title {
 	margin: 2em 0 0.4em;
 }
 
-.imm-tk-kit .imm-tk-section-title:first-of-type {
+.etcf-kit .etcf-section-title:first-of-type {
 	margin-top: 0.5em;
 }
 
-.imm-tk-kit .imm-tk-panel-note {
+.etcf-kit .etcf-panel-note {
 	margin: 0 0 1em;
-	color: var(--imm-muted);
+	color: var(--etcf-muted);
 }
 
-.imm-tk-kit .imm-tk-share-hint {
+.etcf-kit .etcf-share-hint {
 	padding: 0.6em 0.9em;
 	border-left: 3px solid currentColor;
-	background: var(--imm-soft);
+	background: var(--etcf-soft);
 }
 
-.imm-tk-kit .imm-tk-share {
+.etcf-kit .etcf-share {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 20px;
 	margin: 12px 0 16px;
 	padding: 16px;
-	border: 1px solid var(--imm-line);
-	border-radius: var(--imm-radius);
+	border: 1px solid var(--etcf-line);
+	border-radius: var(--etcf-radius);
 }
 
-.imm-tk-kit .imm-tk-share-images {
+.etcf-kit .etcf-share-images {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 12px;
 	align-content: flex-start;
 }
 
-.imm-tk-kit .imm-tk-share-images figure {
+.etcf-kit .etcf-share-images figure {
 	margin: 0;
 	text-align: center;
 }
 
-.imm-tk-kit .imm-tk-share-images img {
+.etcf-kit .etcf-share-images img {
 	display: block;
 	width: 126px;
 	height: 224px;
@@ -117,24 +117,24 @@
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-.imm-tk-kit .imm-tk-share-images figcaption {
+.etcf-kit .etcf-share-images figcaption {
 	margin-top: 6px;
 	font-size: 0.85em;
 }
 
-.imm-tk-kit .imm-tk-share-body {
+.etcf-kit .etcf-share-body {
 	flex: 1 1 300px;
 	min-width: 0;
 }
 
-.imm-tk-kit .imm-tk-share-body textarea {
+.etcf-kit .etcf-share-body textarea {
 	box-sizing: border-box;
 	width: 100%;
 	min-height: 12em;
 	padding: 0.6em 0.8em;
-	border: 1px solid var(--imm-line);
-	border-radius: var(--imm-radius);
-	background: var(--imm-soft);
+	border: 1px solid var(--etcf-line);
+	border-radius: var(--etcf-radius);
+	background: var(--etcf-soft);
 	color: inherit;
 	font: inherit;
 	font-size: 0.9em;
@@ -142,57 +142,57 @@
 	resize: vertical;
 }
 
-.imm-tk-kit .imm-tk-share-buttons {
+.etcf-kit .etcf-share-buttons {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
 	margin: 10px 0 0;
 }
 
-.imm-tk-kit .imm-tk-share-error,
-.imm-tk-sharebutton .imm-tk-share-error {
+.etcf-kit .etcf-share-error,
+.etcf-sharebutton .etcf-share-error {
 	margin: 8px 0 0;
 	color: #c62828;
 }
 
-.imm-tk-kit .imm-tk-day {
+.etcf-kit .etcf-day {
 	display: grid;
 	grid-template-columns: 150px minmax(0, 1fr);
 	gap: 20px;
 	align-items: start;
 	padding: 20px 0 4px;
-	border-top: 1px solid var(--imm-line);
+	border-top: 1px solid var(--etcf-line);
 }
 
-.imm-tk-kit .imm-tk-due-label,
-.imm-tk-kit .imm-tk-share-col > h4 {
+.etcf-kit .etcf-due-label,
+.etcf-kit .etcf-share-col > h4 {
 	margin: 0 0 4px;
 }
 
-.imm-tk-kit .imm-tk-share-col > h4 {
+.etcf-kit .etcf-share-col > h4 {
 	font-size: 1em;
-	color: var(--imm-muted);
+	color: var(--etcf-muted);
 }
 
-.imm-tk-kit .imm-tk-share-pair {
+.etcf-kit .etcf-share-pair {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
 	gap: 16px;
 }
 
 /* Tear-off calendar date. */
-.imm-tk-kit .imm-tk-date {
+.etcf-kit .etcf-date {
 	display: flex;
 	align-items: center;
 	gap: 10px;
 	padding: 8px 10px;
-	border: 1px solid var(--imm-line);
+	border: 1px solid var(--etcf-line);
 	border-top: 4px solid currentColor;
 	border-radius: 2px;
 	line-height: 1.25;
 }
 
-.imm-tk-kit .imm-tk-date-day {
+.etcf-kit .etcf-date-day {
 	min-width: 1.6em;
 	font-size: 2em;
 	font-weight: 700;
@@ -201,78 +201,78 @@
 	text-align: center;
 }
 
-.imm-tk-kit .imm-tk-date-rest {
-	color: var(--imm-muted);
+.etcf-kit .etcf-date-rest {
+	color: var(--etcf-muted);
 	font-size: 0.8em;
 }
 
-.imm-tk-kit .imm-tk-short {
+.etcf-kit .etcf-short {
 	display: none;
 }
 
 /* QR codes. */
-.imm-tk-kit .imm-tk-qr-row {
+.etcf-kit .etcf-qr-row {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 12px 24px;
 	margin: 0 0 12px;
 }
 
-.imm-tk-kit .imm-tk-qr {
+.etcf-kit .etcf-qr {
 	display: flex;
 	align-items: center;
 	gap: 12px;
 	margin: 0;
 }
 
-.imm-tk-kit .imm-tk-qr img {
+.etcf-kit .etcf-qr img {
 	display: block;
 	width: 72px;
 	height: 72px;
 	background: #fff;
-	border: 1px solid var(--imm-line);
+	border: 1px solid var(--etcf-line);
 }
 
-.imm-tk-kit .imm-tk-qr figcaption {
+.etcf-kit .etcf-qr figcaption {
 	font-size: 0.8em;
 	line-height: 1.5;
 }
 
 @media (max-width: 782px) {
-	.imm-tk-kit .imm-tk-day {
+	.etcf-kit .etcf-day {
 		grid-template-columns: 64px minmax(0, 1fr);
 		gap: 12px;
 	}
 
-	.imm-tk-kit .imm-tk-date {
+	.etcf-kit .etcf-date {
 		flex-direction: column;
 		gap: 4px;
 		padding: 6px 4px;
 		text-align: center;
 	}
 
-	.imm-tk-kit .imm-tk-long {
+	.etcf-kit .etcf-long {
 		display: none;
 	}
 
-	.imm-tk-kit .imm-tk-short {
+	.etcf-kit .etcf-short {
 		display: inline;
 	}
 
-	.imm-tk-kit .imm-tk-share-pair {
+	.etcf-kit .etcf-share-pair {
 		grid-template-columns: minmax(0, 1fr);
 	}
 
-	.imm-tk-kit .imm-tk-share {
+	.etcf-kit .etcf-share {
 		padding: 12px;
 	}
 
-	.imm-tk-kit .imm-tk-share-images img {
+	.etcf-kit .etcf-share-images img {
 		width: 108px;
 		height: 192px;
 	}
 
-	.imm-tk-kit .imm-tk-share-buttons .imm-tk-button {
+	.etcf-kit .etcf-share-buttons .etcf-button {
 		flex: 1 1 auto;
 	}
 }

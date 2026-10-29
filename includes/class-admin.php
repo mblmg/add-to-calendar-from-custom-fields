@@ -5,10 +5,10 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Admin
+class ETCF_Admin
 {
     /** Slug of the main page (overview); the other pages are PAGE . '-' . area. */
-    const PAGE = 'event-toolkit';
+    const PAGE = 'etcf';
     /** Who may use the share page: everyone who can write posts. */
     const SHARE_CAP = 'edit_posts';
     /** Slug of the former page under Settings, redirected to the new menu. */
@@ -18,65 +18,65 @@ class IMM_TK_Admin
     {
         add_action('admin_menu', [self::class, 'menu']);
         add_action('admin_init', function () {
-            register_setting('imm_tk', IMM_TK_Settings::OPTION, [
+            register_setting('etcf', ETCF_Settings::OPTION, [
                 'type'              => 'array',
-                'sanitize_callback' => [IMM_TK_Settings::class, 'sanitize'],
-                'default'           => IMM_TK_Settings::defaults(),
+                'sanitize_callback' => [ETCF_Settings::class, 'sanitize'],
+                'default'           => ETCF_Settings::defaults(),
             ]);
-            register_setting('imm_ig', IMM_IG_Instagram::OPTION, [
+            register_setting('etcf_ig', ETCF_Instagram::OPTION, [
                 'type'              => 'array',
-                'sanitize_callback' => [IMM_IG_Instagram::class, 'sanitize'],
-                'default'           => IMM_IG_Instagram::defaults(),
+                'sanitize_callback' => [ETCF_Instagram::class, 'sanitize'],
+                'default'           => ETCF_Instagram::defaults(),
             ]);
-            register_setting('imm_nl', IMM_NL_Newsletter::OPTION, [
+            register_setting('etcf_nl', ETCF_Newsletter::OPTION, [
                 'type'              => 'array',
-                'sanitize_callback' => [IMM_NL_Newsletter::class, 'sanitize'],
-                'default'           => IMM_NL_Newsletter::defaults(),
+                'sanitize_callback' => [ETCF_Newsletter::class, 'sanitize'],
+                'default'           => ETCF_Newsletter::defaults(),
             ]);
-            register_setting('imm_so', IMM_SO_Social::OPTION, [
+            register_setting('etcf_so', ETCF_Social::OPTION, [
                 'type'              => 'array',
-                'sanitize_callback' => [IMM_SO_Social::class, 'sanitize'],
-                'default'           => IMM_SO_Social::defaults(),
+                'sanitize_callback' => [ETCF_Social::class, 'sanitize'],
+                'default'           => ETCF_Social::defaults(),
             ]);
-            register_setting('imm_tg', IMM_TG_Settings::OPTION, [
+            register_setting('etcf_tg', ETCF_Telegram_Settings::OPTION, [
                 'type'              => 'array',
-                'sanitize_callback' => [IMM_TG_Settings::class, 'sanitize'],
-                'default'           => IMM_TG_Settings::defaults(),
+                'sanitize_callback' => [ETCF_Telegram_Settings::class, 'sanitize'],
+                'default'           => ETCF_Telegram_Settings::defaults(),
             ]);
         });
 
         // Rebuild the rewrite rules after saving (base path and file names may have changed).
-        add_action('update_option_' . IMM_TK_Settings::OPTION, function () {
-            IMM_TK_Endpoints::add_rewrite_rules();
+        add_action('update_option_' . ETCF_Settings::OPTION, function () {
+            ETCF_Endpoints::add_rewrite_rules();
             flush_rewrite_rules();
         });
-        add_action('admin_post_imm_tg_find_chats', [self::class, 'handle_find_chats']);
-        add_action('admin_post_imm_tg_send_test', [self::class, 'handle_send_test']);
-        add_action('admin_post_imm_ig_check', [self::class, 'handle_ig_check']);
-        add_action('admin_post_imm_ig_post_now', [self::class, 'handle_ig_post_now']);
-        add_action('admin_post_imm_so_check', [self::class, 'handle_so_check']);
-        add_action('admin_post_imm_nl_check', [self::class, 'handle_nl_check']);
-        add_action('admin_post_imm_nl_test', [self::class, 'handle_nl_test']);
-        add_action('admin_post_imm_so_post_now', [self::class, 'handle_so_post_now']);
+        add_action('admin_post_etcf_tg_find_chats', [self::class, 'handle_find_chats']);
+        add_action('admin_post_etcf_tg_send_test', [self::class, 'handle_send_test']);
+        add_action('admin_post_etcf_ig_check', [self::class, 'handle_ig_check']);
+        add_action('admin_post_etcf_ig_post_now', [self::class, 'handle_ig_post_now']);
+        add_action('admin_post_etcf_so_check', [self::class, 'handle_so_check']);
+        add_action('admin_post_etcf_nl_check', [self::class, 'handle_nl_check']);
+        add_action('admin_post_etcf_nl_test', [self::class, 'handle_nl_test']);
+        add_action('admin_post_etcf_so_post_now', [self::class, 'handle_so_post_now']);
         add_action('admin_enqueue_scripts', function () {
             if (self::current_tab() === '') {
                 return;
             }
             // The file time as version, so browsers load a changed file even within the same plugin version.
             $version = function (string $file): string {
-                $time = filemtime(IMM_TK_DIR . $file);
-                return IMM_TK_VERSION . ($time ? '.' . $time : '');
+                $time = filemtime(ETCF_DIR . $file);
+                return ETCF_VERSION . ($time ? '.' . $time : '');
             };
-            wp_enqueue_script('imm-tk-share', plugins_url('assets/share.js', IMM_TK_FILE), [], $version('assets/share.js'), true);
-            wp_enqueue_style('imm-tk-admin', plugins_url('assets/admin.css', IMM_TK_FILE), [], $version('assets/admin.css'));
+            wp_enqueue_script('etcf-share', plugins_url('assets/share.js', ETCF_FILE), [], $version('assets/share.js'), true);
+            wp_enqueue_style('etcf-admin', plugins_url('assets/admin.css', ETCF_FILE), [], $version('assets/admin.css'));
         });
         add_action('wp_dashboard_setup', [self::class, 'dashboard_widget']);
         add_action('admin_enqueue_scripts', function ($hook) {
             if ($hook === 'index.php') {
-                wp_enqueue_style('imm-tk-admin', plugins_url('assets/admin.css', IMM_TK_FILE), [], IMM_TK_VERSION . '.' . filemtime(IMM_TK_DIR . 'assets/admin.css'));
+                wp_enqueue_style('etcf-admin', plugins_url('assets/admin.css', ETCF_FILE), [], ETCF_VERSION . '.' . filemtime(ETCF_DIR . 'assets/admin.css'));
             }
         });
-        add_filter('plugin_action_links_' . plugin_basename(IMM_TK_FILE), function ($links) {
+        add_filter('plugin_action_links_' . plugin_basename(ETCF_FILE), function ($links) {
             array_unshift($links, '<a href="' . esc_url(self::url('events')) . '">' . esc_html__('Settings', 'event-toolkit-for-custom-fields') . '</a>');
             return $links;
         });
@@ -117,14 +117,14 @@ class IMM_TK_Admin
     /** Dashboard widget "Share today", placed first. */
     public static function dashboard_widget(): void
     {
-        if (!current_user_can(self::SHARE_CAP) || !IMM_TK_Settings::is_configured()) {
+        if (!current_user_can(self::SHARE_CAP) || !ETCF_Settings::is_configured()) {
             return;
         }
-        wp_add_dashboard_widget('imm_tk_share_today', __('Share today', 'event-toolkit-for-custom-fields'), [self::class, 'render_dashboard_widget']);
+        wp_add_dashboard_widget('etcf_share_today', __('Share today', 'event-toolkit-for-custom-fields'), [self::class, 'render_dashboard_widget']);
         global $wp_meta_boxes;
         $normal = $wp_meta_boxes['dashboard']['normal']['core'] ?? [];
-        if (isset($normal['imm_tk_share_today'])) {
-            $wp_meta_boxes['dashboard']['normal']['core'] = ['imm_tk_share_today' => $normal['imm_tk_share_today']] + $normal;
+        if (isset($normal['etcf_share_today'])) {
+            $wp_meta_boxes['dashboard']['normal']['core'] = ['etcf_share_today' => $normal['etcf_share_today']] + $normal;
         }
     }
 
@@ -133,13 +133,13 @@ class IMM_TK_Admin
         $now   = new DateTimeImmutable('now', wp_timezone());
         $items = [];
         foreach ([0 => __('Today', 'event-toolkit-for-custom-fields'), 1 => __('Tomorrow', 'event-toolkit-for-custom-fields')] as $offset => $label) {
-            foreach (IMM_TK_Share::events_on($now->setTime(0, 0)->modify('+' . $offset . ' days')) as $e) {
+            foreach (ETCF_Share::events_on($now->setTime(0, 0)->modify('+' . $offset . ' days')) as $e) {
                 if ($e->end > $now) {
-                    $items[] = [$label, IMM_TK_Digest::title($e)];
+                    $items[] = [$label, ETCF_Digest::title($e)];
                 }
             }
         }
-        echo '<div class="imm-tk-widget">';
+        echo '<div class="etcf-widget">';
         if ($items) {
             echo '<ul>';
             foreach ($items as [$label, $title]) {
@@ -312,12 +312,12 @@ class IMM_TK_Admin
         $tabs = self::tabs();
         $tab  = self::current_tab() ?: 'overview';
         ?>
-        <div class="wrap imm-tk">
-            <header class="imm-tk-head">
+        <div class="wrap etcf">
+            <header class="etcf-head">
                 <h1><?php echo esc_html($tab === 'overview' ? __('Event Toolkit', 'event-toolkit-for-custom-fields') : $tabs[$tab]); ?></h1>
-                <p class="imm-tk-intro"><?php echo esc_html(self::intros()[$tab]); ?></p>
+                <p class="etcf-intro"><?php echo esc_html(self::intros()[$tab]); ?></p>
             </header>
-            <nav class="imm-tk-nav" aria-label="<?php esc_attr_e('Event Toolkit', 'event-toolkit-for-custom-fields'); ?>">
+            <nav class="etcf-nav" aria-label="<?php esc_attr_e('Event Toolkit', 'event-toolkit-for-custom-fields'); ?>">
                 <?php foreach ($tabs as $id => $label) : ?>
                     <a href="<?php echo esc_url(self::url($id)); ?>"<?php echo $id === $tab ? ' aria-current="page"' : ''; ?>><?php echo esc_html($label); ?></a>
                 <?php endforeach; ?>
@@ -325,7 +325,7 @@ class IMM_TK_Admin
             <hr class="wp-header-end">
             <?php
             settings_errors();
-            if ($tab !== 'overview' && $tab !== 'events' && !IMM_TK_Settings::is_configured()) {
+            if ($tab !== 'overview' && $tab !== 'events' && !ETCF_Settings::is_configured()) {
                 echo '<div class="notice notice-info inline"><p>' . wp_kses(sprintf(
                     /* translators: %s: link to the page "Events" */
                     __('First tell the plugin where your events are: post type and date field on the page %s.', 'event-toolkit-for-custom-fields'),
@@ -349,22 +349,22 @@ class IMM_TK_Admin
                     self::render_newsletter();
                     break;
                 case 'stories':
-                    echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
+                    echo '<div class="etcf-layout"><div class="etcf-main">';
                     self::render_core_form('share');
-                    echo '</div><aside class="imm-tk-aside">';
+                    echo '</div><aside class="etcf-aside">';
                     self::panel([self::class, 'render_story_sample']);
                     echo '</aside></div>';
                     break;
                 default:
-                    echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
+                    echo '<div class="etcf-layout"><div class="etcf-main">';
                     self::render_core_form($tab);
-                    echo '</div><aside class="imm-tk-aside">';
+                    echo '</div><aside class="etcf-aside">';
                     switch ($tab) {
                         case 'events':
                             self::panel([self::class, 'render_event_preview']);
                             self::panel(function () {
-                                self::render_field_finder((string) IMM_TK_Settings::get('post_type'));
-                            }, 'imm-tk-panel--scroll');
+                                self::render_field_finder((string) ETCF_Settings::get('post_type'));
+                            }, 'etcf-panel--scroll');
                             break;
                         case 'calendar':
                             self::panel([self::class, 'render_usage']);
@@ -387,8 +387,8 @@ class IMM_TK_Admin
 
     private static function render_overview(): void
     {
-        if (!IMM_TK_Settings::is_configured()) {
-            echo '<section class="imm-tk-panel imm-tk-empty">';
+        if (!ETCF_Settings::is_configured()) {
+            echo '<section class="etcf-panel etcf-empty">';
             echo '<h2>' . esc_html__('Start with your events', 'event-toolkit-for-custom-fields') . '</h2>';
             echo '<p>' . esc_html__('Tell the plugin which post type holds your events and which field has the date. Everything else (calendar, search engines, Telegram, Instagram, newsletter) builds on that.', 'event-toolkit-for-custom-fields') . '</p>';
             echo '<p><a class="button button-primary" href="' . esc_url(self::url('events')) . '">' . esc_html__('Set up events', 'event-toolkit-for-custom-fields') . '</a></p>';
@@ -398,47 +398,47 @@ class IMM_TK_Admin
         $tz  = wp_timezone();
         $now = new DateTimeImmutable('now', $tz);
 
-        echo '<div class="imm-tk-layout imm-tk-layout--overview"><div class="imm-tk-main">';
-        echo '<h2 class="imm-tk-section-title">' . esc_html__('The next 7 days', 'event-toolkit-for-custom-fields') . '</h2>';
-        echo '<ol class="imm-tk-week">';
+        echo '<div class="etcf-layout etcf-layout--overview"><div class="etcf-main">';
+        echo '<h2 class="etcf-section-title">' . esc_html__('The next 7 days', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<ol class="etcf-week">';
         for ($i = 0; $i < 7; $i++) {
             $day    = $now->setTime(0, 0)->modify('+' . $i . ' days');
-            $events = array_values(array_filter(IMM_TK_Share::events_on($day), function (IMM_TK_Event $e) use ($now) {
+            $events = array_values(array_filter(ETCF_Share::events_on($day), function (ETCF_Event $e) use ($now) {
                 return $e->end > $now;
             }));
             $out    = self::outgoing($day, $events, $now);
-            echo '<li class="imm-tk-week-day' . ($events || $out ? '' : ' is-quiet') . '">';
-            IMM_TK_Share_Kit::date_badge($day, $i === 0);
-            echo '<div class="imm-tk-week-body">';
+            echo '<li class="etcf-week-day' . ($events || $out ? '' : ' is-quiet') . '">';
+            ETCF_Share_Kit::date_badge($day, $i === 0);
+            echo '<div class="etcf-week-body">';
             if ($events) {
-                echo '<ul class="imm-tk-week-events">';
+                echo '<ul class="etcf-week-events">';
                 foreach ($events as $e) {
                     $edit = get_edit_post_link($e->id);
-                    $name = esc_html(IMM_TK_Digest::title($e));
-                    echo '<li><span class="imm-tk-week-time">' . esc_html(IMM_TK_Sharepic::start_time($e)) . '</span> <span>'
+                    $name = esc_html(ETCF_Digest::title($e));
+                    echo '<li><span class="etcf-week-time">' . esc_html(ETCF_Sharepic::start_time($e)) . '</span> <span>'
                         . ($edit ? '<a href="' . esc_url($edit) . '">' . $name . '</a>' : $name) . '</span></li>'; // phpcs:ignore WordPress.Security.EscapeOutput -- $name is escaped above.
                 }
                 echo '</ul>';
             }
             if ($out) {
-                echo '<ul class="imm-tk-week-out">';
+                echo '<ul class="etcf-week-out">';
                 foreach ($out as $item) {
-                    echo '<li><span class="imm-tk-week-time">' . esc_html($item['time']) . '</span> <span class="imm-tk-week-what"><strong>' . esc_html($item['channel']) . '</strong> ' . esc_html($item['label']) . '</span>';
-                    if (!empty($item['spec']) && IMM_TK_Sharepic::available()) {
-                        $url = IMM_TK_Share::image_url($item['spec']);
-                        echo ' <a class="imm-tk-thumb" href="' . esc_url($url) . '" target="_blank" rel="noopener"><img src="' . esc_url($url) . '" alt="" width="27" height="48" loading="lazy"></a>';
+                    echo '<li><span class="etcf-week-time">' . esc_html($item['time']) . '</span> <span class="etcf-week-what"><strong>' . esc_html($item['channel']) . '</strong> ' . esc_html($item['label']) . '</span>';
+                    if (!empty($item['spec']) && ETCF_Sharepic::available()) {
+                        $url = ETCF_Share::image_url($item['spec']);
+                        echo ' <a class="etcf-thumb" href="' . esc_url($url) . '" target="_blank" rel="noopener"><img src="' . esc_url($url) . '" alt="" width="27" height="48" loading="lazy"></a>';
                     }
                     echo '</li>';
                 }
                 echo '</ul>';
             }
             if (!$events && !$out) {
-                echo '<p class="imm-tk-week-none">' . esc_html__('No events, nothing goes out.', 'event-toolkit-for-custom-fields') . '</p>';
+                echo '<p class="etcf-week-none">' . esc_html__('No events, nothing goes out.', 'event-toolkit-for-custom-fields') . '</p>';
             }
             echo '</div></li>';
         }
         echo '</ol>';
-        echo '</div><aside class="imm-tk-aside">';
+        echo '</div><aside class="etcf-aside">';
         self::panel([self::class, 'render_channels']);
         echo '</aside></div>';
     }
@@ -457,49 +457,49 @@ class IMM_TK_Admin
             [$h, $m] = array_map('intval', explode(':', $hm));
             return $day->setTime($h, $m);
         };
-        $issue_day = (int) $day->format('N') === (int) IMM_TK_Settings::get('digest_weekday');
+        $issue_day = (int) $day->format('N') === (int) ETCF_Settings::get('digest_weekday');
 
         if ($issue_day) {
-            $issue = $at((string) IMM_TK_Settings::get('digest_time'));
+            $issue = $at((string) ETCF_Settings::get('digest_time'));
             if ($issue > $now) {
-                $empty = IMM_TK_Digest::is_empty(IMM_TK_Digest::select($issue, $issue));
+                $empty = ETCF_Digest::is_empty(ETCF_Digest::select($issue, $issue));
                 $label = $empty ? __('Weekly preview (skipped: nothing in it)', 'event-toolkit-for-custom-fields') : __('Weekly preview', 'event-toolkit-for-custom-fields');
-                if (IMM_TG_Settings::get('enabled') && IMM_TG_Settings::is_ready()) {
+                if (ETCF_Telegram_Settings::get('enabled') && ETCF_Telegram_Settings::is_ready()) {
                     $items[] = ['sort' => $issue, 'channel' => 'Telegram', 'label' => $label];
                 }
-                if (IMM_NL_Newsletter::active()) {
-                    $items[] = ['sort' => $issue, 'channel' => IMM_NL_Newsletter::provider_name(), 'label' => $label];
-                } elseif (IMM_TK_Settings::get('digest_feed_enabled')) {
+                if (ETCF_Newsletter::active()) {
+                    $items[] = ['sort' => $issue, 'channel' => ETCF_Newsletter::provider_name(), 'label' => $label];
+                } elseif (ETCF_Settings::get('digest_feed_enabled')) {
                     $items[] = ['sort' => $issue, 'channel' => __('Newsletter feed', 'event-toolkit-for-custom-fields'), 'label' => $label];
                 }
-                if (IMM_SO_Social::get('weekly')) {
-                    foreach (IMM_SO_Social::active_networks() as $network) {
+                if (ETCF_Social::get('weekly')) {
+                    foreach (ETCF_Social::active_networks() as $network) {
                         $items[] = ['sort' => $issue, 'channel' => $network === 'bluesky' ? 'Bluesky' : 'Mastodon', 'label' => $label];
                     }
                 }
-                if (IMM_TK_Settings::get('share_reminder') && !$empty) {
+                if (ETCF_Settings::get('share_reminder') && !$empty) {
                     $items[] = ['sort' => $issue, 'channel' => __('Mail', 'event-toolkit-for-custom-fields'), 'label' => __('Reminder to share', 'event-toolkit-for-custom-fields')];
                 }
             }
         }
-        if ($events && !$issue_day && IMM_TG_Settings::get('today') && IMM_TG_Settings::is_ready()) {
-            $time = $at((string) IMM_TG_Settings::get('today_time'));
+        if ($events && !$issue_day && ETCF_Telegram_Settings::get('today') && ETCF_Telegram_Settings::is_ready()) {
+            $time = $at((string) ETCF_Telegram_Settings::get('today_time'));
             if ($time > $now) {
                 $items[] = ['sort' => $time, 'channel' => 'Telegram', 'label' => __('"Today" message, silent', 'event-toolkit-for-custom-fields')];
             }
         }
-        if ($events && !$issue_day && IMM_SO_Social::get('today')) {
-            $time = $at((string) IMM_SO_Social::get('today_time'));
+        if ($events && !$issue_day && ETCF_Social::get('today')) {
+            $time = $at((string) ETCF_Social::get('today_time'));
             if ($time > $now) {
-                foreach (IMM_SO_Social::active_networks() as $network) {
+                foreach (ETCF_Social::active_networks() as $network) {
                     $items[] = ['sort' => $time, 'channel' => $network === 'bluesky' ? 'Bluesky' : 'Mastodon', 'label' => __('"Today" post', 'event-toolkit-for-custom-fields')];
                 }
             }
         }
-        if (IMM_IG_Scheduler::active()) {
-            $time = $at((string) IMM_IG_Instagram::get('time'));
+        if (ETCF_Instagram_Scheduler::active()) {
+            $time = $at((string) ETCF_Instagram::get('time'));
             if ($time > $now) {
-                foreach (IMM_IG_Scheduler::plan($time) as $story) {
+                foreach (ETCF_Instagram_Scheduler::plan($time) as $story) {
                     $items[] = ['sort' => $time, 'channel' => 'Instagram', 'label' => $story['label'], 'spec' => $story['spec']];
                 }
             }
@@ -519,60 +519,60 @@ class IMM_TK_Admin
     {
         global $wp_locale;
         $tf      = get_option('time_format') ?: 'H:i';
-        $weekday = $wp_locale->get_weekday((int) IMM_TK_Settings::get('digest_weekday') % 7);
+        $weekday = $wp_locale->get_weekday((int) ETCF_Settings::get('digest_weekday') % 7);
         $digest  = sprintf(
             /* translators: 1: weekday, 2: time */
             __('every %1$s at %2$s', 'event-toolkit-for-custom-fields'),
             $weekday,
-            wp_date($tf, IMM_TK_Digest::next_issue()->getTimestamp())
+            wp_date($tf, ETCF_Digest::next_issue()->getTimestamp())
         );
         $off  = __('off', 'event-toolkit-for-custom-fields');
         $todo = __('not set up yet', 'event-toolkit-for-custom-fields');
 
-        $tg_state = !IMM_TG_Settings::is_ready() ? 'todo' : (IMM_TG_Settings::get('enabled') ? 'on' : 'off');
-        $ig_state = !IMM_IG_Instagram::is_ready() ? 'todo' : (IMM_IG_Instagram::get('enabled') ? 'on' : 'off');
+        $tg_state = !ETCF_Telegram_Settings::is_ready() ? 'todo' : (ETCF_Telegram_Settings::get('enabled') ? 'on' : 'off');
+        $ig_state = !ETCF_Instagram::is_ready() ? 'todo' : (ETCF_Instagram::get('enabled') ? 'on' : 'off');
         $channels = [
             ['calendar', __('Calendar', 'event-toolkit-for-custom-fields'), 'on', __('calendar files for every event and a subscription', 'event-toolkit-for-custom-fields')],
-            ['search', __('Search engines', 'event-toolkit-for-custom-fields'), IMM_TK_Settings::get('schema_enabled') ? 'on' : 'off', IMM_TK_Settings::get('schema_enabled') ? __('event markup on every event page', 'event-toolkit-for-custom-fields') : $off],
+            ['search', __('Search engines', 'event-toolkit-for-custom-fields'), ETCF_Settings::get('schema_enabled') ? 'on' : 'off', ETCF_Settings::get('schema_enabled') ? __('event markup on every event page', 'event-toolkit-for-custom-fields') : $off],
             ['digest', __('Weekly preview', 'event-toolkit-for-custom-fields'), 'on', $digest],
-            ['digest', __('Newsletter feed', 'event-toolkit-for-custom-fields'), IMM_TK_Settings::get('digest_feed_enabled') ? 'on' : 'off', IMM_TK_Settings::get('digest_feed_enabled') ? (IMM_TK_Settings::get('digest_feed_only_new') ? __('only in weeks with new events', 'event-toolkit-for-custom-fields') : __('every week', 'event-toolkit-for-custom-fields')) : $off],
-            ['telegram', 'Telegram', $tg_state, $tg_state === 'on' ? $digest . (IMM_TG_Settings::get('today') ? ', ' . __('plus "Today" on event days', 'event-toolkit-for-custom-fields') : '') : ($tg_state === 'off' ? $off : $todo)],
+            ['digest', __('Newsletter feed', 'event-toolkit-for-custom-fields'), ETCF_Settings::get('digest_feed_enabled') ? 'on' : 'off', ETCF_Settings::get('digest_feed_enabled') ? (ETCF_Settings::get('digest_feed_only_new') ? __('only in weeks with new events', 'event-toolkit-for-custom-fields') : __('every week', 'event-toolkit-for-custom-fields')) : $off],
+            ['telegram', 'Telegram', $tg_state, $tg_state === 'on' ? $digest . (ETCF_Telegram_Settings::get('today') ? ', ' . __('plus "Today" on event days', 'event-toolkit-for-custom-fields') : '') : ($tg_state === 'off' ? $off : $todo)],
             ['instagram', 'Instagram', $ig_state, $ig_state === 'on' ? sprintf(
                 /* translators: 1: Instagram username, 2: time */
                 __('@%1$s, daily at %2$s', 'event-toolkit-for-custom-fields'),
-                (string) IMM_IG_Instagram::get('username'),
-                (string) IMM_IG_Instagram::get('time')
+                (string) ETCF_Instagram::get('username'),
+                (string) ETCF_Instagram::get('time')
             ) : ($ig_state === 'off' ? $off : $todo)],
-            ['newsletter', __('Newsletter, sent directly', 'event-toolkit-for-custom-fields'), IMM_NL_Newsletter::is_ready() ? (IMM_NL_Newsletter::get('enabled') ? 'on' : 'off') : 'off', IMM_NL_Newsletter::active() ? sprintf(
+            ['newsletter', __('Newsletter, sent directly', 'event-toolkit-for-custom-fields'), ETCF_Newsletter::is_ready() ? (ETCF_Newsletter::get('enabled') ? 'on' : 'off') : 'off', ETCF_Newsletter::active() ? sprintf(
                 /* translators: %s: service name */
                 __('through %s, at the time of the weekly preview', 'event-toolkit-for-custom-fields'),
-                IMM_NL_Newsletter::provider_name()
+                ETCF_Newsletter::provider_name()
             ) : $off],
-            ['social', 'Mastodon', self::social_state('mastodon'), self::social_state('mastodon') === 'on' ? (string) wp_parse_url((string) IMM_SO_Social::get('mastodon_instance'), PHP_URL_HOST) : (self::social_state('mastodon') === 'off' ? $off : $todo)],
-            ['social', 'Bluesky', self::social_state('bluesky'), self::social_state('bluesky') === 'on' ? '@' . IMM_SO_Social::get('bluesky_handle') : (self::social_state('bluesky') === 'off' ? $off : $todo)],
-            ['stories', __('Reminder to share', 'event-toolkit-for-custom-fields'), IMM_TK_Settings::get('share_reminder') ? 'on' : 'off', IMM_TK_Settings::get('share_reminder') ? (string) IMM_TK_Settings::get('share_reminder_to') : $off],
+            ['social', 'Mastodon', self::social_state('mastodon'), self::social_state('mastodon') === 'on' ? (string) wp_parse_url((string) ETCF_Social::get('mastodon_instance'), PHP_URL_HOST) : (self::social_state('mastodon') === 'off' ? $off : $todo)],
+            ['social', 'Bluesky', self::social_state('bluesky'), self::social_state('bluesky') === 'on' ? '@' . ETCF_Social::get('bluesky_handle') : (self::social_state('bluesky') === 'off' ? $off : $todo)],
+            ['stories', __('Reminder to share', 'event-toolkit-for-custom-fields'), ETCF_Settings::get('share_reminder') ? 'on' : 'off', ETCF_Settings::get('share_reminder') ? (string) ETCF_Settings::get('share_reminder_to') : $off],
         ];
         $labels = ['on' => __('On', 'event-toolkit-for-custom-fields'), 'off' => __('Off', 'event-toolkit-for-custom-fields'), 'todo' => __('To do', 'event-toolkit-for-custom-fields')];
 
-        echo '<h2>' . esc_html__('Channels', 'event-toolkit-for-custom-fields') . '</h2><ul class="imm-tk-channels">';
+        echo '<h2>' . esc_html__('Channels', 'event-toolkit-for-custom-fields') . '</h2><ul class="etcf-channels">';
         foreach ($channels as [$tab, $name, $state, $detail]) {
-            echo '<li class="is-' . esc_attr($state) . '"><a href="' . esc_url(self::url($tab)) . '"><span class="imm-tk-channel-name">' . esc_html($name) . '</span>'
-                . '<span class="imm-tk-badge">' . esc_html($labels[$state]) . '</span>'
-                . '<span class="imm-tk-channel-detail">' . esc_html($detail) . '</span></a></li>';
+            echo '<li class="is-' . esc_attr($state) . '"><a href="' . esc_url(self::url($tab)) . '"><span class="etcf-channel-name">' . esc_html($name) . '</span>'
+                . '<span class="etcf-badge">' . esc_html($labels[$state]) . '</span>'
+                . '<span class="etcf-channel-detail">' . esc_html($detail) . '</span></a></li>';
         }
         echo '</ul>';
-        echo '<p class="imm-tk-feed"><label for="imm-tk-feed-url">' . esc_html__('Calendar subscription address', 'event-toolkit-for-custom-fields') . '</label>'
-            . '<input id="imm-tk-feed-url" type="text" class="large-text code" readonly value="' . esc_attr(IMM_TK_Links::get('webcal')) . '" data-imm-select></p>';
+        echo '<p class="etcf-feed"><label for="etcf-feed-url">' . esc_html__('Calendar subscription address', 'event-toolkit-for-custom-fields') . '</label>'
+            . '<input id="etcf-feed-url" type="text" class="large-text code" readonly value="' . esc_attr(ETCF_Links::get('webcal')) . '" data-etcf-select></p>';
     }
 
     /** 'on', 'off' or 'todo' for Mastodon or Bluesky. */
     private static function social_state(string $network): string
     {
-        $ready = $network === 'bluesky' ? IMM_SO_Social::bluesky_ready() : IMM_SO_Social::mastodon_ready();
+        $ready = $network === 'bluesky' ? ETCF_Social::bluesky_ready() : ETCF_Social::mastodon_ready();
         if (!$ready) {
             return 'todo';
         }
-        return IMM_SO_Social::get($network . '_enabled') ? 'on' : 'off';
+        return ETCF_Social::get($network . '_enabled') ? 'on' : 'off';
     }
 
     /** Runs a render function and wraps its output in a panel, unless it printed nothing. */
@@ -582,7 +582,7 @@ class IMM_TK_Admin
         $render();
         $html = trim((string) ob_get_clean());
         if ($html !== '') {
-            echo '<section class="imm-tk-panel' . ($class !== '' ? ' ' . esc_attr($class) : '') . '">';
+            echo '<section class="etcf-panel' . ($class !== '' ? ' ' . esc_attr($class) : '') . '">';
             echo $html; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped by the render function.
             echo '</section>';
         }
@@ -595,7 +595,7 @@ class IMM_TK_Admin
      */
     private static function status_list(array $rows): void
     {
-        echo '<dl class="imm-tk-status">';
+        echo '<dl class="etcf-status">';
         foreach ($rows as $label => $value) {
             echo '<div><dt>' . esc_html($label) . '</dt><dd>' . esc_html($value) . '</dd></div>';
         }
@@ -605,21 +605,21 @@ class IMM_TK_Admin
     /** Form with the core settings of one tab. */
     private static function render_core_form(string $tab): void
     {
-        $s      = IMM_TK_Settings::all();
-        $keys   = array_keys(IMM_TK_Settings::tabs()[$tab]);
-        $name   = IMM_TK_Settings::OPTION;
+        $s      = ETCF_Settings::all();
+        $keys   = array_keys(ETCF_Settings::tabs()[$tab]);
+        $name   = ETCF_Settings::OPTION;
 
         echo '<form method="post" action="options.php">';
-        settings_fields('imm_tk');
+        settings_fields('etcf');
         echo '<input type="hidden" name="' . esc_attr($name . '[_tab]') . '" value="' . esc_attr($tab) . '">';
         $groups = self::groups()[$tab] ?? [['', '', $keys]];
         foreach ($groups as [$title, $description, $group_keys]) {
-            echo '<section class="imm-tk-panel">';
+            echo '<section class="etcf-panel">';
             if ($title !== '') {
                 echo '<h2>' . esc_html($title) . '</h2>';
             }
             if ($description !== '') {
-                echo '<p class="imm-tk-panel-note">' . esc_html($description) . '</p>';
+                echo '<p class="etcf-panel-note">' . esc_html($description) . '</p>';
             }
             echo '<table class="form-table" role="presentation">';
             foreach (array_intersect($group_keys, $keys) as $key) {
@@ -635,13 +635,13 @@ class IMM_TK_Admin
     private static function render_field(string $key, array $s): void
     {
         $fields = self::fields();
-        $name   = IMM_TK_Settings::OPTION;
+        $name   = ETCF_Settings::OPTION;
         if ($key === 'digest_time') {
             return; // Rendered together with the weekday.
         }
         [$label, $help, $type] = $fields[$key];
         $extra = $fields[$key][3] ?? '';
-        $id    = 'imm-tk-' . $key;
+        $id    = 'etcf-' . $key;
         $field = $name . '[' . $key . ']';
         echo '<tr><th scope="row"><label for="' . esc_attr($id) . '">' . esc_html($label) . '</label></th><td>';
         switch ($type) {
@@ -661,12 +661,12 @@ class IMM_TK_Admin
                 break;
             case 'choice':
                 echo '<select id="' . esc_attr($id) . '" name="' . esc_attr($field) . '">';
-                foreach (IMM_TK_Settings::choices()[$key] as $value => $choice) {
+                foreach (ETCF_Settings::choices()[$key] as $value => $choice) {
                     echo '<option value="' . esc_attr($value) . '" ' . selected((string) $s[$key], (string) $value, false) . '>' . esc_html($choice) . '</option>';
                 }
                 echo '</select>';
                 if ($key === 'sharepic_fonts') {
-                    $detected = IMM_TK_Fonts::detect();
+                    $detected = ETCF_Fonts::detect();
                     $names    = array_unique(array_filter([$detected['heading'], $detected['text']]));
                     echo '<p class="description">' . esc_html($names
                         /* translators: %s: font names */
@@ -675,7 +675,7 @@ class IMM_TK_Admin
                 }
                 break;
             case 'font':
-                $detected = IMM_TK_Fonts::detect()[$key === 'sharepic_heading_font' ? 'heading' : 'text'];
+                $detected = ETCF_Fonts::detect()[$key === 'sharepic_heading_font' ? 'heading' : 'text'];
                 echo '<input type="text" class="regular-text" id="' . esc_attr($id) . '" name="' . esc_attr($field) . '" value="' . esc_attr($s[$key]) . '" placeholder="' . esc_attr($detected) . '">';
                 break;
             case 'color':
@@ -719,10 +719,10 @@ class IMM_TK_Admin
 
     private static function render_event_preview(): void
     {
-        if (!IMM_TK_Settings::is_configured()) {
+        if (!ETCF_Settings::is_configured()) {
             return;
         }
-        $events = array_slice(IMM_TK_Endpoints::feed_events(), 0, 5);
+        $events = array_slice(ETCF_Endpoints::feed_events(), 0, 5);
         echo '<h2>' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
         if (!$events) {
             echo '<p>' . esc_html__('No events found in the feed period. Are the post type and the date field correct?', 'event-toolkit-for-custom-fields') . '</p>';
@@ -730,8 +730,8 @@ class IMM_TK_Admin
         }
         $date_format = get_option('date_format');
         $time_format = get_option('time_format');
-        echo '<p class="imm-tk-panel-note">' . esc_html__('How the plugin reads the next events. If something is off, check the field names.', 'event-toolkit-for-custom-fields') . '</p>';
-        echo '<ul class="imm-tk-check">';
+        echo '<p class="etcf-panel-note">' . esc_html__('How the plugin reads the next events. If something is off, check the field names.', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<ul class="etcf-check">';
         foreach ($events as $e) {
             if ($e->all_day) {
                 $when = wp_date($date_format, $e->start->getTimestamp(), $e->start->getTimezone()) . ' ' . __('(all day)', 'event-toolkit-for-custom-fields');
@@ -739,25 +739,25 @@ class IMM_TK_Admin
                 $when = wp_date($date_format . ', ' . $time_format, $e->start->getTimestamp(), $e->start->getTimezone())
                     . ' – ' . wp_date(($e->end->format('Y-m-d') === $e->start->format('Y-m-d') ? '' : $date_format . ', ') . $time_format, $e->end->getTimestamp(), $e->end->getTimezone());
             }
-            echo '<li><strong>' . esc_html(IMM_TK_Digest::title($e)) . '</strong>'
+            echo '<li><strong>' . esc_html(ETCF_Digest::title($e)) . '</strong>'
                 . '<span>' . esc_html($when) . '</span>'
                 . ($e->location !== '' ? '<span>' . esc_html($e->location) . '</span>' : '')
-                . '<a href="' . esc_url(IMM_TK_Links::event_ics_url($e->id)) . '">' . esc_html__('Calendar file (.ics)', 'event-toolkit-for-custom-fields') . '</a></li>';
+                . '<a href="' . esc_url(ETCF_Links::event_ics_url($e->id)) . '">' . esc_html__('Calendar file (.ics)', 'event-toolkit-for-custom-fields') . '</a></li>';
         }
         echo '</ul>';
     }
 
     private static function render_usage(): void
     {
-        if (IMM_TK_Settings::is_configured()) {
+        if (ETCF_Settings::is_configured()) {
             echo '<h2>' . esc_html__('Subscription address', 'event-toolkit-for-custom-fields') . '</h2>';
-            echo '<p><input type="text" class="large-text code" readonly data-imm-select value="' . esc_attr(IMM_TK_Links::get('feed')) . '"></p>';
+            echo '<p><input type="text" class="large-text code" readonly data-etcf-select value="' . esc_attr(ETCF_Links::get('feed')) . '"></p>';
         }
         echo '<h2>' . esc_html__('Usage', 'event-toolkit-for-custom-fields') . '</h2>';
         echo '<p><strong>Breakdance:</strong> ' . esc_html__('In the link field of a button or text link, choose the dynamic data category "Add to Calendar".', 'event-toolkit-for-custom-fields') . '</p>';
-        echo '<p><strong>' . esc_html__('Shortcode:', 'event-toolkit-for-custom-fields') . '</strong> <code>[imm_calendar_link type="ics" text="Add to calendar"]</code>. ' . esc_html__('Without "text" only the URL is returned.', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<p><strong>' . esc_html__('Shortcode:', 'event-toolkit-for-custom-fields') . '</strong> <code>[etcf_calendar_link type="ics" text="Add to calendar"]</code>. ' . esc_html__('Without "text" only the URL is returned.', 'event-toolkit-for-custom-fields') . '</p>';
         echo '<table class="widefat striped"><thead><tr><th>type</th><th>' . esc_html__('Link', 'event-toolkit-for-custom-fields') . '</th></tr></thead><tbody>';
-        foreach (IMM_TK_Links::types() as $type => $label) {
+        foreach (ETCF_Links::types() as $type => $label) {
             echo '<tr><td><code>' . esc_html($type) . '</code></td><td>' . esc_html($label) . '</td></tr>';
         }
         echo '</tbody></table>';
@@ -765,12 +765,12 @@ class IMM_TK_Admin
 
     private static function render_schema_preview(): void
     {
-        if (!IMM_TK_Settings::is_configured() || !IMM_TK_Settings::get('schema_enabled')) {
+        if (!ETCF_Settings::is_configured() || !ETCF_Settings::get('schema_enabled')) {
             return;
         }
         $now  = new DateTimeImmutable('now', wp_timezone());
         $next = null;
-        foreach (IMM_TK_Endpoints::feed_events() as $e) {
+        foreach (ETCF_Endpoints::feed_events() as $e) {
             if ($e->end >= $now) {
                 $next = $e;
                 break;
@@ -781,9 +781,9 @@ class IMM_TK_Admin
         }
         echo '<h2>' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
         /* translators: %s: event title */
-        echo '<p>' . esc_html(sprintf(__('This is what search engines read on the page of "%s":', 'event-toolkit-for-custom-fields'), IMM_TK_Digest::title($next))) . '</p>';
+        echo '<p>' . esc_html(sprintf(__('This is what search engines read on the page of "%s":', 'event-toolkit-for-custom-fields'), ETCF_Digest::title($next))) . '</p>';
         echo '<pre style="max-width:900px;max-height:400px;overflow:auto;background:#fff;border:1px solid #c3c4c7;padding:12px">'
-            . esc_html(wp_json_encode(IMM_TK_Schema::build($next), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE))
+            . esc_html(wp_json_encode(ETCF_Schema::build($next), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE))
             . '</pre>';
         echo '<p><a href="' . esc_url('https://search.google.com/test/rich-results?url=' . rawurlencode($next->url)) . '" target="_blank" rel="noopener">'
             . esc_html__('Check this page with Google\'s Rich Results Test', 'event-toolkit-for-custom-fields') . '</a></p>';
@@ -793,7 +793,7 @@ class IMM_TK_Admin
     private static function live_selection(): array
     {
         $now = new DateTimeImmutable('now', wp_timezone());
-        return IMM_TK_Digest::select($now, $now);
+        return ETCF_Digest::select($now, $now);
     }
 
     public static function preview_note(): string
@@ -805,31 +805,31 @@ class IMM_TK_Admin
     /** Next issue time as text, e.g. "Monday, November 2, 2026, 10:00". */
     private static function next_issue_text(): string
     {
-        $next = IMM_TK_Digest::next_issue();
+        $next = ETCF_Digest::next_issue();
         return wp_date(get_option('date_format') . ', ' . get_option('time_format'), $next->getTimestamp(), $next->getTimezone());
     }
 
     private static function render_digest_info(): void
     {
-        if (!IMM_TK_Settings::is_configured()) {
+        if (!ETCF_Settings::is_configured()) {
             return;
         }
-        if (IMM_TK_Settings::get('digest_feed_enabled')) {
+        if (ETCF_Settings::get('digest_feed_enabled')) {
             self::panel(function () {
                 echo '<h2>' . esc_html__('Newsletter feed', 'event-toolkit-for-custom-fields') . '</h2>';
-                echo '<p><input type="text" class="large-text code" readonly value="' . esc_attr(IMM_TK_Digest_Feed::url()) . '" data-imm-select></p>';
+                echo '<p><input type="text" class="large-text code" readonly value="' . esc_attr(ETCF_Digest_Feed::url()) . '" data-etcf-select></p>';
                 echo '<p>' . esc_html__('Enter this address in an RSS campaign of your newsletter service (e.g. Brevo, CleverReach or Mailchimp). The feed contains one entry per issue with the whole preview, so the service sends one mail per week. In weeks with no upcoming and no new events, the feed stays empty and no mail is sent.', 'event-toolkit-for-custom-fields') . '</p>';
             });
         }
         self::panel(function () {
             $selection = self::live_selection();
             echo '<h2>' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
-            echo '<p class="imm-tk-panel-note">' . esc_html(self::preview_note()) . '</p>';
-            if (IMM_TK_Digest::is_empty($selection)) {
+            echo '<p class="etcf-panel-note">' . esc_html(self::preview_note()) . '</p>';
+            if (ETCF_Digest::is_empty($selection)) {
                 echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
                 return;
             }
-            echo '<div class="imm-tk-mail">' . wp_kses_post(IMM_TK_Digest::email_html($selection)) . '</div>';
+            echo '<div class="etcf-mail">' . wp_kses_post(ETCF_Digest::email_html($selection)) . '</div>';
         });
     }
 
@@ -837,16 +837,16 @@ class IMM_TK_Admin
 
     private static function render_telegram(): void
     {
-        $s     = IMM_TG_Settings::all();
-        $name  = IMM_TG_Settings::OPTION;
+        $s     = ETCF_Telegram_Settings::all();
+        $name  = ETCF_Telegram_Settings::OPTION;
         $field = function (string $key) use ($name): string {
             return $name . '[' . $key . ']';
         };
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only selects which notice to show.
-        $notice = isset($_GET['imm_tg']) ? sanitize_key(wp_unslash($_GET['imm_tg'])) : '';
+        $notice = isset($_GET['etcf_tg']) ? sanitize_key(wp_unslash($_GET['etcf_tg'])) : '';
 
         self::render_telegram_notice($notice);
-        echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
+        echo '<div class="etcf-layout"><div class="etcf-main">';
         echo '<p>' . wp_kses(sprintf(
             /* translators: %s: link to the page "Weekly preview" */
             __('Schedule and content of the posts come from the page %s.', 'event-toolkit-for-custom-fields'),
@@ -855,8 +855,8 @@ class IMM_TK_Admin
         self::render_telegram_status();
         ?>
         <form method="post" action="options.php">
-            <?php settings_fields('imm_tg'); ?>
-            <section class="imm-tk-panel">
+            <?php settings_fields('etcf_tg'); ?>
+            <section class="etcf-panel">
             <h2><?php esc_html_e('Bot and posts', 'event-toolkit-for-custom-fields'); ?></h2>
             <table class="form-table" role="presentation">
                 <tr>
@@ -864,9 +864,9 @@ class IMM_TK_Admin
                     <td><label><input type="checkbox" name="<?php echo esc_attr($field('enabled')); ?>" value="1" <?php checked(!empty($s['enabled'])); ?>> <?php esc_html_e('Post automatically every week', 'event-toolkit-for-custom-fields'); ?></label></td>
                 </tr>
                 <tr>
-                    <th scope="row"><label for="imm-tg-token"><?php esc_html_e('Bot token', 'event-toolkit-for-custom-fields'); ?></label></th>
+                    <th scope="row"><label for="etcf-tg-token"><?php esc_html_e('Bot token', 'event-toolkit-for-custom-fields'); ?></label></th>
                     <td>
-                        <input type="password" class="regular-text" id="imm-tg-token" name="<?php echo esc_attr($field('token')); ?>" value="" autocomplete="off"
+                        <input type="password" class="regular-text" id="etcf-tg-token" name="<?php echo esc_attr($field('token')); ?>" value="" autocomplete="off"
                                placeholder="<?php echo $s['token'] !== '' ? esc_attr__('Saved. Leave empty to keep it.', 'event-toolkit-for-custom-fields') : '123456789:AA…'; ?>">
                         <?php if ($s['token'] !== '') : ?>
                             <label style="margin-left:1em"><input type="checkbox" name="<?php echo esc_attr($field('delete_token')); ?>" value="1"> <?php esc_html_e('Delete token', 'event-toolkit-for-custom-fields'); ?></label>
@@ -875,23 +875,23 @@ class IMM_TK_Admin
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row"><label for="imm-tg-chat"><?php esc_html_e('Chat ID', 'event-toolkit-for-custom-fields'); ?></label></th>
+                    <th scope="row"><label for="etcf-tg-chat"><?php esc_html_e('Chat ID', 'event-toolkit-for-custom-fields'); ?></label></th>
                     <td>
-                        <input type="text" class="regular-text" id="imm-tg-chat" name="<?php echo esc_attr($field('chat_id')); ?>" value="<?php echo esc_attr($s['chat_id']); ?>">
+                        <input type="text" class="regular-text" id="etcf-tg-chat" name="<?php echo esc_attr($field('chat_id')); ?>" value="<?php echo esc_attr($s['chat_id']); ?>">
                         <p class="description"><?php esc_html_e('ID of the group or channel, e.g. -1001234567890. Use "Find chats" below to look it up.', 'event-toolkit-for-custom-fields'); ?></p>
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row"><label for="imm-tg-thread"><?php esc_html_e('Topic ID (optional)', 'event-toolkit-for-custom-fields'); ?></label></th>
+                    <th scope="row"><label for="etcf-tg-thread"><?php esc_html_e('Topic ID (optional)', 'event-toolkit-for-custom-fields'); ?></label></th>
                     <td>
-                        <input type="text" class="small-text" id="imm-tg-thread" name="<?php echo esc_attr($field('thread_id')); ?>" value="<?php echo esc_attr($s['thread_id']); ?>">
+                        <input type="text" class="small-text" id="etcf-tg-thread" name="<?php echo esc_attr($field('thread_id')); ?>" value="<?php echo esc_attr($s['thread_id']); ?>">
                         <p class="description"><?php esc_html_e('For groups with topics: the topic the digest goes to. Empty = the general chat.', 'event-toolkit-for-custom-fields'); ?></p>
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row"><label for="imm-tg-preview-pos"><?php esc_html_e('Link preview', 'event-toolkit-for-custom-fields'); ?></label></th>
+                    <th scope="row"><label for="etcf-tg-preview-pos"><?php esc_html_e('Link preview', 'event-toolkit-for-custom-fields'); ?></label></th>
                     <td>
-                        <select id="imm-tg-preview-pos" name="<?php echo esc_attr($field('link_preview')); ?>">
+                        <select id="etcf-tg-preview-pos" name="<?php echo esc_attr($field('link_preview')); ?>">
                             <option value="above" <?php selected($s['link_preview'], 'above'); ?>><?php esc_html_e('Above the text', 'event-toolkit-for-custom-fields'); ?></option>
                             <option value="below" <?php selected($s['link_preview'], 'below'); ?>><?php esc_html_e('Below the text', 'event-toolkit-for-custom-fields'); ?></option>
                             <option value="none" <?php selected($s['link_preview'], 'none'); ?>><?php esc_html_e('No preview', 'event-toolkit-for-custom-fields'); ?></option>
@@ -922,7 +922,7 @@ class IMM_TK_Admin
         self::panel(function () use ($notice) {
             self::render_chat_finder($notice === 'chats');
         });
-        echo '</div><aside class="imm-tk-aside">';
+        echo '</div><aside class="etcf-aside">';
         self::panel([self::class, 'render_telegram_preview']);
         echo '</aside></div>';
     }
@@ -934,8 +934,8 @@ class IMM_TK_Admin
             'empty' => ['warning', __('Nothing to post: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields')],
         ];
         if ($notice === 'error') {
-            $error = get_transient('imm_tg_error_' . get_current_user_id());
-            delete_transient('imm_tg_error_' . get_current_user_id());
+            $error = get_transient('etcf_tg_error_' . get_current_user_id());
+            delete_transient('etcf_tg_error_' . get_current_user_id());
             $messages['error'] = ['error', (string) $error];
         }
         if (isset($messages[$notice])) {
@@ -945,8 +945,8 @@ class IMM_TK_Admin
 
     private static function render_telegram_status(): void
     {
-        $state  = IMM_TG_Settings::state();
-        $next   = wp_next_scheduled(IMM_TG_Scheduler::HOOK);
+        $state  = ETCF_Telegram_Settings::state();
+        $next   = wp_next_scheduled(ETCF_Telegram_Scheduler::HOOK);
         $format = get_option('date_format') . ' ' . get_option('time_format');
         $rows   = [
             __('Next digest', 'event-toolkit-for-custom-fields') => $next ? wp_date($format, $next) : __('not scheduled (turn on the weekly digest and enter token and chat ID)', 'event-toolkit-for-custom-fields'),
@@ -960,27 +960,27 @@ class IMM_TK_Admin
 
     private static function render_chat_finder(bool $show_result): void
     {
-        echo '<h2 id="imm-tg-chats">' . esc_html__('Find chats', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<h2 id="etcf-tg-chats">' . esc_html__('Find chats', 'event-toolkit-for-custom-fields') . '</h2>';
         echo '<ol>';
         echo '<li>' . esc_html__('Add the bot to your group (or as administrator to your channel) and allow it to post messages.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '<li>' . wp_kses(__('In a group with topics: open the topic and send <code>/start@YourBotName</code> there. In a channel: post any message. The bot does not answer; it only reads the chat ID.', 'event-toolkit-for-custom-fields'), ['code' => []]) . '</li>';
         echo '<li>' . esc_html__('Click the button. The chats and topics the bot has seen in the last 24 hours appear below.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '</ol>';
 
-        if (IMM_TG_Settings::get('token') === '') {
+        if (ETCF_Telegram_Settings::get('token') === '') {
             echo '<p><em>' . esc_html__('Save the bot token first.', 'event-toolkit-for-custom-fields') . '</em></p>';
             return;
         }
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
-        echo '<input type="hidden" name="action" value="imm_tg_find_chats">';
-        wp_nonce_field('imm_tg_find_chats');
+        echo '<input type="hidden" name="action" value="etcf_tg_find_chats">';
+        wp_nonce_field('etcf_tg_find_chats');
         submit_button(__('Find chats', 'event-toolkit-for-custom-fields'), 'secondary', 'submit', false);
         echo '</form>';
 
         if (!$show_result) {
             return;
         }
-        $data = get_transient('imm_tg_chats_' . get_current_user_id());
+        $data = get_transient('etcf_tg_chats_' . get_current_user_id());
         if (!$data) {
             return;
         }
@@ -1009,24 +1009,24 @@ class IMM_TK_Admin
 
     private static function render_telegram_preview(): void
     {
-        if (!IMM_TK_Settings::is_configured()) {
+        if (!ETCF_Settings::is_configured()) {
             return;
         }
-        echo '<h2 id="imm-tg-preview">' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<h2 id="etcf-tg-preview">' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
         $selection = self::live_selection();
-        $message   = IMM_TG_Telegram::message($selection);
-        echo '<p class="imm-tk-panel-note">' . esc_html(self::preview_note()) . '</p>';
+        $message   = ETCF_Telegram::message($selection);
+        echo '<p class="etcf-panel-note">' . esc_html(self::preview_note()) . '</p>';
         if ($message === '') {
             echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
             return;
         }
 
         // Approximation of Telegram's link preview: the featured image of the next event.
-        $position = (string) IMM_TG_Settings::get('link_preview');
-        $event    = IMM_TK_Digest::lead_event($selection);
+        $position = (string) ETCF_Telegram_Settings::get('link_preview');
+        $event    = ETCF_Digest::lead_event($selection);
         $image    = ($event && $position !== 'none') ? get_the_post_thumbnail_url($event->id, 'medium_large') : '';
         $figure   = $image ? '<img src="' . esc_url($image) . '" alt="" style="display:block;width:100%;height:auto;border-radius:6px;margin:8px 0">' : '';
-        $html     = '<div class="imm-tk-bubble">'
+        $html     = '<div class="etcf-bubble">'
             . ($position === 'above' ? $figure : '')
             . nl2br($message)
             . ($position === 'below' ? $figure : '')
@@ -1039,12 +1039,12 @@ class IMM_TK_Admin
             'br'  => [],
         ]);
 
-        if (!IMM_TG_Settings::is_ready()) {
+        if (!ETCF_Telegram_Settings::is_ready()) {
             return;
         }
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '" style="margin-top:1em">';
-        echo '<input type="hidden" name="action" value="imm_tg_send_test">';
-        wp_nonce_field('imm_tg_send_test');
+        echo '<input type="hidden" name="action" value="etcf_tg_send_test">';
+        wp_nonce_field('etcf_tg_send_test');
         submit_button(__('Post this preview to the chat now', 'event-toolkit-for-custom-fields'), 'secondary', 'submit', false);
         echo '<p class="description">' . esc_html__('Goes to the chat and topic above. Does not change the weekly schedule.', 'event-toolkit-for-custom-fields') . '</p>';
         echo '</form>';
@@ -1056,16 +1056,16 @@ class IMM_TK_Admin
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
         }
-        check_admin_referer('imm_tg_find_chats');
+        check_admin_referer('etcf_tg_find_chats');
 
-        $me    = IMM_TG_Telegram::call('getMe');
-        $chats = is_wp_error($me) ? $me : IMM_TG_Telegram::recent_chats();
-        set_transient('imm_tg_chats_' . get_current_user_id(), [
+        $me    = ETCF_Telegram::call('getMe');
+        $chats = is_wp_error($me) ? $me : ETCF_Telegram::recent_chats();
+        set_transient('etcf_tg_chats_' . get_current_user_id(), [
             'bot'   => is_wp_error($me) ? '' : ($me['username'] ?? ''),
             'chats' => $chats,
         ], HOUR_IN_SECONDS);
 
-        wp_safe_redirect(self::url('telegram', ['imm_tg' => 'chats']) . '#imm-tg-chats');
+        wp_safe_redirect(self::url('telegram', ['etcf_tg' => 'chats']) . '#etcf-tg-chats');
         exit;
     }
 
@@ -1075,19 +1075,19 @@ class IMM_TK_Admin
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
         }
-        check_admin_referer('imm_tg_send_test');
+        check_admin_referer('etcf_tg_send_test');
 
         $now    = new DateTimeImmutable('now', wp_timezone());
-        $result = IMM_TG_Telegram::post($now, $now);
+        $result = ETCF_Telegram::post($now, $now);
         if ($result === null) {
             $status = 'empty';
         } elseif (is_wp_error($result)) {
-            set_transient('imm_tg_error_' . get_current_user_id(), $result->get_error_message(), 5 * MINUTE_IN_SECONDS);
+            set_transient('etcf_tg_error_' . get_current_user_id(), $result->get_error_message(), 5 * MINUTE_IN_SECONDS);
             $status = 'error';
         } else {
             $status = 'sent';
         }
-        wp_safe_redirect(self::url('telegram', ['imm_tg' => $status]) . '#imm-tg-preview');
+        wp_safe_redirect(self::url('telegram', ['etcf_tg' => $status]) . '#etcf-tg-preview');
         exit;
     }
     /* ------------------------------------------------------------------ Share */
@@ -1098,32 +1098,32 @@ class IMM_TK_Admin
         if (!current_user_can(self::SHARE_CAP)) {
             return;
         }
-        echo '<div class="wrap imm-tk imm-tk-sharepage"><header class="imm-tk-head"><h1>' . esc_html__('Share', 'event-toolkit-for-custom-fields') . '</h1>';
-        echo '<p class="imm-tk-intro">' . esc_html__('Ready-made texts and story images for WhatsApp, Signal, Instagram and everywhere else you post by hand.', 'event-toolkit-for-custom-fields');
+        echo '<div class="wrap etcf etcf-sharepage"><header class="etcf-head"><h1>' . esc_html__('Share', 'event-toolkit-for-custom-fields') . '</h1>';
+        echo '<p class="etcf-intro">' . esc_html__('Ready-made texts and story images for WhatsApp, Signal, Instagram and everywhere else you post by hand.', 'event-toolkit-for-custom-fields');
         if (current_user_can('manage_options')) {
             echo ' <a href="' . esc_url(self::url('stories')) . '">' . esc_html__('Change the look of the images', 'event-toolkit-for-custom-fields') . '</a>';
         }
         echo '</p></header><hr class="wp-header-end">';
-        if (!IMM_TK_Settings::is_configured()) {
+        if (!ETCF_Settings::is_configured()) {
             echo '<div class="notice notice-info inline"><p>' . esc_html__('The plugin does not know yet where your events are. An administrator sets this up under Event Toolkit → Events.', 'event-toolkit-for-custom-fields') . '</p></div></div>';
             return;
         }
-        IMM_TK_Share_Kit::render();
+        ETCF_Share_Kit::render();
         echo '</div>';
     }
 
     /** A sample story image on the settings page of the images. */
     private static function render_story_sample(): void
     {
-        if (!IMM_TK_Settings::is_configured() || !IMM_TK_Sharepic::available()) {
+        if (!ETCF_Settings::is_configured() || !ETCF_Sharepic::available()) {
             return;
         }
         $now = new DateTimeImmutable('now', wp_timezone());
-        foreach (IMM_TK_Endpoints::feed_events() as $e) {
+        foreach (ETCF_Endpoints::feed_events() as $e) {
             if ($e->end > $now && !$e->is_off()) {
-                $url = IMM_TK_Share::image_url(['type' => 'event', 'variant' => 'tomorrow', 'id' => $e->id]);
+                $url = ETCF_Share::image_url(['type' => 'event', 'variant' => 'tomorrow', 'id' => $e->id]);
                 echo '<h2>' . esc_html__('Example', 'event-toolkit-for-custom-fields') . '</h2>';
-                echo '<p class="imm-tk-story-sample"><img src="' . esc_url($url) . '" alt="" width="270" height="480"></p>';
+                echo '<p class="etcf-story-sample"><img src="' . esc_url($url) . '" alt="" width="270" height="480"></p>';
                 echo '<p><a href="' . esc_url(self::url('share')) . '">' . esc_html__('All images on the share page', 'event-toolkit-for-custom-fields') . '</a></p>';
                 return;
             }
@@ -1134,31 +1134,31 @@ class IMM_TK_Admin
 
     private static function render_instagram(): void
     {
-        $s     = IMM_IG_Instagram::all();
-        $state = IMM_IG_Instagram::state();
-        $name  = IMM_IG_Instagram::OPTION;
+        $s     = ETCF_Instagram::all();
+        $state = ETCF_Instagram::state();
+        $name  = ETCF_Instagram::OPTION;
         $field = function (string $key) use ($name): string {
             return $name . '[' . $key . ']';
         };
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only selects which notice to show.
-        $notice = isset($_GET['imm_ig']) ? sanitize_key(wp_unslash($_GET['imm_ig'])) : '';
+        $notice = isset($_GET['etcf_ig']) ? sanitize_key(wp_unslash($_GET['etcf_ig'])) : '';
         if ($notice !== '') {
-            $message = get_transient('imm_ig_notice_' . get_current_user_id());
-            delete_transient('imm_ig_notice_' . get_current_user_id());
+            $message = get_transient('etcf_ig_notice_' . get_current_user_id());
+            delete_transient('etcf_ig_notice_' . get_current_user_id());
             if (is_array($message)) {
                 printf('<div class="notice notice-%s"><p>%s</p></div>', esc_attr($message[0]), esc_html($message[1]));
             }
         }
 
-        echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
+        echo '<div class="etcf-layout"><div class="etcf-main">';
         echo '<p>' . esc_html__('Stories posted through the API cannot contain link stickers. The images show your web address instead.', 'event-toolkit-for-custom-fields') . '</p>';
-        if (IMM_TK_Sharepic::problem() !== '') {
-            echo '<div class="notice notice-warning inline"><p>' . esc_html(IMM_TK_Sharepic::problem()) . '</p></div>';
+        if (ETCF_Sharepic::problem() !== '') {
+            echo '<div class="notice notice-warning inline"><p>' . esc_html(ETCF_Sharepic::problem()) . '</p></div>';
         }
 
         // Status.
         $format = get_option('date_format') . ' ' . get_option('time_format');
-        $next   = wp_next_scheduled(IMM_IG_Scheduler::HOOK);
+        $next   = wp_next_scheduled(ETCF_Instagram_Scheduler::HOOK);
         $rows   = [
             __('Account', 'event-toolkit-for-custom-fields')     => $s['username'] !== '' ? '@' . $s['username'] : __('not connected', 'event-toolkit-for-custom-fields'),
             __('Next stories', 'event-toolkit-for-custom-fields') => $next ? wp_date($format, $next) : __('not scheduled (turn on automatic stories and save an access token)', 'event-toolkit-for-custom-fields'),
@@ -1174,14 +1174,14 @@ class IMM_TK_Admin
             $rows[__('Note', 'event-toolkit-for-custom-fields')] = __('Instagram allows stories through the API only for business accounts. Switch the account type in the Instagram app (free of charge).', 'event-toolkit-for-custom-fields');
         }
         self::status_list($rows);
-        $connected = IMM_IG_Instagram::is_ready();
+        $connected = ETCF_Instagram::is_ready();
         if (!$connected) {
             self::panel([self::class, 'render_instagram_setup']);
         }
         ?>
         <form method="post" action="options.php">
-            <?php settings_fields('imm_ig'); ?>
-            <section class="imm-tk-panel">
+            <?php settings_fields('etcf_ig'); ?>
+            <section class="etcf-panel">
             <h2><?php esc_html_e('Connection and schedule', 'event-toolkit-for-custom-fields'); ?></h2>
             <table class="form-table" role="presentation">
                 <tr>
@@ -1189,9 +1189,9 @@ class IMM_TK_Admin
                     <td><label><input type="checkbox" name="<?php echo esc_attr($field('enabled')); ?>" value="1" <?php checked(!empty($s['enabled'])); ?>> <?php esc_html_e('Post stories automatically', 'event-toolkit-for-custom-fields'); ?></label></td>
                 </tr>
                 <tr>
-                    <th scope="row"><label for="imm-ig-token"><?php esc_html_e('Access token', 'event-toolkit-for-custom-fields'); ?></label></th>
+                    <th scope="row"><label for="etcf-ig-token"><?php esc_html_e('Access token', 'event-toolkit-for-custom-fields'); ?></label></th>
                     <td>
-                        <input type="password" class="regular-text" id="imm-ig-token" name="<?php echo esc_attr($field('token')); ?>" value="" autocomplete="off"
+                        <input type="password" class="regular-text" id="etcf-ig-token" name="<?php echo esc_attr($field('token')); ?>" value="" autocomplete="off"
                                placeholder="<?php echo $s['token'] !== '' ? esc_attr__('Saved. Leave empty to keep it.', 'event-toolkit-for-custom-fields') : 'IGAA…'; ?>">
                         <?php if ($s['token'] !== '') : ?>
                             <label style="margin-left:1em"><input type="checkbox" name="<?php echo esc_attr($field('delete_token')); ?>" value="1"> <?php esc_html_e('Delete token', 'event-toolkit-for-custom-fields'); ?></label>
@@ -1200,9 +1200,9 @@ class IMM_TK_Admin
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row"><label for="imm-ig-time"><?php esc_html_e('Time of day', 'event-toolkit-for-custom-fields'); ?></label></th>
+                    <th scope="row"><label for="etcf-ig-time"><?php esc_html_e('Time of day', 'event-toolkit-for-custom-fields'); ?></label></th>
                     <td>
-                        <input type="time" id="imm-ig-time" name="<?php echo esc_attr($field('time')); ?>" value="<?php echo esc_attr($s['time']); ?>">
+                        <input type="time" id="etcf-ig-time" name="<?php echo esc_attr($field('time')); ?>" value="<?php echo esc_attr($s['time']); ?>">
                         <p class="description"><?php esc_html_e('All stories of a day go out at this time. Stories stay visible for 24 hours, so the story of the day before ends when the one of the day begins.', 'event-toolkit-for-custom-fields'); ?></p>
                     </td>
                 </tr>
@@ -1221,33 +1221,33 @@ class IMM_TK_Admin
         </form>
         <?php
         if ($connected) {
-            echo '<div class="imm-tk-actions">';
+            echo '<div class="etcf-actions">';
             echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
-            echo '<input type="hidden" name="action" value="imm_ig_check">';
-            wp_nonce_field('imm_ig_check');
+            echo '<input type="hidden" name="action" value="etcf_ig_check">';
+            wp_nonce_field('etcf_ig_check');
             submit_button(__('Check connection', 'event-toolkit-for-custom-fields'), 'secondary', 'submit', false);
             echo '</form>';
-            if (IMM_IG_Instagram::get('enabled')) {
+            if (ETCF_Instagram::get('enabled')) {
                 echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
-                echo '<input type="hidden" name="action" value="imm_ig_post_now">';
-                wp_nonce_field('imm_ig_post_now');
+                echo '<input type="hidden" name="action" value="etcf_ig_post_now">';
+                wp_nonce_field('etcf_ig_post_now');
                 submit_button(__('Post today\'s stories now', 'event-toolkit-for-custom-fields'), 'secondary', 'submit', false);
                 echo '</form>';
             }
             echo '</div>';
-            if (IMM_IG_Instagram::get('enabled')) {
+            if (ETCF_Instagram::get('enabled')) {
                 echo '<p class="description">' . esc_html__('Posts the stories planned for today that are not online yet. Stories already posted are not posted twice.', 'event-toolkit-for-custom-fields') . '</p>';
             }
-            echo '<details class="imm-tk-details"><summary>' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</summary>';
+            echo '<details class="etcf-details"><summary>' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</summary>';
             self::render_instagram_setup();
             echo '</details>';
         }
 
-        echo '</div><aside class="imm-tk-aside">';
+        echo '</div><aside class="etcf-aside">';
         self::panel([self::class, 'render_instagram_plan']);
         if ($state['log']) {
             self::panel(function () use ($state, $format) {
-                echo '<h2>' . esc_html__('Recent activity', 'event-toolkit-for-custom-fields') . '</h2><ul class="imm-tk-log">';
+                echo '<h2>' . esc_html__('Recent activity', 'event-toolkit-for-custom-fields') . '</h2><ul class="etcf-log">';
                 foreach (array_slice($state['log'], 0, 15) as $entry) {
                     echo '<li' . (empty($entry[2]) ? ' class="is-error"' : '') . '><time>' . esc_html(wp_date($format, (int) $entry[0])) . '</time> ' . esc_html((string) $entry[1]) . '</li>';
                 }
@@ -1260,33 +1260,33 @@ class IMM_TK_Admin
     /** Steps to connect an Instagram account. */
     private static function render_instagram_setup(): void
     {
-        echo '<h2>' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</h2><ol class="imm-tk-steps">';
+        echo '<h2>' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</h2><ol class="etcf-steps">';
         echo '<li>' . esc_html__('In the Instagram app, switch the account to a business account (Settings → Account type and tools). This is free.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '<li>' . wp_kses(__('On <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">developers.facebook.com</a>, create an app of the type "Business" and add the product "Instagram" with "API setup with Instagram login".', 'event-toolkit-for-custom-fields'), ['a' => ['href' => [], 'target' => [], 'rel' => []]]) . '</li>';
         echo '<li>' . esc_html__('Under "Generate access tokens", add your Instagram account and generate a token. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '<li>' . esc_html__('Paste the token above and save. The plugin reads the account and renews the token every week. If the site is unreachable for more than 60 days, generate a new token.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '</ol>';
-        echo '<p class="imm-tk-panel-note">' . esc_html__('Instagram downloads the story images from your site, so the uploads folder must be publicly reachable (no maintenance mode or password protection).', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<p class="etcf-panel-note">' . esc_html__('Instagram downloads the story images from your site, so the uploads folder must be publicly reachable (no maintenance mode or password protection).', 'event-toolkit-for-custom-fields') . '</p>';
     }
 
     /** The stories of the next seven days, with images. */
     private static function render_instagram_plan(): void
     {
-        if (!IMM_TK_Settings::is_configured()) {
+        if (!ETCF_Settings::is_configured()) {
             return;
         }
         echo '<h2>' . esc_html__('Plan for the next 7 days', 'event-toolkit-for-custom-fields') . '</h2>';
-        if (!IMM_IG_Scheduler::active()) {
-            echo '<p class="imm-tk-panel-note">' . esc_html__('This is what would go out once the stories are switched on.', 'event-toolkit-for-custom-fields') . '</p>';
+        if (!ETCF_Instagram_Scheduler::active()) {
+            echo '<p class="etcf-panel-note">' . esc_html__('This is what would go out once the stories are switched on.', 'event-toolkit-for-custom-fields') . '</p>';
         }
         $tz     = wp_timezone();
-        $run    = IMM_IG_Scheduler::next_run(new DateTimeImmutable('today', $tz));
-        $posted = (array) IMM_IG_Instagram::state()['posted'];
+        $run    = ETCF_Instagram_Scheduler::next_run(new DateTimeImmutable('today', $tz));
+        $posted = (array) ETCF_Instagram::state()['posted'];
         $any    = false;
-        echo '<ol class="imm-tk-plan">';
+        echo '<ol class="etcf-plan">';
         for ($i = 0; $i < 7; $i++) {
             $day   = $run->modify('+' . $i . ' days');
-            $items = IMM_IG_Scheduler::plan($day);
+            $items = ETCF_Instagram_Scheduler::plan($day);
             if (!$items) {
                 continue;
             }
@@ -1306,14 +1306,14 @@ class IMM_TK_Admin
     /** A story thumbnail with its label. */
     private static function story_chip(array $spec, string $label, bool $done = false): void
     {
-        echo '<li class="imm-tk-story">';
-        if (IMM_TK_Sharepic::available()) {
-            $url = IMM_TK_Share::image_url($spec);
+        echo '<li class="etcf-story">';
+        if (ETCF_Sharepic::available()) {
+            $url = ETCF_Share::image_url($spec);
             echo '<a href="' . esc_url($url) . '" target="_blank" rel="noopener"><img src="' . esc_url($url) . '" alt="" width="45" height="80" loading="lazy"></a>';
         }
         echo '<span>' . esc_html($label);
         if ($done) {
-            echo ' <em class="imm-tk-done">' . esc_html__('posted', 'event-toolkit-for-custom-fields') . '</em>';
+            echo ' <em class="etcf-done">' . esc_html__('posted', 'event-toolkit-for-custom-fields') . '</em>';
         }
         echo '</span></li>';
     }
@@ -1323,13 +1323,13 @@ class IMM_TK_Admin
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
         }
-        check_admin_referer('imm_ig_check');
-        $me = IMM_IG_Instagram::me();
+        check_admin_referer('etcf_ig_check');
+        $me = ETCF_Instagram::me();
         if (is_wp_error($me)) {
             $notice = ['error', $me->get_error_message()];
         } else {
-            IMM_IG_Instagram::update_state(['account_type' => (string) ($me['account_type'] ?? '')]);
-            $limit  = IMM_IG_Instagram::call('GET', IMM_IG_Instagram::get('user_id') . '/content_publishing_limit', ['fields' => 'quota_usage,config']);
+            ETCF_Instagram::update_state(['account_type' => (string) ($me['account_type'] ?? '')]);
+            $limit  = ETCF_Instagram::call('GET', ETCF_Instagram::get('user_id') . '/content_publishing_limit', ['fields' => 'quota_usage,config']);
             $used   = is_wp_error($limit) ? '' : (string) ($limit['data'][0]['quota_usage'] ?? '');
             $notice = ['success', sprintf(
                 /* translators: 1: Instagram username, 2: number of posts in the last 24 hours */
@@ -1338,8 +1338,8 @@ class IMM_TK_Admin
                 $used !== '' ? $used : '–'
             )];
         }
-        set_transient('imm_ig_notice_' . get_current_user_id(), $notice, 5 * MINUTE_IN_SECONDS);
-        wp_safe_redirect(self::url('instagram', ['imm_ig' => 'notice']));
+        set_transient('etcf_ig_notice_' . get_current_user_id(), $notice, 5 * MINUTE_IN_SECONDS);
+        wp_safe_redirect(self::url('instagram', ['etcf_ig' => 'notice']));
         exit;
     }
 
@@ -1348,10 +1348,10 @@ class IMM_TK_Admin
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
         }
-        check_admin_referer('imm_ig_post_now');
-        $result = IMM_IG_Scheduler::post_due();
+        check_admin_referer('etcf_ig_post_now');
+        $result = ETCF_Instagram_Scheduler::post_due();
         if ($result['errors']) {
-            $log    = IMM_IG_Instagram::state()['log'];
+            $log    = ETCF_Instagram::state()['log'];
             $notice = ['error', (string) ($log[0][1] ?? __('Error', 'event-toolkit-for-custom-fields'))];
         } elseif ($result['posted']) {
             /* translators: %d: number of stories */
@@ -1359,49 +1359,49 @@ class IMM_TK_Admin
         } else {
             $notice = ['info', __('Nothing to post: no stories planned for today, or all of them are online already.', 'event-toolkit-for-custom-fields')];
         }
-        set_transient('imm_ig_notice_' . get_current_user_id(), $notice, 5 * MINUTE_IN_SECONDS);
-        wp_safe_redirect(self::url('instagram', ['imm_ig' => 'notice']));
+        set_transient('etcf_ig_notice_' . get_current_user_id(), $notice, 5 * MINUTE_IN_SECONDS);
+        wp_safe_redirect(self::url('instagram', ['etcf_ig' => 'notice']));
         exit;
     }
     /* ------------------------------------------------------------------ Mastodon & Bluesky */
 
     private static function render_social(): void
     {
-        $s     = IMM_SO_Social::all();
-        $name  = IMM_SO_Social::OPTION;
+        $s     = ETCF_Social::all();
+        $name  = ETCF_Social::OPTION;
         $field = function (string $key) use ($name): string {
             return $name . '[' . $key . ']';
         };
-        self::render_transient_notice('imm_so');
+        self::render_transient_notice('etcf_so');
         $secret = function (string $key, string $delete, string $placeholder) use ($s, $field) {
-            echo '<input type="password" class="regular-text" id="imm-so-' . esc_attr($key) . '" name="' . esc_attr($field($key)) . '" value="" autocomplete="off" placeholder="' . esc_attr($s[$key] !== '' ? __('Saved. Leave empty to keep it.', 'event-toolkit-for-custom-fields') : $placeholder) . '">';
+            echo '<input type="password" class="regular-text" id="etcf-so-' . esc_attr($key) . '" name="' . esc_attr($field($key)) . '" value="" autocomplete="off" placeholder="' . esc_attr($s[$key] !== '' ? __('Saved. Leave empty to keep it.', 'event-toolkit-for-custom-fields') : $placeholder) . '">';
             if ($s[$key] !== '') {
                 echo ' <label><input type="checkbox" name="' . esc_attr($field($delete)) . '" value="1"> ' . esc_html__('Delete', 'event-toolkit-for-custom-fields') . '</label>';
             }
         };
 
-        echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
+        echo '<div class="etcf-layout"><div class="etcf-main">';
         echo '<form method="post" action="options.php">';
-        settings_fields('imm_so');
+        settings_fields('etcf_so');
 
-        echo '<section class="imm-tk-panel"><h2>Mastodon</h2><table class="form-table" role="presentation">';
+        echo '<section class="etcf-panel"><h2>Mastodon</h2><table class="form-table" role="presentation">';
         echo '<tr><th scope="row">' . esc_html__('Post', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('mastodon_enabled')) . '" value="1" ' . checked(!empty($s['mastodon_enabled']), true, false) . '> ' . esc_html__('Post to Mastodon', 'event-toolkit-for-custom-fields') . '</label></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-so-instance">' . esc_html__('Server', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="url" class="regular-text" id="imm-so-instance" name="' . esc_attr($field('mastodon_instance')) . '" value="' . esc_attr($s['mastodon_instance']) . '" placeholder="https://mastodon.social"></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-so-mastodon_token">' . esc_html__('Access token', 'event-toolkit-for-custom-fields') . '</label></th><td>';
+        echo '<tr><th scope="row"><label for="etcf-so-instance">' . esc_html__('Server', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="url" class="regular-text" id="etcf-so-instance" name="' . esc_attr($field('mastodon_instance')) . '" value="' . esc_attr($s['mastodon_instance']) . '" placeholder="https://mastodon.social"></td></tr>';
+        echo '<tr><th scope="row"><label for="etcf-so-mastodon_token">' . esc_html__('Access token', 'event-toolkit-for-custom-fields') . '</label></th><td>';
         $secret('mastodon_token', 'delete_mastodon_token', '');
         echo '<p class="description">' . esc_html__('In Mastodon: Preferences → Development → New application. Allow "write:statuses" and "write:media", save, and copy "Your access token".', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
         echo '</table></section>';
 
-        echo '<section class="imm-tk-panel"><h2>Bluesky</h2><table class="form-table" role="presentation">';
+        echo '<section class="etcf-panel"><h2>Bluesky</h2><table class="form-table" role="presentation">';
         echo '<tr><th scope="row">' . esc_html__('Post', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('bluesky_enabled')) . '" value="1" ' . checked(!empty($s['bluesky_enabled']), true, false) . '> ' . esc_html__('Post to Bluesky', 'event-toolkit-for-custom-fields') . '</label></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-so-handle">' . esc_html__('Handle', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="imm-so-handle" name="' . esc_attr($field('bluesky_handle')) . '" value="' . esc_attr($s['bluesky_handle']) . '" placeholder="name.bsky.social"></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-so-bluesky_password">' . esc_html__('App password', 'event-toolkit-for-custom-fields') . '</label></th><td>';
+        echo '<tr><th scope="row"><label for="etcf-so-handle">' . esc_html__('Handle', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="etcf-so-handle" name="' . esc_attr($field('bluesky_handle')) . '" value="' . esc_attr($s['bluesky_handle']) . '" placeholder="name.bsky.social"></td></tr>';
+        echo '<tr><th scope="row"><label for="etcf-so-bluesky_password">' . esc_html__('App password', 'event-toolkit-for-custom-fields') . '</label></th><td>';
         $secret('bluesky_password', 'delete_bluesky_password', 'xxxx-xxxx-xxxx-xxxx');
         echo '<p class="description">' . esc_html__('In Bluesky: Settings → Privacy and security → App passwords → Add. Not your normal password.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-so-service">' . esc_html__('Server', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="url" class="regular-text" id="imm-so-service" name="' . esc_attr($field('bluesky_service')) . '" value="' . esc_attr($s['bluesky_service']) . '"><p class="description">' . esc_html__('Only change this if your account is on its own server.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="etcf-so-service">' . esc_html__('Server', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="url" class="regular-text" id="etcf-so-service" name="' . esc_attr($field('bluesky_service')) . '" value="' . esc_attr($s['bluesky_service']) . '"><p class="description">' . esc_html__('Only change this if your account is on its own server.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
         echo '</table></section>';
 
-        echo '<section class="imm-tk-panel"><h2>' . esc_html__('What is posted', 'event-toolkit-for-custom-fields') . '</h2><table class="form-table" role="presentation">';
+        echo '<section class="etcf-panel"><h2>' . esc_html__('What is posted', 'event-toolkit-for-custom-fields') . '</h2><table class="form-table" role="presentation">';
         echo '<tr><th scope="row">' . esc_html__('Weekly preview', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('weekly')) . '" value="1" ' . checked(!empty($s['weekly']), true, false) . '> ' . esc_html__('At the time of the weekly preview', 'event-toolkit-for-custom-fields') . '</label></td></tr>';
         echo '<tr><th scope="row">' . esc_html__('On event days', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('today')) . '" value="1" ' . checked(!empty($s['today']), true, false) . '> ' . esc_html__('Short "Today" post at', 'event-toolkit-for-custom-fields') . '</label> <input type="time" name="' . esc_attr($field('today_time')) . '" value="' . esc_attr($s['today_time']) . '"><p class="description">' . esc_html__('Not on the day of the weekly preview, which already lists the events.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
         echo '<tr><th scope="row">' . esc_html__('Cancellations', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('notify_status')) . '" value="1" ' . checked(!empty($s['notify_status']), true, false) . '> ' . esc_html__('Post a short notice when an upcoming event is cancelled or postponed', 'event-toolkit-for-custom-fields') . '</label></td></tr>';
@@ -1410,28 +1410,28 @@ class IMM_TK_Admin
         submit_button(__('Save settings', 'event-toolkit-for-custom-fields'));
         echo '</form>';
 
-        if (IMM_SO_Social::mastodon_ready() || IMM_SO_Social::bluesky_ready()) {
-            echo '<div class="imm-tk-actions">';
-            echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="imm_so_check">';
-            wp_nonce_field('imm_so_check');
+        if (ETCF_Social::mastodon_ready() || ETCF_Social::bluesky_ready()) {
+            echo '<div class="etcf-actions">';
+            echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="etcf_so_check">';
+            wp_nonce_field('etcf_so_check');
             submit_button(__('Check connection', 'event-toolkit-for-custom-fields'), 'secondary', 'submit', false);
             echo '</form>';
-            if (IMM_SO_Social::active_networks()) {
-                echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="imm_so_post_now">';
-                wp_nonce_field('imm_so_post_now');
+            if (ETCF_Social::active_networks()) {
+                echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="etcf_so_post_now">';
+                wp_nonce_field('etcf_so_post_now');
                 submit_button(__('Post the weekly preview now', 'event-toolkit-for-custom-fields'), 'secondary', 'submit', false);
                 echo '</form>';
             }
             echo '</div>';
         }
 
-        echo '</div><aside class="imm-tk-aside">';
+        echo '</div><aside class="etcf-aside">';
         self::panel([self::class, 'render_social_preview']);
-        $log = IMM_SO_Social::state()['log'];
+        $log = ETCF_Social::state()['log'];
         if ($log) {
             self::panel(function () use ($log) {
                 $format = get_option('date_format') . ' ' . get_option('time_format');
-                echo '<h2>' . esc_html__('Recent activity', 'event-toolkit-for-custom-fields') . '</h2><ul class="imm-tk-log">';
+                echo '<h2>' . esc_html__('Recent activity', 'event-toolkit-for-custom-fields') . '</h2><ul class="etcf-log">';
                 foreach (array_slice($log, 0, 15) as $entry) {
                     echo '<li' . (empty($entry[2]) ? ' class="is-error"' : '') . '><time>' . esc_html(wp_date($format, (int) $entry[0])) . '</time> ' . esc_html((string) $entry[1]) . '</li>';
                 }
@@ -1443,21 +1443,21 @@ class IMM_TK_Admin
 
     private static function render_social_preview(): void
     {
-        if (!IMM_TK_Settings::is_configured()) {
+        if (!ETCF_Settings::is_configured()) {
             return;
         }
         $selection = self::live_selection();
         echo '<h2>' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
-        echo '<p class="imm-tk-panel-note">' . esc_html(self::preview_note()) . '</p>';
-        if (IMM_TK_Digest::is_empty($selection)) {
+        echo '<p class="etcf-panel-note">' . esc_html(self::preview_note()) . '</p>';
+        if (ETCF_Digest::is_empty($selection)) {
             echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
             return;
         }
-        foreach (['mastodon' => ['Mastodon', IMM_SO_Social::MASTODON_LIMIT], 'bluesky' => ['Bluesky', IMM_SO_Social::BLUESKY_LIMIT]] as $network => [$label, $limit]) {
-            $text = IMM_SO_Social::week_text($selection, $limit, $network);
+        foreach (['mastodon' => ['Mastodon', ETCF_Social::MASTODON_LIMIT], 'bluesky' => ['Bluesky', ETCF_Social::BLUESKY_LIMIT]] as $network => [$label, $limit]) {
+            $text = ETCF_Social::week_text($selection, $limit, $network);
             /* translators: 1: network name, 2: length of the text, 3: maximum length */
-            echo '<h3>' . esc_html(sprintf(__('%1$s (%2$d of %3$d characters)', 'event-toolkit-for-custom-fields'), $label, IMM_SO_Social::count($text, $network), $limit)) . '</h3>';
-            echo '<div class="imm-tk-bubble">' . nl2br(esc_html($text)) . '</div>';
+            echo '<h3>' . esc_html(sprintf(__('%1$s (%2$d of %3$d characters)', 'event-toolkit-for-custom-fields'), $label, ETCF_Social::count($text, $network), $limit)) . '</h3>';
+            echo '<div class="etcf-bubble">' . nl2br(esc_html($text)) . '</div>';
         }
     }
 
@@ -1477,20 +1477,20 @@ class IMM_TK_Admin
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
         }
-        check_admin_referer('imm_so_check');
+        check_admin_referer('etcf_so_check');
         $lines = [];
         $ok    = true;
-        if (IMM_SO_Social::mastodon_ready()) {
-            $account = IMM_SO_Social::mastodon_check();
+        if (ETCF_Social::mastodon_ready()) {
+            $account = ETCF_Social::mastodon_check();
             $ok      = $ok && !is_wp_error($account);
             $lines[] = 'Mastodon: ' . (is_wp_error($account) ? $account->get_error_message() : '@' . ($account['acct'] ?? '') . ' ✓');
         }
-        if (IMM_SO_Social::bluesky_ready()) {
-            $session = IMM_SO_Social::bluesky_session();
+        if (ETCF_Social::bluesky_ready()) {
+            $session = ETCF_Social::bluesky_session();
             $ok      = $ok && !is_wp_error($session);
-            $lines[] = 'Bluesky: ' . (is_wp_error($session) ? $session->get_error_message() : '@' . ($session['handle'] ?? IMM_SO_Social::get('bluesky_handle')) . ' ✓');
+            $lines[] = 'Bluesky: ' . (is_wp_error($session) ? $session->get_error_message() : '@' . ($session['handle'] ?? ETCF_Social::get('bluesky_handle')) . ' ✓');
         }
-        set_transient('imm_so_notice_' . get_current_user_id(), [$ok ? 'success' : 'error', implode(' – ', $lines)], 5 * MINUTE_IN_SECONDS);
+        set_transient('etcf_so_notice_' . get_current_user_id(), [$ok ? 'success' : 'error', implode(' – ', $lines)], 5 * MINUTE_IN_SECONDS);
         wp_safe_redirect(self::url('social'));
         exit;
     }
@@ -1500,8 +1500,8 @@ class IMM_TK_Admin
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
         }
-        check_admin_referer('imm_so_post_now');
-        $results = IMM_SO_Social::post_weekly(self::live_selection());
+        check_admin_referer('etcf_so_post_now');
+        $results = ETCF_Social::post_weekly(self::live_selection());
         $lines   = [];
         $ok      = true;
         foreach ($results as $network => $result) {
@@ -1515,7 +1515,7 @@ class IMM_TK_Admin
                 $lines[] = $name . ': ' . __('posted', 'event-toolkit-for-custom-fields');
             }
         }
-        set_transient('imm_so_notice_' . get_current_user_id(), [$ok ? 'success' : 'error', implode(' – ', $lines)], 5 * MINUTE_IN_SECONDS);
+        set_transient('etcf_so_notice_' . get_current_user_id(), [$ok ? 'success' : 'error', implode(' – ', $lines)], 5 * MINUTE_IN_SECONDS);
         wp_safe_redirect(self::url('social'));
         exit;
     }
@@ -1523,27 +1523,27 @@ class IMM_TK_Admin
 
     private static function render_newsletter(): void
     {
-        $s     = IMM_NL_Newsletter::all();
-        $name  = IMM_NL_Newsletter::OPTION;
+        $s     = ETCF_Newsletter::all();
+        $name  = ETCF_Newsletter::OPTION;
         $field = function (string $key) use ($name): string {
             return $name . '[' . $key . ']';
         };
-        self::render_transient_notice('imm_nl');
+        self::render_transient_notice('etcf_nl');
         $code = ['code' => []];
         $link = ['a' => ['href' => [], 'target' => [], 'rel' => []], 'code' => []];
 
-        echo '<div class="imm-tk-layout"><div class="imm-tk-main">';
+        echo '<div class="etcf-layout"><div class="etcf-main">';
 
         // Two ways.
-        echo '<section class="imm-tk-panel"><h2>' . esc_html__('Two ways to send', 'event-toolkit-for-custom-fields') . '</h2>';
-        echo '<dl class="imm-tk-ways">';
+        echo '<section class="etcf-panel"><h2>' . esc_html__('Two ways to send', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<dl class="etcf-ways">';
         echo '<div><dt>' . esc_html__('RSS feed', 'event-toolkit-for-custom-fields') . '</dt><dd>' . esc_html__('Your newsletter service fetches the weekly preview from the feed and sends it on its own schedule. Works with every service that has RSS-to-email, for example Brevo, Mailchimp or MailerLite.', 'event-toolkit-for-custom-fields') . '</dd></div>';
         echo '<div><dt>' . esc_html__('Direct', 'event-toolkit-for-custom-fields') . '</dt><dd>' . esc_html__('The plugin creates the campaign at the time of the weekly preview and sends it through the interface of Brevo or Emailit. Needed for Emailit, which has no RSS-to-email.', 'event-toolkit-for-custom-fields') . '</dd></div>';
         echo '</dl>';
-        if (IMM_TK_Settings::get('digest_feed_enabled')) {
-            echo '<p><label for="imm-nl-feed">' . esc_html__('Feed address', 'event-toolkit-for-custom-fields') . '</label><input id="imm-nl-feed" type="text" class="large-text code" readonly data-imm-select value="' . esc_attr(IMM_TK_Digest_Feed::url()) . '"></p>';
+        if (ETCF_Settings::get('digest_feed_enabled')) {
+            echo '<p><label for="etcf-nl-feed">' . esc_html__('Feed address', 'event-toolkit-for-custom-fields') . '</label><input id="etcf-nl-feed" type="text" class="large-text code" readonly data-etcf-select value="' . esc_attr(ETCF_Digest_Feed::url()) . '"></p>';
         }
-        echo '<p class="imm-tk-panel-note">' . wp_kses(sprintf(
+        echo '<p class="etcf-panel-note">' . wp_kses(sprintf(
             /* translators: %s: link to the page "Weekly preview" */
             __('Both ways send nothing in weeks without upcoming events. "Only with news" and the feed itself are set on the page %s.', 'event-toolkit-for-custom-fields'),
             '<a href="' . esc_url(self::url('digest')) . '">' . esc_html__('Weekly preview', 'event-toolkit-for-custom-fields') . '</a>'
@@ -1551,7 +1551,7 @@ class IMM_TK_Admin
         echo '</section>';
 
         // Guides.
-        echo '<h2 class="imm-tk-section-title">' . esc_html__('Connect your service', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<h2 class="etcf-section-title">' . esc_html__('Connect your service', 'event-toolkit-for-custom-fields') . '</h2>';
         $guides = [
             'brevo-rss' => [
                 __('Brevo with the RSS feed', 'event-toolkit-for-custom-fields'),
@@ -1614,7 +1614,7 @@ class IMM_TK_Admin
         ];
         $open = $s['provider'] === 'emailit' ? 'emailit' : 'brevo-rss';
         foreach ($guides as $id => [$title, $steps, $more]) {
-            echo '<details class="imm-tk-guide"' . ($id === $open ? ' open' : '') . '><summary>' . esc_html($title) . '</summary><ol class="imm-tk-steps">';
+            echo '<details class="etcf-guide"' . ($id === $open ? ' open' : '') . '><summary>' . esc_html($title) . '</summary><ol class="etcf-steps">';
             foreach ($steps as $step) {
                 echo '<li>' . wp_kses($step, $code) . '</li>';
             }
@@ -1624,33 +1624,33 @@ class IMM_TK_Admin
             }
             echo '</details>';
         }
-        echo '<p class="imm-tk-panel-note">' . esc_html__('In the EU, newsletters need a double opt-in and the legal notice of the sender. Signup forms come from your newsletter service.', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<p class="etcf-panel-note">' . esc_html__('In the EU, newsletters need a double opt-in and the legal notice of the sender. Signup forms come from your newsletter service.', 'event-toolkit-for-custom-fields') . '</p>';
 
         // Direct sending.
-        echo '<h2 class="imm-tk-section-title">' . esc_html__('Send directly', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<h2 class="etcf-section-title">' . esc_html__('Send directly', 'event-toolkit-for-custom-fields') . '</h2>';
         echo '<form method="post" action="options.php">';
-        settings_fields('imm_nl');
-        echo '<section class="imm-tk-panel"><table class="form-table" role="presentation">';
+        settings_fields('etcf_nl');
+        echo '<section class="etcf-panel"><table class="form-table" role="presentation">';
         echo '<tr><th scope="row">' . esc_html__('Sending', 'event-toolkit-for-custom-fields') . '</th><td><label><input type="checkbox" name="' . esc_attr($field('enabled')) . '" value="1" ' . checked(!empty($s['enabled']), true, false) . '> ' . esc_html__('Send the weekly preview to the list at its time', 'event-toolkit-for-custom-fields') . '</label><p class="description">' . esc_html__('Leave this off if your service already uses the RSS feed, or subscribers get two mails.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-nl-provider">' . esc_html__('Service', 'event-toolkit-for-custom-fields') . '</label></th><td><select id="imm-nl-provider" name="' . esc_attr($field('provider')) . '"><option value="">' . esc_html__('Choose …', 'event-toolkit-for-custom-fields') . '</option><option value="brevo" ' . selected($s['provider'], 'brevo', false) . '>Brevo</option><option value="emailit" ' . selected($s['provider'], 'emailit', false) . '>Emailit</option></select></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-nl-key">' . esc_html__('API key', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="password" class="regular-text" id="imm-nl-key" name="' . esc_attr($field('api_key')) . '" value="" autocomplete="off" placeholder="' . esc_attr($s['api_key'] !== '' ? __('Saved. Leave empty to keep it.', 'event-toolkit-for-custom-fields') : '') . '">';
+        echo '<tr><th scope="row"><label for="etcf-nl-provider">' . esc_html__('Service', 'event-toolkit-for-custom-fields') . '</label></th><td><select id="etcf-nl-provider" name="' . esc_attr($field('provider')) . '"><option value="">' . esc_html__('Choose …', 'event-toolkit-for-custom-fields') . '</option><option value="brevo" ' . selected($s['provider'], 'brevo', false) . '>Brevo</option><option value="emailit" ' . selected($s['provider'], 'emailit', false) . '>Emailit</option></select></td></tr>';
+        echo '<tr><th scope="row"><label for="etcf-nl-key">' . esc_html__('API key', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="password" class="regular-text" id="etcf-nl-key" name="' . esc_attr($field('api_key')) . '" value="" autocomplete="off" placeholder="' . esc_attr($s['api_key'] !== '' ? __('Saved. Leave empty to keep it.', 'event-toolkit-for-custom-fields') : '') . '">';
         if ($s['api_key'] !== '') {
             echo ' <label><input type="checkbox" name="' . esc_attr($field('delete_api_key')) . '" value="1"> ' . esc_html__('Delete', 'event-toolkit-for-custom-fields') . '</label>';
         }
         echo '</td></tr>';
-        echo '<tr><th scope="row"><label for="imm-nl-list">' . esc_html__('List or audience', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="imm-nl-list" name="' . esc_attr($field('list_id')) . '" value="' . esc_attr($s['list_id']) . '"><p class="description">' . wp_kses(__('Brevo: number of the contact list, e.g. <code>3</code>. Emailit: audience ID, e.g. <code>aud_…</code>.', 'event-toolkit-for-custom-fields'), $code) . '</p></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-nl-from-name">' . esc_html__('Sender name', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="imm-nl-from-name" name="' . esc_attr($field('from_name')) . '" value="' . esc_attr($s['from_name']) . '"></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-nl-from">' . esc_html__('Sender address', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="email" class="regular-text" id="imm-nl-from" name="' . esc_attr($field('from_email')) . '" value="' . esc_attr($s['from_email']) . '"><p class="description">' . esc_html__('Must be verified with the service.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-nl-subject">' . esc_html__('Subject', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="imm-nl-subject" name="' . esc_attr($field('subject')) . '" value="' . esc_attr($s['subject']) . '" placeholder="' . esc_attr(IMM_TK_Digest::issue_title(IMM_TK_Digest::next_issue())) . '"><p class="description">' . esc_html__('Empty = "Weekly preview" with the date.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-nl-footer">' . esc_html__('Footer', 'event-toolkit-for-custom-fields') . '</label></th><td><textarea class="large-text" rows="4" id="imm-nl-footer" name="' . esc_attr($field('footer')) . '">' . esc_textarea($s['footer']) . '</textarea><p class="description">' . esc_html__('Name and postal address of the sender (legal notice). The unsubscribe link is added automatically.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
-        echo '<tr><th scope="row"><label for="imm-nl-test">' . esc_html__('Test address', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="email" class="regular-text" id="imm-nl-test" name="' . esc_attr($field('test_email')) . '" value="' . esc_attr($s['test_email']) . '"></td></tr>';
+        echo '<tr><th scope="row"><label for="etcf-nl-list">' . esc_html__('List or audience', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="etcf-nl-list" name="' . esc_attr($field('list_id')) . '" value="' . esc_attr($s['list_id']) . '"><p class="description">' . wp_kses(__('Brevo: number of the contact list, e.g. <code>3</code>. Emailit: audience ID, e.g. <code>aud_…</code>.', 'event-toolkit-for-custom-fields'), $code) . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="etcf-nl-from-name">' . esc_html__('Sender name', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="etcf-nl-from-name" name="' . esc_attr($field('from_name')) . '" value="' . esc_attr($s['from_name']) . '"></td></tr>';
+        echo '<tr><th scope="row"><label for="etcf-nl-from">' . esc_html__('Sender address', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="email" class="regular-text" id="etcf-nl-from" name="' . esc_attr($field('from_email')) . '" value="' . esc_attr($s['from_email']) . '"><p class="description">' . esc_html__('Must be verified with the service.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="etcf-nl-subject">' . esc_html__('Subject', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="text" class="regular-text" id="etcf-nl-subject" name="' . esc_attr($field('subject')) . '" value="' . esc_attr($s['subject']) . '" placeholder="' . esc_attr(ETCF_Digest::issue_title(ETCF_Digest::next_issue())) . '"><p class="description">' . esc_html__('Empty = "Weekly preview" with the date.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="etcf-nl-footer">' . esc_html__('Footer', 'event-toolkit-for-custom-fields') . '</label></th><td><textarea class="large-text" rows="4" id="etcf-nl-footer" name="' . esc_attr($field('footer')) . '">' . esc_textarea($s['footer']) . '</textarea><p class="description">' . esc_html__('Name and postal address of the sender (legal notice). The unsubscribe link is added automatically.', 'event-toolkit-for-custom-fields') . '</p></td></tr>';
+        echo '<tr><th scope="row"><label for="etcf-nl-test">' . esc_html__('Test address', 'event-toolkit-for-custom-fields') . '</label></th><td><input type="email" class="regular-text" id="etcf-nl-test" name="' . esc_attr($field('test_email')) . '" value="' . esc_attr($s['test_email']) . '"></td></tr>';
         echo '</table></section>';
         submit_button(__('Save settings', 'event-toolkit-for-custom-fields'));
         echo '</form>';
 
-        if (IMM_NL_Newsletter::is_ready()) {
-            echo '<div class="imm-tk-actions">';
-            foreach (['imm_nl_check' => __('Check connection', 'event-toolkit-for-custom-fields'), 'imm_nl_test' => __('Send a test mail', 'event-toolkit-for-custom-fields')] as $action => $label) {
+        if (ETCF_Newsletter::is_ready()) {
+            echo '<div class="etcf-actions">';
+            foreach (['etcf_nl_check' => __('Check connection', 'event-toolkit-for-custom-fields'), 'etcf_nl_test' => __('Send a test mail', 'event-toolkit-for-custom-fields')] as $action => $label) {
                 echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="' . esc_attr($action) . '">';
                 wp_nonce_field($action);
                 submit_button($label, 'secondary', 'submit', false);
@@ -1659,27 +1659,27 @@ class IMM_TK_Admin
             echo '</div><p class="description">' . esc_html__('The test mail goes only to the test address, not to the list.', 'event-toolkit-for-custom-fields') . '</p>';
         }
 
-        echo '</div><aside class="imm-tk-aside">';
+        echo '</div><aside class="etcf-aside">';
         self::panel(function () {
-            if (!IMM_TK_Settings::is_configured()) {
+            if (!ETCF_Settings::is_configured()) {
                 return;
             }
             $selection = self::live_selection();
             echo '<h2>' . esc_html__('Preview', 'event-toolkit-for-custom-fields') . '</h2>';
-            echo '<p class="imm-tk-panel-note">' . esc_html(self::preview_note()) . '</p>';
-            if (IMM_TK_Digest::is_empty($selection)) {
+            echo '<p class="etcf-panel-note">' . esc_html(self::preview_note()) . '</p>';
+            if (ETCF_Digest::is_empty($selection)) {
                 echo '<p>' . esc_html__('Right now there would be nothing in it: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields') . '</p>';
                 return;
             }
             $now  = new DateTimeImmutable('now', wp_timezone());
-            $html = IMM_NL_Newsletter::html($selection, IMM_NL_Newsletter::subject($now), '');
-            echo '<iframe class="imm-tk-mail-frame" title="' . esc_attr__('Preview', 'event-toolkit-for-custom-fields') . '" sandbox="" srcdoc="' . esc_attr($html) . '"></iframe>';
+            $html = ETCF_Newsletter::html($selection, ETCF_Newsletter::subject($now), '');
+            echo '<iframe class="etcf-mail-frame" title="' . esc_attr__('Preview', 'event-toolkit-for-custom-fields') . '" sandbox="" srcdoc="' . esc_attr($html) . '"></iframe>';
         });
-        $log = IMM_NL_Newsletter::state()['log'];
+        $log = ETCF_Newsletter::state()['log'];
         if ($log) {
             self::panel(function () use ($log) {
                 $format = get_option('date_format') . ' ' . get_option('time_format');
-                echo '<h2>' . esc_html__('Recent activity', 'event-toolkit-for-custom-fields') . '</h2><ul class="imm-tk-log">';
+                echo '<h2>' . esc_html__('Recent activity', 'event-toolkit-for-custom-fields') . '</h2><ul class="etcf-log">';
                 foreach (array_slice($log, 0, 15) as $entry) {
                     echo '<li' . (empty($entry[2]) ? ' class="is-error"' : '') . '><time>' . esc_html(wp_date($format, (int) $entry[0])) . '</time> ' . esc_html((string) $entry[1]) . '</li>';
                 }
@@ -1694,9 +1694,9 @@ class IMM_TK_Admin
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
         }
-        check_admin_referer('imm_nl_check');
-        $result = IMM_NL_Newsletter::check();
-        set_transient('imm_nl_notice_' . get_current_user_id(), is_wp_error($result) ? ['error', $result->get_error_message()] : ['success', $result], 5 * MINUTE_IN_SECONDS);
+        check_admin_referer('etcf_nl_check');
+        $result = ETCF_Newsletter::check();
+        set_transient('etcf_nl_notice_' . get_current_user_id(), is_wp_error($result) ? ['error', $result->get_error_message()] : ['success', $result], 5 * MINUTE_IN_SECONDS);
         wp_safe_redirect(self::url('newsletter'));
         exit;
     }
@@ -1706,18 +1706,18 @@ class IMM_TK_Admin
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Not allowed.', 'event-toolkit-for-custom-fields'));
         }
-        check_admin_referer('imm_nl_test');
+        check_admin_referer('etcf_nl_test');
         $now    = new DateTimeImmutable('now', wp_timezone());
-        $result = IMM_NL_Newsletter::send_test(self::live_selection(), $now);
+        $result = ETCF_Newsletter::send_test(self::live_selection(), $now);
         if ($result === null) {
             $notice = ['warning', __('Nothing to send: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields')];
         } elseif (is_wp_error($result)) {
             $notice = ['error', $result->get_error_message()];
         } else {
             /* translators: %s: e-mail address */
-            $notice = ['success', sprintf(__('Test mail sent to %s.', 'event-toolkit-for-custom-fields'), (string) IMM_NL_Newsletter::get('test_email'))];
+            $notice = ['success', sprintf(__('Test mail sent to %s.', 'event-toolkit-for-custom-fields'), (string) ETCF_Newsletter::get('test_email'))];
         }
-        set_transient('imm_nl_notice_' . get_current_user_id(), $notice, 5 * MINUTE_IN_SECONDS);
+        set_transient('etcf_nl_notice_' . get_current_user_id(), $notice, 5 * MINUTE_IN_SECONDS);
         wp_safe_redirect(self::url('newsletter'));
         exit;
     }

@@ -8,17 +8,17 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TG_Scheduler
+class ETCF_Telegram_Scheduler
 {
-    const HOOK  = 'imm_tg_weekly_digest';
-    const TODAY = 'imm_tg_today';
+    const HOOK  = 'etcf_tg_weekly_digest';
+    const TODAY = 'etcf_tg_today';
 
     public static function init(): void
     {
         add_action(self::HOOK, [self::class, 'run']);
         add_action(self::TODAY, [self::class, 'run_today']);
         add_action('init', [self::class, 'ensure_scheduled']);
-        foreach ([IMM_TG_Settings::OPTION, IMM_TK_Settings::OPTION] as $option) {
+        foreach ([ETCF_Telegram_Settings::OPTION, ETCF_Settings::OPTION] as $option) {
             add_action('update_option_' . $option, [self::class, 'reschedule']);
             add_action('add_option_' . $option, [self::class, 'reschedule']);
         }
@@ -26,15 +26,15 @@ class IMM_TG_Scheduler
 
     public static function ensure_scheduled(): void
     {
-        $active = IMM_TG_Settings::get('enabled') && IMM_TG_Settings::is_ready();
+        $active = ETCF_Telegram_Settings::get('enabled') && ETCF_Telegram_Settings::is_ready();
         $next   = wp_next_scheduled(self::HOOK);
         if ($active && !$next) {
-            wp_schedule_single_event(IMM_TK_Digest::next_issue()->getTimestamp(), self::HOOK);
+            wp_schedule_single_event(ETCF_Digest::next_issue()->getTimestamp(), self::HOOK);
         } elseif (!$active && $next) {
             wp_clear_scheduled_hook(self::HOOK);
         }
 
-        $today = IMM_TG_Settings::get('today') && IMM_TG_Settings::is_ready() && IMM_TK_Settings::is_configured();
+        $today = ETCF_Telegram_Settings::get('today') && ETCF_Telegram_Settings::is_ready() && ETCF_Settings::is_configured();
         $next  = wp_next_scheduled(self::TODAY);
         if ($today && !$next) {
             wp_schedule_single_event(self::next_today()->getTimestamp(), self::TODAY);
@@ -47,7 +47,7 @@ class IMM_TG_Scheduler
     public static function next_today(?DateTimeImmutable $now = null): DateTimeImmutable
     {
         $now = $now ?? new DateTimeImmutable('now', wp_timezone());
-        [$hour, $minute] = array_map('intval', explode(':', (string) IMM_TG_Settings::get('today_time')));
+        [$hour, $minute] = array_map('intval', explode(':', (string) ETCF_Telegram_Settings::get('today_time')));
         $run = $now->setTime($hour, $minute);
         return $run <= $now ? $run->modify('+1 day') : $run;
     }
@@ -63,17 +63,17 @@ class IMM_TG_Scheduler
 
         $now  = new DateTimeImmutable('now', wp_timezone());
         $date = $now->format('Y-m-d');
-        if (IMM_TG_Settings::state()['today_sent'] === $date) {
+        if (ETCF_Telegram_Settings::state()['today_sent'] === $date) {
             return;
         }
-        if (IMM_TG_Settings::get('enabled') && (int) $now->format('N') === (int) IMM_TK_Settings::get('digest_weekday')) {
+        if (ETCF_Telegram_Settings::get('enabled') && (int) $now->format('N') === (int) ETCF_Settings::get('digest_weekday')) {
             return;
         }
-        $result = IMM_TG_Telegram::post_today($now);
+        $result = ETCF_Telegram::post_today($now);
         if (is_array($result)) {
-            IMM_TG_Settings::update_state(['today_sent' => $date]);
+            ETCF_Telegram_Settings::update_state(['today_sent' => $date]);
         } elseif (is_wp_error($result)) {
-            IMM_TG_Settings::update_state([
+            ETCF_Telegram_Settings::update_state([
                 'last_run'    => time(),
                 /* translators: %s: error message */
                 'last_result' => sprintf(__('Error: %s', 'event-toolkit-for-custom-fields'), $result->get_error_message()),
@@ -95,7 +95,7 @@ class IMM_TG_Scheduler
 
     public static function run(): void
     {
-        $state = IMM_TG_Settings::state();
+        $state = ETCF_Telegram_Settings::state();
         $now   = time();
 
         // Guard against double posts, e.g. if cron fires twice.
@@ -105,21 +105,21 @@ class IMM_TG_Scheduler
         }
 
         $current = new DateTimeImmutable('now', wp_timezone());
-        $result  = IMM_TG_Telegram::post(IMM_TK_Digest::current_issue($current), $current);
+        $result  = ETCF_Telegram::post(ETCF_Digest::current_issue($current), $current);
 
         if ($result === null) {
-            IMM_TG_Settings::update_state([
+            ETCF_Telegram_Settings::update_state([
                 'last_run'    => $now,
                 'last_result' => __('Nothing posted: no events in the coming days and nothing new.', 'event-toolkit-for-custom-fields'),
             ]);
         } elseif (is_wp_error($result)) {
-            IMM_TG_Settings::update_state([
+            ETCF_Telegram_Settings::update_state([
                 'last_run'    => $now,
                 /* translators: %s: error message */
                 'last_result' => sprintf(__('Error: %s', 'event-toolkit-for-custom-fields'), $result->get_error_message()),
             ]);
         } else {
-            IMM_TG_Settings::update_state([
+            ETCF_Telegram_Settings::update_state([
                 'last_run'    => $now,
                 'last_sent'   => $now,
                 'last_result' => __('Posted.', 'event-toolkit-for-custom-fields'),

@@ -11,12 +11,12 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_SO_Social
+class ETCF_Social
 {
-    const OPTION = 'imm_so_settings';
-    const STATE  = 'imm_so_state';
-    const WEEKLY = 'imm_so_weekly';
-    const TODAY  = 'imm_so_today';
+    const OPTION = 'etcf_so_settings';
+    const STATE  = 'etcf_so_state';
+    const WEEKLY = 'etcf_so_weekly';
+    const TODAY  = 'etcf_so_today';
 
     const MASTODON_LIMIT = 500;
     const BLUESKY_LIMIT  = 300;
@@ -134,8 +134,8 @@ class IMM_SO_Social
         add_action(self::WEEKLY, [self::class, 'run_weekly']);
         add_action(self::TODAY, [self::class, 'run_today']);
         add_action('init', [self::class, 'ensure_scheduled']);
-        add_action('imm_tk_status_notice', [self::class, 'status_notice'], 10, 2);
-        foreach ([self::OPTION, IMM_TK_Settings::OPTION] as $option) {
+        add_action('etcf_status_notice', [self::class, 'status_notice'], 10, 2);
+        foreach ([self::OPTION, ETCF_Settings::OPTION] as $option) {
             add_action('update_option_' . $option, [self::class, 'reschedule']);
             add_action('add_option_' . $option, [self::class, 'reschedule']);
         }
@@ -143,9 +143,9 @@ class IMM_SO_Social
 
     public static function ensure_scheduled(): void
     {
-        $active = IMM_TK_Settings::is_configured() && self::active_networks();
+        $active = ETCF_Settings::is_configured() && self::active_networks();
         $jobs   = [
-            self::WEEKLY => $active && self::get('weekly') ? IMM_TK_Digest::next_issue() : null,
+            self::WEEKLY => $active && self::get('weekly') ? ETCF_Digest::next_issue() : null,
             self::TODAY  => $active && self::get('today') ? self::next_today() : null,
         ];
         foreach ($jobs as $hook => $when) {
@@ -182,10 +182,10 @@ class IMM_SO_Social
     {
         wp_clear_scheduled_hook(self::WEEKLY);
         $now   = new DateTimeImmutable('now', wp_timezone());
-        $issue = IMM_TK_Digest::current_issue($now->modify('+1 minute'));
+        $issue = ETCF_Digest::current_issue($now->modify('+1 minute'));
         if (self::state()['weekly_sent'] !== $issue->format('Y-m-d')) {
             self::update_state(['weekly_sent' => $issue->format('Y-m-d')]);
-            self::post_weekly(IMM_TK_Digest::select($issue, $now));
+            self::post_weekly(ETCF_Digest::select($issue, $now));
         }
         self::ensure_scheduled();
     }
@@ -196,7 +196,7 @@ class IMM_SO_Social
         $now  = new DateTimeImmutable('now', wp_timezone());
         $date = $now->format('Y-m-d');
         // Not on the issue day: the weekly preview already lists today's events.
-        $issue_day = (int) $now->format('N') === (int) IMM_TK_Settings::get('digest_weekday');
+        $issue_day = (int) $now->format('N') === (int) ETCF_Settings::get('digest_weekday');
         if (!$issue_day && self::state()['today_sent'] !== $date) {
             self::update_state(['today_sent' => $date]);
             self::post_today($now);
@@ -214,11 +214,11 @@ class IMM_SO_Social
     public static function post_weekly(array $selection, ?array $networks = null): array
     {
         $networks = $networks ?? self::active_networks();
-        if (IMM_TK_Digest::is_empty($selection)) {
+        if (ETCF_Digest::is_empty($selection)) {
             return array_fill_keys($networks, null);
         }
-        $images = self::get('images') ? IMM_TK_Sharepic::week_frames($selection) : [];
-        $alt    = IMM_TK_Share::week_text($selection, true);
+        $images = self::get('images') ? ETCF_Sharepic::week_frames($selection) : [];
+        $alt    = ETCF_Share::week_text($selection, true);
         $out    = [];
         foreach ($networks as $network) {
             $text          = self::week_text($selection, $network === 'bluesky' ? self::BLUESKY_LIMIT : self::MASTODON_LIMIT, $network);
@@ -231,15 +231,15 @@ class IMM_SO_Social
     public static function post_today(DateTimeImmutable $now, ?array $networks = null): array
     {
         $networks = $networks ?? self::active_networks();
-        $events   = array_values(array_filter(IMM_TK_Share::events_on($now), function (IMM_TK_Event $e) use ($now) {
+        $events   = array_values(array_filter(ETCF_Share::events_on($now), function (ETCF_Event $e) use ($now) {
             return $e->end > $now && !$e->is_off();
         }));
         if (!$events) {
             return array_fill_keys($networks, null);
         }
-        $images = self::get('images') ? IMM_TK_Sharepic::day_frames($events, 'today') : [];
+        $images = self::get('images') ? ETCF_Sharepic::day_frames($events, 'today') : [];
         $alt    = implode("\n\n", array_map(function ($e) {
-            return IMM_TK_Share::event_text($e, 'today', true);
+            return ETCF_Share::event_text($e, 'today', true);
         }, $events));
         $out    = [];
         foreach ($networks as $network) {
@@ -249,8 +249,8 @@ class IMM_SO_Social
         return $out;
     }
 
-    /** Cancelled or postponed event (action from IMM_TK_Status). */
-    public static function status_notice(IMM_TK_Event $event, string $text): void
+    /** Cancelled or postponed event (action from ETCF_Status). */
+    public static function status_notice(ETCF_Event $event, string $text): void
     {
         if (!self::get('notify_status')) {
             return;
@@ -266,16 +266,16 @@ class IMM_SO_Social
     {
         $blocks = [];
         if ($selection['week']) {
-            $lines = [IMM_TK_Digest::heading_week()];
+            $lines = [ETCF_Digest::heading_week()];
             foreach ($selection['week'] as $e) {
-                $lines[] = self::short_when($e) . ' ' . IMM_TK_Digest::title($e);
+                $lines[] = self::short_when($e) . ' ' . ETCF_Digest::title($e);
             }
             $blocks[] = $lines;
         }
         if ($selection['new']) {
-            $lines = [IMM_TK_Digest::heading_new()];
+            $lines = [ETCF_Digest::heading_new()];
             foreach ($selection['new'] as $e) {
-                $lines[] = IMM_TK_Sharepic::short_date($e) . ' ' . IMM_TK_Digest::title($e);
+                $lines[] = ETCF_Sharepic::short_date($e) . ' ' . ETCF_Digest::title($e);
             }
             $blocks[] = $lines;
         }
@@ -283,23 +283,23 @@ class IMM_SO_Social
         foreach ($blocks as $lines) {
             $parts[] = implode("\n", $lines);
         }
-        return self::fit_text($parts, $limit, $network, IMM_TK_Digest::program_url());
+        return self::fit_text($parts, $limit, $network, ETCF_Digest::program_url());
     }
 
     public static function today_text(array $events, int $limit, string $network): string
     {
         $lines = [__('Today', 'event-toolkit-for-custom-fields')];
         foreach ($events as $e) {
-            $lines[] = IMM_TK_Sharepic::start_time($e) . ' ' . IMM_TK_Digest::title($e);
+            $lines[] = ETCF_Sharepic::start_time($e) . ' ' . ETCF_Digest::title($e);
         }
-        $link = count($events) === 1 ? $events[0]->url : IMM_TK_Digest::program_url();
+        $link = count($events) === 1 ? $events[0]->url : ETCF_Digest::program_url();
         return self::fit_text([implode("\n", $lines)], $limit, $network, $link);
     }
 
     /** "Thu, 10/29, 8:00 pm" */
-    private static function short_when(IMM_TK_Event $e): string
+    private static function short_when(ETCF_Event $e): string
     {
-        return IMM_TK_Sharepic::short_date($e) . ', ' . IMM_TK_Sharepic::start_time($e) . ':';
+        return ETCF_Sharepic::short_date($e) . ', ' . ETCF_Sharepic::start_time($e) . ':';
     }
 
     /**
@@ -362,7 +362,7 @@ class IMM_SO_Social
     {
         $files = [];
         foreach (array_slice($images, 0, 4) as $spec) {
-            $file = IMM_TK_Sharepic::file($spec);
+            $file = ETCF_Sharepic::file($spec);
             if (!is_wp_error($file)) {
                 $files[] = $file['path'];
             }
@@ -392,7 +392,7 @@ class IMM_SO_Social
         if ($code >= 300 || !is_array($body)) {
             $message = is_array($body) ? (string) ($body['error_description'] ?? $body['message'] ?? $body['error'] ?? '') : '';
             /* translators: 1: HTTP status code, 2: error message */
-            return new WP_Error('imm_so_http', trim(sprintf(__('HTTP %1$d %2$s', 'event-toolkit-for-custom-fields'), $code, $message)));
+            return new WP_Error('etcf_so_http', trim(sprintf(__('HTTP %1$d %2$s', 'event-toolkit-for-custom-fields'), $code, $message)));
         }
         return $body;
     }
@@ -497,7 +497,7 @@ class IMM_SO_Social
             $images[] = [
                 'alt'         => mb_substr($alt, 0, 1000),
                 'image'       => $blob['blob'],
-                'aspectRatio' => ['width' => IMM_TK_Sharepic::W, 'height' => IMM_TK_Sharepic::H],
+                'aspectRatio' => ['width' => ETCF_Sharepic::W, 'height' => ETCF_Sharepic::H],
             ];
         }
         if ($images) {

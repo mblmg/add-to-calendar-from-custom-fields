@@ -13,7 +13,7 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Sharepic
+class ETCF_Sharepic
 {
     const W      = 1080;
     const H      = 1920;
@@ -56,12 +56,12 @@ class IMM_TK_Sharepic
         return '';
     }
 
-    /** Font files: the website's fonts or a standard font of the server (see IMM_TK_Fonts). */
+    /** Font files: the website's fonts or a standard font of the server (see ETCF_Fonts). */
     public static function fonts(): array
     {
         static $fonts = null;
         if ($fonts === null) {
-            $fonts = IMM_TK_Fonts::files();
+            $fonts = ETCF_Fonts::files();
         }
         return $fonts;
     }
@@ -77,7 +77,7 @@ class IMM_TK_Sharepic
     {
         $frames = [];
         foreach (['week', 'new'] as $part) {
-            $ids    = array_map(function (IMM_TK_Event $e) {
+            $ids    = array_map(function (ETCF_Event $e) {
                 return $e->id;
             }, $selection[$part]);
             $chunks = array_chunk($ids, self::ROWS);
@@ -91,7 +91,7 @@ class IMM_TK_Sharepic
     /**
      * Frames announcing the events of one day: one frame per event, or a list if there are many.
      *
-     * @param IMM_TK_Event[] $events
+     * @param ETCF_Event[] $events
      * @param string         $variant 'today' or 'tomorrow'
      * @return array[] specs
      */
@@ -101,7 +101,7 @@ class IMM_TK_Sharepic
             return [];
         }
         if (count($events) > self::MAX_SINGLE) {
-            $ids    = array_map(function (IMM_TK_Event $e) {
+            $ids    = array_map(function (ETCF_Event $e) {
                 return $e->id;
             }, $events);
             $chunks = array_chunk($ids, self::ROWS);
@@ -111,7 +111,7 @@ class IMM_TK_Sharepic
             }
             return $frames;
         }
-        return array_map(function (IMM_TK_Event $e) use ($variant) {
+        return array_map(function (ETCF_Event $e) use ($variant) {
             return ['type' => 'event', 'variant' => $variant, 'id' => $e->id];
         }, $events);
     }
@@ -144,14 +144,14 @@ class IMM_TK_Sharepic
     {
         $spec = self::clean_spec($spec);
         if (!$spec) {
-            return new WP_Error('imm_tk_sharepic_spec', __('Unknown image.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('etcf_sharepic_spec', __('Unknown image.', 'event-toolkit-for-custom-fields'));
         }
         if (!self::available()) {
-            return new WP_Error('imm_tk_sharepic_gd', self::problem());
+            return new WP_Error('etcf_sharepic_gd', self::problem());
         }
         $events = self::events($spec);
         if (!$events) {
-            return new WP_Error('imm_tk_sharepic_event', __('The event was not found or has no valid date.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('etcf_sharepic_event', __('The event was not found or has no valid date.', 'event-toolkit-for-custom-fields'));
         }
 
         $uploads = wp_upload_dir();
@@ -162,26 +162,26 @@ class IMM_TK_Sharepic
 
         if (!file_exists($path)) {
             if (!wp_mkdir_p($dir)) {
-                return new WP_Error('imm_tk_sharepic_dir', __('The uploads folder is not writable.', 'event-toolkit-for-custom-fields'));
+                return new WP_Error('etcf_sharepic_dir', __('The uploads folder is not writable.', 'event-toolkit-for-custom-fields'));
             }
             $image = $spec['type'] === 'event' ? self::render_event($events[0], $spec['variant']) : self::render_list($events, $spec);
             $ok    = imagejpeg($image, $path, 88);
             imagedestroy($image);
             if (!$ok) {
-                return new WP_Error('imm_tk_sharepic_write', __('The image could not be saved.', 'event-toolkit-for-custom-fields'));
+                return new WP_Error('etcf_sharepic_write', __('The image could not be saved.', 'event-toolkit-for-custom-fields'));
             }
             self::cleanup($dir);
         }
         return ['path' => $path, 'url' => $url];
     }
 
-    /** @return IMM_TK_Event[] */
+    /** @return ETCF_Event[] */
     private static function events(array $spec): array
     {
         $ids    = $spec['type'] === 'event' ? [$spec['id']] : $spec['ids'];
         $events = [];
         foreach ($ids as $id) {
-            $event = IMM_TK_Event::from_post($id);
+            $event = ETCF_Event::from_post($id);
             if ($event) {
                 $events[] = $event;
             }
@@ -192,7 +192,7 @@ class IMM_TK_Sharepic
     /** Everything the image depends on. */
     private static function fingerprint(array $spec, array $events): string
     {
-        $data = [$spec, IMM_TK_VERSION, self::DESIGN, self::style(), array_map('basename', self::fonts()), get_locale(), get_option('time_format')];
+        $data = [$spec, ETCF_VERSION, self::DESIGN, self::style(), array_map('basename', self::fonts()), get_locale(), get_option('time_format')];
         foreach ($events as $e) {
             $data[] = [$e->id, $e->title, $e->status, $e->start->format('c'), $e->main_start->format('c'), $e->doors ? $e->doors->format('c') : '', $e->location, get_post_thumbnail_id($e->id), $e->modified->format('c')];
         }
@@ -202,10 +202,10 @@ class IMM_TK_Sharepic
     /** Deletes images older than three weeks. Runs at most once a day. */
     private static function cleanup(string $dir): void
     {
-        if (get_transient('imm_tk_sharepic_cleanup')) {
+        if (get_transient('etcf_sharepic_cleanup')) {
             return;
         }
-        set_transient('imm_tk_sharepic_cleanup', 1, DAY_IN_SECONDS);
+        set_transient('etcf_sharepic_cleanup', 1, DAY_IN_SECONDS);
         foreach ((array) glob($dir . '/*.jpg') as $file) {
             if ($file && filemtime($file) < time() - 21 * DAY_IN_SECONDS) {
                 wp_delete_file($file);
@@ -218,14 +218,14 @@ class IMM_TK_Sharepic
     /** Colours and footer text from the settings. */
     public static function style(): array
     {
-        $footer = trim((string) IMM_TK_Settings::get('sharepic_footer'));
+        $footer = trim((string) ETCF_Settings::get('sharepic_footer'));
         if ($footer === '') {
-            $footer = preg_replace('#^https?://(www\.)?#', '', untrailingslashit(IMM_TK_Digest::program_url()));
+            $footer = preg_replace('#^https?://(www\.)?#', '', untrailingslashit(ETCF_Digest::program_url()));
         }
         return [
-            'paper'  => (string) IMM_TK_Settings::get('sharepic_paper'),
-            'ink'    => (string) IMM_TK_Settings::get('sharepic_ink'),
-            'accent' => (string) IMM_TK_Settings::get('sharepic_accent'),
+            'paper'  => (string) ETCF_Settings::get('sharepic_paper'),
+            'ink'    => (string) ETCF_Settings::get('sharepic_ink'),
+            'accent' => (string) ETCF_Settings::get('sharepic_accent'),
             'footer' => $footer,
         ];
     }
@@ -415,21 +415,21 @@ class IMM_TK_Sharepic
     }
 
     /** "Wednesday, October 29" */
-    public static function long_date(IMM_TK_Event $e): string
+    public static function long_date(ETCF_Event $e): string
     {
         /* translators: long date on story images, see https://www.php.net/manual/datetime.format.php */
         return wp_date(__('l, F j', 'event-toolkit-for-custom-fields'), $e->start->getTimestamp(), $e->start->getTimezone());
     }
 
     /** "Wed, 10/29" */
-    public static function short_date(IMM_TK_Event $e): string
+    public static function short_date(ETCF_Event $e): string
     {
         /* translators: short date on story images, see https://www.php.net/manual/datetime.format.php */
         return wp_date(__('D, n/j', 'event-toolkit-for-custom-fields'), $e->start->getTimestamp(), $e->start->getTimezone());
     }
 
     /** Start of the programme only, e.g. "7:30 pm". */
-    public static function start_time(IMM_TK_Event $e): string
+    public static function start_time(ETCF_Event $e): string
     {
         if ($e->all_day) {
             return __('all day', 'event-toolkit-for-custom-fields');
@@ -440,9 +440,9 @@ class IMM_TK_Sharepic
     }
 
     /** Venue name, including the default venue (a single event should say where it is). */
-    public static function venue_name(IMM_TK_Event $e): string
+    public static function venue_name(ETCF_Event $e): string
     {
-        return (string) ($e->location_parts[0] ?? IMM_TK_Settings::get('venue_name'));
+        return (string) ($e->location_parts[0] ?? ETCF_Settings::get('venue_name'));
     }
 
     /* ------------------------------------------------------------ images */
@@ -490,7 +490,7 @@ class IMM_TK_Sharepic
      * @param callable $caption function ($im, int $scale, int $x, int $y, int $width, array $palette) draws into the strip.
      * @return resource|GdImage
      */
-    private static function polaroid(IMM_TK_Event $event, int $photo, int $frame, int $strip, float $angle, array $p, callable $caption)
+    private static function polaroid(ETCF_Event $event, int $photo, int $frame, int $strip, float $angle, array $p, callable $caption)
     {
         $s  = 2;
         $w  = ($photo + 2 * $frame) * $s;
@@ -590,7 +590,7 @@ class IMM_TK_Sharepic
      *
      * @return resource|GdImage
      */
-    public static function render_event(IMM_TK_Event $e, string $variant)
+    public static function render_event(ETCF_Event $e, string $variant)
     {
         $today = $variant === 'today';
         $p     = self::palette($today);
@@ -610,14 +610,14 @@ class IMM_TK_Sharepic
 
         // When: today and with the date as big word only the time, tomorrow day and time.
         if ($e->is_off()) {
-            $when = self::long_date($e) . ', ' . IMM_TK_Digest::time($e);
+            $when = self::long_date($e) . ', ' . ETCF_Digest::time($e);
         } elseif ($today) {
-            $when = IMM_TK_Digest::time($e);
+            $when = ETCF_Digest::time($e);
         } elseif ($dated) {
             // The big word already shows weekday and date.
-            $when = IMM_TK_Digest::time($e);
+            $when = ETCF_Digest::time($e);
         } else {
-            $when = self::long_date($e) . ', ' . IMM_TK_Digest::time($e);
+            $when = self::long_date($e) . ', ' . ETCF_Digest::time($e);
         }
         [$px, $lines] = self::fit_short($f['text'], $when, $width, 42, 34, 30);
         $y = self::lines($im, $f['text'], $px, 1.3, self::MARGIN, $y + 18, $p['fg'], $lines);
@@ -625,7 +625,7 @@ class IMM_TK_Sharepic
         // Caption on the polaroid strip: the title.
         $frame = 30;
         // The big word already says "Cancelled", so the caption keeps the plain title.
-        $title = $e->is_off() ? str_replace("\u{00AD}", '', $e->title) : IMM_TK_Digest::title($e);
+        $title = $e->is_off() ? str_replace("\u{00AD}", '', $e->title) : ETCF_Digest::title($e);
         $venue = self::venue_name($e);
 
         // Space left for the polaroid: down to the venue line above the footer.
@@ -663,7 +663,7 @@ class IMM_TK_Sharepic
     /**
      * A list of events: the week, the new events, or many events on one day.
      *
-     * @param IMM_TK_Event[] $events
+     * @param ETCF_Event[] $events
      * @return resource|GdImage
      */
     public static function render_list(array $events, array $spec)
@@ -680,7 +680,7 @@ class IMM_TK_Sharepic
             [$dpx, $dlines] = self::fit_short($f['text'], self::long_date($events[0]), $width, 42, 34, 30);
             $y = self::lines($im, $f['text'], $dpx, 1.3, self::MARGIN, $y + 18, $p['fg'], $dlines);
         } else {
-            $heading = $variant === 'week' ? IMM_TK_Digest::heading_week() : IMM_TK_Digest::heading_new();
+            $heading = $variant === 'week' ? ETCF_Digest::heading_week() : ETCF_Digest::heading_new();
             [$hpx, $hlines] = self::fit($f['display'], $heading, $width, 104, 64, 3);
             $y = self::lines($im, $f['display'], $hpx, 1.02, self::MARGIN - 4, self::TOP, $p['fg'], $hlines);
         }
@@ -704,9 +704,9 @@ class IMM_TK_Sharepic
             $ph = imagesy($pol);
             imagedestroy($pol);
 
-            $when  = $day ? IMM_TK_Digest::time($e) : self::short_date($e) . ', ' . self::start_time($e);
+            $when  = $day ? ETCF_Digest::time($e) : self::short_date($e) . ', ' . self::start_time($e);
             [$wpx, $wlines] = self::fit($f['text'], $when, $text_w, 32 + 4 * $grow, 24, 2);
-            [$tpx, $tlines] = self::fit($f['display'], IMM_TK_Digest::title($e), $text_w, 50 + 10 * $grow, 36, 3);
+            [$tpx, $tlines] = self::fit($f['display'], ETCF_Digest::title($e), $text_w, 50 + 10 * $grow, 36, 3);
             $block = (int) round($wpx * 1.4) * count($wlines) + (int) round($tpx * 1.08) * count($tlines);
             $ty    = $y + (int) max(0, ($ph - $block) / 2) - 6;
             $ty    = self::lines($im, $f['text'], $wpx, 1.4, $text_x, $ty, $p['muted'], $wlines);

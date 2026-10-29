@@ -5,7 +5,7 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Links
+class ETCF_Links
 {
     /** Link types with their labels. */
     public static function types(): array
@@ -35,7 +35,7 @@ class IMM_TK_Links
                 return 'https://calendar.google.com/calendar/render?cid=' . rawurlencode(preg_replace('#^https?://#', 'webcal://', self::feed_url()));
         }
 
-        $event = IMM_TK_Event::from_post($post ?: self::current_post_id());
+        $event = ETCF_Event::from_post($post ?: self::current_post_id());
         if (!$event) {
             return '';
         }
@@ -51,7 +51,7 @@ class IMM_TK_Links
                 return self::outlook($event, 'https://outlook.office.com/calendar/0/action/compose');
             case 'qr_svg':
             case 'qr_png':
-                $file = IMM_TK_QR::file($event->id, $type === 'qr_png' ? 'png' : 'svg');
+                $file = ETCF_QR::file($event->id, $type === 'qr_png' ? 'png' : 'svg');
                 return is_wp_error($file) ? '' : $file['url'];
         }
         return '';
@@ -68,28 +68,28 @@ class IMM_TK_Links
 
     public static function feed_url(): string
     {
-        $base = IMM_TK_Settings::get('base_path');
-        $slug = IMM_TK_Settings::get('feed_slug');
+        $base = ETCF_Settings::get('base_path');
+        $slug = ETCF_Settings::get('feed_slug');
         if (get_option('permalink_structure')) {
             return home_url('/' . $base . '/' . $slug . '.ics');
         }
-        return add_query_arg('imm_tk_feed', '1', home_url('/'));
+        return add_query_arg('etcf_feed', '1', home_url('/'));
     }
 
     public static function event_ics_url(int $post_id): string
     {
         if (get_option('permalink_structure')) {
-            return home_url('/' . IMM_TK_Settings::get('base_path') . '/event-' . $post_id . '.ics');
+            return home_url('/' . ETCF_Settings::get('base_path') . '/event-' . $post_id . '.ics');
         }
-        return add_query_arg('imm_tk_event', $post_id, home_url('/'));
+        return add_query_arg('etcf_event', $post_id, home_url('/'));
     }
 
-    private static function google(IMM_TK_Event $event): string
+    private static function google(ETCF_Event $event): string
     {
         if ($event->all_day) {
             $dates = $event->start->format('Ymd') . '/' . $event->end->format('Ymd');
         } else {
-            $dates = IMM_TK_ICS::utc($event->start) . '/' . IMM_TK_ICS::utc($event->end);
+            $dates = ETCF_ICS::utc($event->start) . '/' . ETCF_ICS::utc($event->end);
         }
         return add_query_arg(array_map('rawurlencode', [
             'action'   => 'TEMPLATE',
@@ -101,7 +101,7 @@ class IMM_TK_Links
         ]), 'https://calendar.google.com/calendar/render');
     }
 
-    private static function outlook(IMM_TK_Event $event, string $base): string
+    private static function outlook(ETCF_Event $event, string $base): string
     {
         if ($event->all_day) {
             $start = $event->start->format('Y-m-d');

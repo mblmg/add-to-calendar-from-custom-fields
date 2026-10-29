@@ -11,7 +11,7 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Digest
+class ETCF_Digest
 {
     /** Latest scheduled issue time at or before $now. */
     public static function current_issue(?DateTimeImmutable $now = null): DateTimeImmutable
@@ -25,8 +25,8 @@ class IMM_TK_Digest
     public static function next_issue(?DateTimeImmutable $now = null): DateTimeImmutable
     {
         $now = $now ?? new DateTimeImmutable('now', wp_timezone());
-        [$hour, $minute] = array_map('intval', explode(':', (string) IMM_TK_Settings::get('digest_time')));
-        $weekday = (int) IMM_TK_Settings::get('digest_weekday');
+        [$hour, $minute] = array_map('intval', explode(':', (string) ETCF_Settings::get('digest_time')));
+        $weekday = (int) ETCF_Settings::get('digest_weekday');
 
         $run  = $now->setTime($hour, $minute);
         $diff = ($weekday - (int) $run->format('N') + 7) % 7;
@@ -42,21 +42,21 @@ class IMM_TK_Digest
      *
      * @param DateTimeImmutable      $issue Issue time.
      * @param DateTimeImmutable|null $now   Leave out events that are over at this time (default: the issue time).
-     * @return array{week: IMM_TK_Event[], new: IMM_TK_Event[]}
+     * @return array{week: ETCF_Event[], new: ETCF_Event[]}
      */
     public static function select(DateTimeImmutable $issue, ?DateTimeImmutable $now = null): array
     {
-        if (!IMM_TK_Settings::is_configured()) {
+        if (!ETCF_Settings::is_configured()) {
             return ['week' => [], 'new' => []];
         }
         $from      = $now ?? $issue;
-        $until     = $issue->setTime(0, 0)->modify('+' . (int) IMM_TK_Settings::get('digest_days_ahead') . ' days');
+        $until     = $issue->setTime(0, 0)->modify('+' . (int) ETCF_Settings::get('digest_days_ahead') . ' days');
         $new_since = $issue->modify('-7 days')->getTimestamp();
         $new_until = $issue->getTimestamp();
 
         $week = [];
         $new  = [];
-        foreach (IMM_TK_Endpoints::feed_events() as $event) {
+        foreach (ETCF_Endpoints::feed_events() as $event) {
             if ($event->end <= $from) {
                 continue; // Over.
             }
@@ -64,7 +64,7 @@ class IMM_TK_Digest
                 $week[] = $event;
                 continue;
             }
-            if (IMM_TK_Settings::get('digest_include_new')) {
+            if (ETCF_Settings::get('digest_include_new')) {
                 $published = (int) get_post_time('U', true, $event->id);
                 if ($published > $new_since && $published <= $new_until) {
                     $new[] = $event;
@@ -72,13 +72,13 @@ class IMM_TK_Digest
             }
         }
 
-        $sort = function (IMM_TK_Event $a, IMM_TK_Event $b) {
+        $sort = function (ETCF_Event $a, ETCF_Event $b) {
             return $a->start <=> $b->start;
         };
         usort($week, $sort);
         usort($new, $sort);
 
-        return apply_filters('imm_tk_digest_events', ['week' => $week, 'new' => $new], $issue);
+        return apply_filters('etcf_digest_events', ['week' => $week, 'new' => $new], $issue);
     }
 
     public static function is_empty(array $selection): bool
@@ -100,19 +100,19 @@ class IMM_TK_Digest
     }
 
     /** The event whose image leads the digest: the next event, else the first new one. */
-    public static function lead_event(array $selection): ?IMM_TK_Event
+    public static function lead_event(array $selection): ?ETCF_Event
     {
         return $selection['week'][0] ?? $selection['new'][0] ?? null;
     }
 
     public static function heading_week(): string
     {
-        return (string) IMM_TK_Settings::get('digest_heading_week') ?: __('This week', 'event-toolkit-for-custom-fields');
+        return (string) ETCF_Settings::get('digest_heading_week') ?: __('This week', 'event-toolkit-for-custom-fields');
     }
 
     public static function heading_new(): string
     {
-        return (string) IMM_TK_Settings::get('digest_heading_new') ?: __('New in the programme', 'event-toolkit-for-custom-fields');
+        return (string) ETCF_Settings::get('digest_heading_new') ?: __('New in the programme', 'event-toolkit-for-custom-fields');
     }
 
     /** Title of an issue, e.g. "Weekly preview, November 2". */
@@ -124,14 +124,14 @@ class IMM_TK_Digest
         return sprintf(__('Weekly preview, %s', 'event-toolkit-for-custom-fields'), $date);
     }
 
-    public static function date(IMM_TK_Event $event): string
+    public static function date(ETCF_Event $event): string
     {
         /* translators: date format for the event date in the weekly preview, see https://www.php.net/manual/datetime.format.php */
         $format = __('D, F j', 'event-toolkit-for-custom-fields');
         return wp_date($format, $event->start->getTimestamp(), $event->start->getTimezone());
     }
 
-    public static function time(IMM_TK_Event $event): string
+    public static function time(ETCF_Event $event): string
     {
         if ($event->all_day) {
             return __('all day', 'event-toolkit-for-custom-fields');
@@ -152,17 +152,17 @@ class IMM_TK_Digest
     }
 
     /** Venue name, unless it is the default venue (no need to repeat it every week). */
-    public static function venue(IMM_TK_Event $event): string
+    public static function venue(ETCF_Event $event): string
     {
         $venue = $event->location_parts[0] ?? '';
-        if ($venue === '' || $venue === (string) IMM_TK_Settings::get('venue_name')) {
+        if ($venue === '' || $venue === (string) ETCF_Settings::get('venue_name')) {
             return '';
         }
         return $venue;
     }
 
     /** Title without soft hyphens (they help on the website, but are noise elsewhere). */
-    public static function title(IMM_TK_Event $event): string
+    public static function title(ETCF_Event $event): string
     {
         $title = str_replace("\u{00AD}", '', $event->title);
         $label = $event->status_label();
@@ -172,7 +172,7 @@ class IMM_TK_Digest
 
     public static function program_url(): string
     {
-        return (string) IMM_TK_Settings::get('digest_program_url') ?: home_url('/');
+        return (string) ETCF_Settings::get('digest_program_url') ?: home_url('/');
     }
 
     /** Text for the closing line, with %s for the programme link. */
@@ -189,7 +189,7 @@ class IMM_TK_Digest
     public static function email_html(array $selection): string
     {
         $out   = [];
-        $intro = trim((string) IMM_TK_Settings::get('digest_intro'));
+        $intro = trim((string) ETCF_Settings::get('digest_intro'));
         if ($intro !== '') {
             $out[] = wpautop(esc_html($intro));
         }
@@ -222,6 +222,6 @@ class IMM_TK_Digest
         $label = preg_replace('#^https?://(www\.)?#', '', untrailingslashit($url));
         $out[] = '<p>' . sprintf(esc_html(self::footer_text()), '<a href="' . esc_url($url) . '">' . esc_html($label) . '</a>') . '</p>';
 
-        return (string) apply_filters('imm_tk_digest_email_html', implode("\n", $out), $selection);
+        return (string) apply_filters('etcf_digest_email_html', implode("\n", $out), $selection);
     }
 }

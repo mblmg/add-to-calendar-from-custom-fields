@@ -1,27 +1,24 @@
 <?php
 /**
  * Shortcode for sites without Breakdance:
- *   [imm_calendar_link type="ics"]                                  -> URL only
- *   [imm_calendar_link type="google" text="Open in Google Calendar"] -> complete link
- *
- * [imm_kalender_link typ="…"] is kept as an alias for sites that used version 1.0 under its earlier name.
+ *   [etcf_calendar_link type="ics"]                                  -> URL only
+ *   [etcf_calendar_link type="google" text="Open in Google Calendar"] -> complete link
  */
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Shortcode
+class ETCF_Shortcode
 {
     public static function init(): void
     {
-        add_shortcode('imm_calendar_link', [self::class, 'render']);
-        add_shortcode('imm_kalender_link', [self::class, 'render']);
+        add_shortcode('etcf_calendar_link', [self::class, 'render']);
     }
 
     public static function render($atts): string
     {
-        $atts = shortcode_atts(['type' => '', 'typ' => '', 'text' => '', 'class' => '', 'id' => 0], $atts);
-        $type = sanitize_key($atts['type'] !== '' ? $atts['type'] : ($atts['typ'] !== '' ? $atts['typ'] : 'ics'));
-        $url  = IMM_TK_Links::get($type, absint($atts['id']) ?: null);
+        $atts = shortcode_atts(['type' => 'ics', 'text' => '', 'class' => '', 'id' => 0], $atts);
+        $type = sanitize_key($atts['type']);
+        $url  = ETCF_Links::get($type, absint($atts['id']) ?: null);
         if ($url === '') {
             return '';
         }

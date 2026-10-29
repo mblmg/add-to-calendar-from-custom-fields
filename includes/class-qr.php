@@ -9,7 +9,7 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_QR
+class ETCF_QR
 {
     const DIR = 'event-toolkit/qr';
 
@@ -107,9 +107,9 @@ class IMM_TK_QR
     }
 
     /** Text the QR code of an event points to: the event page. */
-    public static function event_target(IMM_TK_Event $event): string
+    public static function event_target(ETCF_Event $event): string
     {
-        return (string) apply_filters('imm_tk_qr_url', $event->url, $event);
+        return (string) apply_filters('etcf_qr_url', $event->url, $event);
     }
 
     /**
@@ -120,23 +120,23 @@ class IMM_TK_QR
      */
     public static function file(int $post_id, string $format = 'svg')
     {
-        $event = IMM_TK_Event::from_post($post_id);
+        $event = ETCF_Event::from_post($post_id);
         if (!$event) {
-            return new WP_Error('imm_tk_qr_event', __('The event was not found or has no valid date.', 'event-toolkit-for-custom-fields'));
+            return new WP_Error('etcf_qr_event', __('The event was not found or has no valid date.', 'event-toolkit-for-custom-fields'));
         }
         $format  = $format === 'png' ? 'png' : 'svg';
         $target  = self::event_target($event);
         $uploads = wp_upload_dir();
         $dir     = trailingslashit($uploads['basedir']) . self::DIR;
-        $name    = 'event-' . $event->id . '-' . substr(md5($target . IMM_TK_VERSION), 0, 10) . '.' . $format;
+        $name    = 'event-' . $event->id . '-' . substr(md5($target . ETCF_VERSION), 0, 10) . '.' . $format;
         $path    = $dir . '/' . $name;
         if (!file_exists($path)) {
             if (!wp_mkdir_p($dir)) {
-                return new WP_Error('imm_tk_qr_dir', __('The uploads folder is not writable.', 'event-toolkit-for-custom-fields'));
+                return new WP_Error('etcf_qr_dir', __('The uploads folder is not writable.', 'event-toolkit-for-custom-fields'));
             }
             $data = $format === 'png' ? self::png($target) : self::svg($target);
             if ($data === null || file_put_contents($path, $data) === false) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- cache in uploads.
-                return new WP_Error('imm_tk_qr_write', __('The QR code could not be saved.', 'event-toolkit-for-custom-fields'));
+                return new WP_Error('etcf_qr_write', __('The QR code could not be saved.', 'event-toolkit-for-custom-fields'));
             }
         }
         return ['path' => $path, 'url' => trailingslashit($uploads['baseurl']) . self::DIR . '/' . $name];

@@ -1,15 +1,15 @@
 <?php
 /**
  * Telegram settings and state. Schedule and content of the weekly preview are core
- * settings (IMM_TK_Settings, "digest_*"), shared with the newsletter feed.
+ * settings (ETCF_Settings, "digest_*"), shared with the newsletter feed.
  */
 
 defined('ABSPATH') || exit;
 
-class IMM_TG_Settings
+class ETCF_Telegram_Settings
 {
-    const OPTION = 'imm_tg_settings';
-    const STATE  = 'imm_tg_state';
+    const OPTION = 'etcf_tg_settings';
+    const STATE  = 'etcf_tg_state';
 
     public static function defaults(): array
     {

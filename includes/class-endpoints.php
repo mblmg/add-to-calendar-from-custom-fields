@@ -7,7 +7,7 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Endpoints
+class ETCF_Endpoints
 {
     public static function init(): void
     {
@@ -16,14 +16,14 @@ class IMM_TK_Endpoints
         }
         add_action('init', [self::class, 'add_rewrite_rules']);
         add_filter('query_vars', function ($vars) {
-            $vars[] = 'imm_tk_event';
-            $vars[] = 'imm_tk_feed';
-            $vars[] = 'imm_tk_digest';
+            $vars[] = 'etcf_event';
+            $vars[] = 'etcf_feed';
+            $vars[] = 'etcf_digest';
             return $vars;
         });
         add_action('template_redirect', [self::class, 'serve'], 0);
         add_filter('redirect_canonical', function ($redirect) {
-            return (get_query_var('imm_tk_event') || get_query_var('imm_tk_feed') || get_query_var('imm_tk_digest')) ? false : $redirect;
+            return (get_query_var('etcf_event') || get_query_var('etcf_feed') || get_query_var('etcf_digest')) ? false : $redirect;
         });
         // Rebuild the rewrite rules if ours are missing, e.g. after an update or after another
         // plugin rebuilt them without ours (such as the predecessor plugins on deactivation).
@@ -36,7 +36,7 @@ class IMM_TK_Endpoints
             return;
         }
         $rules = get_option('rewrite_rules');
-        $key   = '^' . preg_quote(IMM_TK_Settings::get('base_path'), '#') . '/' . preg_quote(IMM_TK_Settings::get('digest_feed_slug'), '#') . '\\.xml$';
+        $key   = '^' . preg_quote(ETCF_Settings::get('base_path'), '#') . '/' . preg_quote(ETCF_Settings::get('digest_feed_slug'), '#') . '\\.xml$';
         if (is_array($rules) && !isset($rules[$key])) {
             flush_rewrite_rules(false);
         }
@@ -44,32 +44,32 @@ class IMM_TK_Endpoints
 
     public static function add_rewrite_rules(): void
     {
-        $base = preg_quote(IMM_TK_Settings::get('base_path'), '#');
-        $feed = preg_quote(IMM_TK_Settings::get('feed_slug'), '#');
-        add_rewrite_rule('^' . $base . '/event-([0-9]+)\.ics$', 'index.php?imm_tk_event=$matches[1]', 'top');
-        add_rewrite_rule('^' . $base . '/' . $feed . '\.ics$', 'index.php?imm_tk_feed=1', 'top');
-        $digest = preg_quote(IMM_TK_Settings::get('digest_feed_slug'), '#');
-        add_rewrite_rule('^' . $base . '/' . $digest . '\.xml$', 'index.php?imm_tk_digest=1', 'top');
+        $base = preg_quote(ETCF_Settings::get('base_path'), '#');
+        $feed = preg_quote(ETCF_Settings::get('feed_slug'), '#');
+        add_rewrite_rule('^' . $base . '/event-([0-9]+)\.ics$', 'index.php?etcf_event=$matches[1]', 'top');
+        add_rewrite_rule('^' . $base . '/' . $feed . '\.ics$', 'index.php?etcf_feed=1', 'top');
+        $digest = preg_quote(ETCF_Settings::get('digest_feed_slug'), '#');
+        add_rewrite_rule('^' . $base . '/' . $digest . '\.xml$', 'index.php?etcf_digest=1', 'top');
     }
 
     public static function serve(): void
     {
-        if (get_query_var('imm_tk_digest')) {
-            IMM_TK_Digest_Feed::serve();
+        if (get_query_var('etcf_digest')) {
+            ETCF_Digest_Feed::serve();
         }
-        $event_id = absint(get_query_var('imm_tk_event'));
-        $is_feed  = (bool) get_query_var('imm_tk_feed');
+        $event_id = absint(get_query_var('etcf_event'));
+        $is_feed  = (bool) get_query_var('etcf_feed');
         if (!$event_id && !$is_feed) {
             return;
         }
 
         // Keep page cache plugins from freezing the calendar data.
         if (!defined('DONOTCACHEPAGE')) {
-            define('DONOTCACHEPAGE', true);
+            define('DONOTCACHEPAGE', true); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- convention of caching plugins.
         }
 
         if ($event_id) {
-            $event = IMM_TK_Event::from_post($event_id);
+            $event = ETCF_Event::from_post($event_id);
             if (!$event) {
                 status_header(404);
                 nocache_headers();
@@ -80,7 +80,7 @@ class IMM_TK_Endpoints
             $filename = sanitize_file_name(sanitize_title($event->title) . '.ics');
         } else {
             $events   = self::feed_events();
-            $filename = IMM_TK_Settings::get('feed_slug') . '.ics';
+            $filename = ETCF_Settings::get('feed_slug') . '.ics';
         }
 
         status_header(200);
@@ -88,11 +88,11 @@ class IMM_TK_Endpoints
         header('Content-Disposition: ' . ($is_feed ? 'inline' : 'attachment') . '; filename="' . $filename . '"');
         header('Cache-Control: public, max-age=900');
         header('X-Robots-Tag: noindex');
-        echo IMM_TK_ICS::calendar($events, $is_feed); // phpcs:ignore WordPress.Security.EscapeOutput
+        echo ETCF_ICS::calendar($events, $is_feed); // phpcs:ignore WordPress.Security.EscapeOutput
         exit;
     }
 
-    /** @return IMM_TK_Event[] */
+    /** @return ETCF_Event[] */
     /** Events of this request, by settings; emptied when a post or its fields change. */
     private static $cache = [];
 
@@ -103,20 +103,20 @@ class IMM_TK_Endpoints
 
     public static function feed_events(): array
     {
-        if (!IMM_TK_Settings::is_configured()) {
+        if (!ETCF_Settings::is_configured()) {
             return [];
         }
-        $key = md5((string) wp_json_encode(IMM_TK_Settings::all()));
+        $key = md5((string) wp_json_encode(ETCF_Settings::all()));
         if (isset(self::$cache[$key])) {
             return self::$cache[$key];
         }
-        $date_key = IMM_TK_Settings::key_list('date_key')[0];
+        $date_key = ETCF_Settings::key_list('date_key')[0];
         $since    = (new DateTimeImmutable('today', wp_timezone()))
-            ->modify('-' . (int) IMM_TK_Settings::get('feed_past_days') . ' days')
+            ->modify('-' . (int) ETCF_Settings::get('feed_past_days') . ' days')
             ->format('Y-m-d');
 
-        $query = new WP_Query(apply_filters('imm_tk_feed_query_args', [
-            'post_type'      => IMM_TK_Settings::get('post_type'),
+        $query = new WP_Query(apply_filters('etcf_feed_query_args', [
+            'post_type'      => ETCF_Settings::get('post_type'),
             'post_status'    => 'publish',
             'posts_per_page' => 300,
             'no_found_rows'  => true,
@@ -133,7 +133,7 @@ class IMM_TK_Endpoints
 
         $events = [];
         foreach ($query->posts as $post) {
-            $event = IMM_TK_Event::from_post($post);
+            $event = ETCF_Event::from_post($post);
             if ($event) {
                 $events[] = $event;
             }

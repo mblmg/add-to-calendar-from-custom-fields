@@ -16,7 +16,7 @@
 
 defined('ABSPATH') || exit;
 
-class IMM_TK_Fonts
+class ETCF_Fonts
 {
     const DIR = 'event-toolkit/fonts';
 
@@ -28,9 +28,9 @@ class IMM_TK_Fonts
     public static function files(): array
     {
         $files = self::standard();
-        if (IMM_TK_Settings::get('sharepic_fonts') === 'site') {
+        if (ETCF_Settings::get('sharepic_fonts') === 'site') {
             $families = self::families();
-            $weight   = (int) IMM_TK_Settings::get('sharepic_heading_weight') ?: self::heading_weight();
+            $weight   = (int) ETCF_Settings::get('sharepic_heading_weight') ?: self::heading_weight();
             $wanted   = [
                 'display' => [$families['heading'], $weight],
                 'text'    => [$families['text'], 400],
@@ -43,7 +43,7 @@ class IMM_TK_Fonts
                 }
             }
         }
-        return (array) apply_filters('imm_tk_sharepic_fonts', $files);
+        return (array) apply_filters('etcf_sharepic_fonts', $files);
     }
 
     /**
@@ -70,7 +70,7 @@ class IMM_TK_Fonts
             [$system, 'Arial.ttf', 'Arial Bold.ttf'],
             [$system, 'arial.ttf', 'arialbd.ttf'],
         ];
-        foreach ((array) apply_filters('imm_tk_standard_font_candidates', $candidates) as [$dirs, $regular, $bold]) {
+        foreach ((array) apply_filters('etcf_standard_font_candidates', $candidates) as [$dirs, $regular, $bold]) {
             foreach ($dirs as $dir) {
                 $r = self::find($dir, $regular);
                 $b = $r !== '' ? self::find($dir, $bold) : '';
@@ -128,8 +128,8 @@ class IMM_TK_Fonts
     public static function families(): array
     {
         $detected = self::detect();
-        $heading  = trim((string) IMM_TK_Settings::get('sharepic_heading_font'));
-        $text     = trim((string) IMM_TK_Settings::get('sharepic_text_font'));
+        $heading  = trim((string) ETCF_Settings::get('sharepic_heading_font'));
+        $text     = trim((string) ETCF_Settings::get('sharepic_text_font'));
         return [
             'heading' => $heading !== '' ? $heading : $detected['heading'],
             'text'    => $text !== '' ? $text : $detected['text'],
@@ -158,7 +158,7 @@ class IMM_TK_Fonts
             $value  = (string) wp_get_global_styles(['elements', 'heading', 'typography', 'fontWeight']);
             $weight = ctype_digit($value) ? (int) $value : 0;
         }
-        $weight = (int) apply_filters('imm_tk_site_heading_weight', $weight);
+        $weight = (int) apply_filters('etcf_site_heading_weight', $weight);
         return $weight >= 100 && $weight <= 900 ? (int) (round($weight / 100) * 100) : 700;
     }
 
@@ -195,7 +195,7 @@ class IMM_TK_Fonts
         if ($found['heading'] === '') {
             $found['heading'] = $found['text'];
         }
-        return (array) apply_filters('imm_tk_site_fonts', $found);
+        return (array) apply_filters('etcf_site_fonts', $found);
     }
 
     /** First family of a CSS font-family list, without quotes; empty for generic families. */
@@ -298,7 +298,7 @@ class IMM_TK_Fonts
         if (is_readable($path) && filesize($path) > 1000) {
             return $path;
         }
-        $fail = 'imm_tk_font_' . md5($family . $weight);
+        $fail = 'etcf_font_' . md5($family . $weight);
         if (get_transient($fail) || !wp_mkdir_p($dir)) {
             return '';
         }
