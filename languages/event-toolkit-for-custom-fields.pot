@@ -1850,9 +1850,22 @@ msgid "Make the token long-lived: click the (i) next to the token, then \"Open i
 msgstr ""
 
 #: includes/class-admin.php
-msgid "Paste the token above and save. The plugin finds the Instagram account and keeps the token of your Page instead, which does not expire."
+msgid "Other tokens work as well: those of older apps with \"API setup with Instagram login\" (starting with IGAA, renewed every week) and system user tokens from \"API setup with Unified login\". With the latter, Meta did not always give access to the Instagram account in our tests."
 msgstr ""
 
 #: includes/class-admin.php
-msgid "Other tokens work as well: those of older apps with \"API setup with Instagram login\" (starting with IGAA, renewed every week) and system user tokens from \"API setup with Unified login\". With the latter, Meta did not always give access to the Instagram account in our tests."
+msgid "Paste the token above and save. The plugin finds the Instagram account and keeps the token of your Page instead. The Access Token Tool says your extended token expires after 60 days; the Page token does not. It only stops working in certain cases, for example when you change your Facebook password or lose access to the Page. Then a notice appears in the admin area."
+msgstr ""
+
+#: includes/class-admin.php
+msgid "Instagram no longer accepts the access token, so no stories are posted."
+msgstr ""
+
+#: includes/class-admin.php
+#, php-format
+msgid "Meta reports: %s"
+msgstr ""
+
+#: includes/class-admin.php
+msgid "Connect Instagram again"
 msgstr ""

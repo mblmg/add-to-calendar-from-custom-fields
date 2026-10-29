@@ -106,6 +106,7 @@ class ETCF_Instagram
                     // Instagram user tokens last 60 days; system user tokens usually do not expire.
                     'token_expires'   => self::is_instagram_token($out['token']) ? time() + 60 * DAY_IN_SECONDS : 0,
                     'account_type'    => $account['account_type'],
+                    'token_error'     => '',
                 ]);
             }
         }
@@ -135,6 +136,7 @@ class ETCF_Instagram
             'token_refreshed' => 0,
             'token_expires'   => 0,
             'account_type'    => '',
+            'token_error'     => '',  // Meta's message while the saved token is rejected; empty when it works.
         ]);
     }
 
@@ -177,10 +179,18 @@ class ETCF_Instagram
             /* translators: %d: HTTP status code */
             return new WP_Error('etcf_ig_api', sprintf(__('Instagram answered with HTTP status %d.', 'event-toolkit-for-custom-fields'), wp_remote_retrieve_response_code($response)));
         }
+        $saved = $token === (string) self::get('token');
         if (isset($body['error'])) {
             $message = (string) ($body['error']['error_user_msg'] ?? $body['error']['message'] ?? 'unknown error');
+            // Code 190: the token expired or was invalidated (password change, removed access, app removed).
+            if ($saved && (int) ($body['error']['code'] ?? 0) === 190) {
+                self::update_state(['token_error' => $message]);
+            }
             /* translators: %s: error message from Instagram */
             return new WP_Error('etcf_ig_api', sprintf(__('Instagram reports: %s', 'event-toolkit-for-custom-fields'), $message), $body['error']);
+        }
+        if ($saved && self::state()['token_error'] !== '') {
+            self::update_state(['token_error' => '']);
         }
         return $body;
     }

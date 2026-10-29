@@ -68,6 +68,7 @@ class ETCF_Admin
             wp_enqueue_script('etcf-share', plugins_url('assets/share.js', ETCF_FILE), [], $version('assets/share.js'), true);
             wp_enqueue_style('etcf-admin', plugins_url('assets/admin.css', ETCF_FILE), [], $version('assets/admin.css'));
         });
+        add_action('admin_notices', [self::class, 'instagram_token_notice']);
         add_action('wp_dashboard_setup', [self::class, 'dashboard_widget']);
         add_action('admin_enqueue_scripts', function ($hook) {
             if ($hook === 'index.php') {
@@ -103,6 +104,26 @@ class ETCF_Admin
             [self::class, 'render_share_page'],
             'dashicons-share',
             3
+        );
+    }
+
+    /** Warning on all admin pages while Meta rejects the saved Instagram token. */
+    public static function instagram_token_notice(): void
+    {
+        if (!current_user_can('manage_options') || ETCF_Instagram::get('token') === '') {
+            return;
+        }
+        $error = (string) ETCF_Instagram::state()['token_error'];
+        if ($error === '') {
+            return;
+        }
+        printf(
+            '<div class="notice notice-error"><p><strong>%s</strong> %s</p><p><a class="button button-primary" href="%s">%s</a></p></div>',
+            esc_html__('Instagram no longer accepts the access token, so no stories are posted.', 'event-toolkit-for-custom-fields'),
+            /* translators: %s: error message from Meta */
+            esc_html(sprintf(__('Meta reports: %s', 'event-toolkit-for-custom-fields'), $error)),
+            esc_url(self::url('instagram') . '#etcf-ig-setup'),
+            esc_html__('Connect Instagram again', 'event-toolkit-for-custom-fields')
         );
     }
 
@@ -1158,7 +1179,7 @@ class ETCF_Admin
         }
         self::status_list($rows);
         $connected = ETCF_Instagram::is_ready();
-        if (!$connected) {
+        if (!$connected || $state['token_error'] !== '') {
             self::panel([self::class, 'render_instagram_setup']);
         }
         ?>
@@ -1228,9 +1249,11 @@ class ETCF_Admin
             if (ETCF_Instagram::get('enabled')) {
                 echo '<p class="description">' . esc_html__('Posts the stories planned for today that are not online yet. Stories already posted are not posted twice.', 'event-toolkit-for-custom-fields') . '</p>';
             }
-            echo '<details class="etcf-details"><summary>' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</summary>';
-            self::render_instagram_setup();
-            echo '</details>';
+            if ($state['token_error'] === '') {
+                echo '<details class="etcf-details"><summary>' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</summary>';
+                self::render_instagram_setup();
+                echo '</details>';
+            }
         }
 
         echo '</div><aside class="etcf-aside">';
@@ -1250,13 +1273,13 @@ class ETCF_Admin
     /** Steps to connect an Instagram account. */
     private static function render_instagram_setup(): void
     {
-        echo '<h2>' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</h2><ol class="etcf-steps">';
+        echo '<h2 id="etcf-ig-setup">' . esc_html__('Connect Instagram', 'event-toolkit-for-custom-fields') . '</h2><ol class="etcf-steps">';
         echo '<li>' . esc_html__('In the Instagram app, switch the account to a business account (Settings → Account type and tools; free of charge) and link it to the Facebook Page of your organisation.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '<li>' . esc_html__('Your Facebook account needs access to that Page and full access to the Instagram account. In a business portfolio, check this under Settings → Instagram accounts → People.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '<li>' . wp_kses(__('On <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener">developers.facebook.com</a>, create an app with the use case "Manage messaging & content on Instagram". In the app, open Use cases → Customize → "API setup with Facebook login" and click "Add required content permissions". The app can stay in development mode; it only posts to your own account, so Meta does not need to review it.', 'event-toolkit-for-custom-fields'), ['a' => ['href' => [], 'target' => [], 'rel' => []]]) . '</li>';
         echo '<li>' . wp_kses(__('Open the <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener">Graph API Explorer</a>, select your app and add the permissions instagram_basic, instagram_content_publish, pages_show_list, pages_read_engagement and business_management. Click "Generate Access Token" and select your Page and your Instagram account.', 'event-toolkit-for-custom-fields'), ['a' => ['href' => [], 'target' => [], 'rel' => []]]) . '</li>';
         echo '<li>' . esc_html__('Make the token long-lived: click the (i) next to the token, then "Open in Access Token Tool", then "Extend Access Token" at the bottom. Copy the extended token.', 'event-toolkit-for-custom-fields') . '</li>';
-        echo '<li>' . esc_html__('Paste the token above and save. The plugin finds the Instagram account and keeps the token of your Page instead, which does not expire.', 'event-toolkit-for-custom-fields') . '</li>';
+        echo '<li>' . esc_html__('Paste the token above and save. The plugin finds the Instagram account and keeps the token of your Page instead. The Access Token Tool says your extended token expires after 60 days; the Page token does not. It only stops working in certain cases, for example when you change your Facebook password or lose access to the Page. Then a notice appears in the admin area.', 'event-toolkit-for-custom-fields') . '</li>';
         echo '</ol>';
         echo '<p class="etcf-panel-note">' . esc_html__('Other tokens work as well: those of older apps with "API setup with Instagram login" (starting with IGAA, renewed every week) and system user tokens from "API setup with Unified login". With the latter, Meta did not always give access to the Instagram account in our tests.', 'event-toolkit-for-custom-fields') . '</p>';
         echo '<p class="etcf-panel-note">' . esc_html__('Instagram downloads the story images from your site, so the uploads folder must be publicly reachable (no maintenance mode or password protection).', 'event-toolkit-for-custom-fields') . '</p>';

@@ -139,7 +139,9 @@ If another plugin already outputs event markup for the same posts, turn the opti
 3. On developers.facebook.com, create an app with the use case "Manage messaging & content on Instagram". Open Use cases → Customize → "API setup with Facebook login" and click "Add required content permissions". The app can stay in development mode, because it only posts to your own account.
 4. In the Graph API Explorer (developers.facebook.com/tools/explorer), select the app, add the permissions instagram_basic, instagram_content_publish, pages_show_list, pages_read_engagement and business_management, click "Generate Access Token" and select your Page and Instagram account.
 5. Extend the token: click the (i) next to it, "Open in Access Token Tool", then "Extend Access Token". Copy the extended token.
-6. Paste it on the page "Instagram" and save. The plugin finds the Instagram account and keeps the token of your Page, which does not expire. Check the plan for the next days and turn on automatic stories.
+6. Paste it on the page "Instagram" and save. The plugin finds the Instagram account and keeps the token of your Page. Check the plan for the next days and turn on automatic stories.
+
+The Access Token Tool says the extended token expires after 60 days. That is your own Facebook token, which the plugin does not keep. The Page token made from it has no expiry date. It only stops working in certain cases, for example when you change your Facebook password, lose access to the Page or remove the app. Then the plugin shows a notice in the admin area with a link to connect Instagram again.
 
 Other tokens work as well: those of older apps with "API setup with Instagram login" (starting with IGAA; the plugin renews them every week) and system user tokens from Meta's newer "API setup with Unified login". With the latter, Meta did not always grant access to the Instagram account in our tests; if the plugin cannot find the account, enter its ID on the page "Instagram". Instagram downloads the images from your site, so the uploads folder must be publicly reachable.
 
