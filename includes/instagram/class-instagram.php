@@ -72,15 +72,20 @@ class ETCF_Instagram
         $time        = trim((string) ($input['time'] ?? ''));
         $out['time'] = preg_match('/^([01]?\d|2[0-3]):([0-5]\d)$/', $time, $m) ? sprintf('%02d:%02d', $m[1], $m[2]) : $old['time'];
 
-        // An empty token field keeps the saved token. A new token is checked right away.
-        $token = trim((string) ($input['token'] ?? ''));
+        // An empty token field keeps the saved token. A new token (or a new account ID) is checked right away.
+        $token      = trim((string) ($input['token'] ?? ''));
+        $account_id = preg_replace('/\D/', '', (string) ($input['account_id'] ?? ''));
+        if ($token === '' && $account_id !== '' && $account_id !== $old['user_id'] && $old['token'] !== '') {
+            $token = $old['token'];
+            $old['token'] = '';
+        }
         if (!empty($input['delete_token'])) {
             $out['token']    = '';
             $out['user_id']  = '';
             $out['username'] = '';
             self::update_state(['token_saved' => 0, 'token_refreshed' => 0, 'token_expires' => 0]);
         } elseif ($token !== '' && $token !== $old['token']) {
-            $account = self::account($token);
+            $account = self::account($token, $account_id);
             if (is_wp_error($account)) {
                 self::settings_error(sprintf(
                     /* translators: %s: error message */
@@ -187,9 +192,17 @@ class ETCF_Instagram
      *
      * @return array|WP_Error ['id' => …, 'username' => …, 'account_type' => … (empty if unknown)]
      */
-    public static function account(string $token = '')
+    public static function account(string $token = '', string $account_id = '')
     {
         $token = $token !== '' ? $token : (string) self::get('token');
+        if ($account_id !== '' && !self::is_instagram_token($token)) {
+            // Account ID entered by hand: only check that the token may use it.
+            $ig = self::call('GET', $account_id, ['fields' => 'id,username'], $token);
+            if (is_wp_error($ig)) {
+                return $ig;
+            }
+            return ['id' => (string) ($ig['id'] ?? $account_id), 'username' => (string) ($ig['username'] ?? ''), 'account_type' => ''];
+        }
         if (self::is_instagram_token($token)) {
             $me = self::call('GET', 'me', ['fields' => 'user_id,username,account_type'], $token);
             if (is_wp_error($me)) {
@@ -220,6 +233,17 @@ class ETCF_Instagram
             return ['id' => (string) $first['id'], 'username' => (string) ($first['username'] ?? ''), 'account_type' => ''];
         }
 
+        // The Instagram accounts of the business portfolio the token belongs to.
+        $business = self::call('GET', 'me', ['fields' => 'client_business_id'], $token);
+        $business = is_wp_error($business) ? '' : (string) ($business['client_business_id'] ?? '');
+        foreach ($business !== '' ? ['owned_instagram_accounts', 'instagram_business_accounts', 'instagram_accounts'] : [] as $edge) {
+            $owned = self::call('GET', $business . '/' . $edge, ['fields' => 'id,username'], $token);
+            $first = is_wp_error($owned) ? null : ($owned['data'][0] ?? null);
+            if (is_array($first) && !empty($first['id'])) {
+                return ['id' => (string) $first['id'], 'username' => (string) ($first['username'] ?? ''), 'account_type' => ''];
+            }
+        }
+
         // Facebook user token: the Instagram account is linked to one of the person's Facebook Pages.
         $pages = self::call('GET', 'me/accounts', ['fields' => 'instagram_business_account{id,username}'], $token);
         foreach (is_wp_error($pages) ? [] : (array) ($pages['data'] ?? []) as $page) {
@@ -230,12 +254,11 @@ class ETCF_Instagram
         }
 
         $detail = trim((string) ($me['name'] ?? '') . ' ' . (string) ($me['id'] ?? ''));
-        if (is_wp_error($list)) {
-            $detail .= ' – ' . $list->get_error_message();
-        }
+        $detail .= ' – assigned_instagram_accounts: ' . (is_wp_error($list) ? $list->get_error_message() : count((array) ($list['data'] ?? [])));
+        $detail .= ' – business: ' . ($business !== '' ? $business : '–');
         return new WP_Error('etcf_ig_no_account', sprintf(
             /* translators: %s: name and ID of the object behind the token, as reported by Meta */
-            __('The token works, but no Instagram account is shared with it. Generate the token again and select the Instagram account. (Token belongs to: %s)', 'event-toolkit-for-custom-fields'),
+            __('The token works, but the plugin could not find the Instagram account. Enter the account ID below (in the Meta app under "Generate access tokens", below the account name) and save again. (Token belongs to: %s)', 'event-toolkit-for-custom-fields'),
             $detail !== '' ? $detail : '?'
         ));
     }

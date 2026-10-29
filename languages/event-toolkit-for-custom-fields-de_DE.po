@@ -1842,5 +1842,13 @@ msgstr "Füg den Token oben ein und speichere. Das Plugin liest das Konto aus. T
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
 #, php-format
-msgid "The token works, but no Instagram account is shared with it. Generate the token again and select the Instagram account. (Token belongs to: %s)"
-msgstr "Der Token funktioniert, aber es ist kein Instagram-Konto damit freigegeben. Erzeug den Token neu und wähl dabei das Instagram-Konto aus. (Token gehört zu: %s)"
+msgid "The token works, but the plugin could not find the Instagram account. Enter the account ID below (in the Meta app under \"Generate access tokens\", below the account name) and save again. (Token belongs to: %s)"
+msgstr "Der Token funktioniert, aber das Plugin hat das Instagram-Konto nicht gefunden. Trag unten die Konto-ID ein (in der Meta-App unter „Zugriffstokens generieren“ unter dem Kontonamen) und speichere noch einmal. (Token gehört zu: %s)"
+
+#: includes/class-admin.php includes/instagram/class-instagram.php
+msgid "Instagram account ID"
+msgstr "Instagram-Konto-ID"
+
+#: includes/class-admin.php includes/instagram/class-instagram.php
+msgid "Filled in automatically. Only needed if the plugin cannot find the account: in the Meta app under \"Generate access tokens\", the number below the account name."
+msgstr "Wird automatisch ausgefüllt. Nur nötig, wenn das Plugin das Konto nicht findet: in der Meta-App unter „Zugriffstokens generieren“ die Zahl unter dem Kontonamen."

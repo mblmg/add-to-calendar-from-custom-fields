@@ -1183,6 +1183,13 @@ class ETCF_Admin
                     </td>
                 </tr>
                 <tr>
+                    <th scope="row"><label for="etcf-ig-account"><?php esc_html_e('Instagram account ID', 'event-toolkit-for-custom-fields'); ?></label></th>
+                    <td>
+                        <input type="text" class="regular-text" id="etcf-ig-account" name="<?php echo esc_attr($field('account_id')); ?>" value="<?php echo esc_attr($s['user_id']); ?>" inputmode="numeric" placeholder="17841…">
+                        <p class="description"><?php esc_html_e('Filled in automatically. Only needed if the plugin cannot find the account: in the Meta app under "Generate access tokens", the number below the account name.', 'event-toolkit-for-custom-fields'); ?></p>
+                    </td>
+                </tr>
+                <tr>
                     <th scope="row"><label for="etcf-ig-time"><?php esc_html_e('Time of day', 'event-toolkit-for-custom-fields'); ?></label></th>
                     <td>
                         <input type="time" id="etcf-ig-time" name="<?php echo esc_attr($field('time')); ?>" value="<?php echo esc_attr($s['time']); ?>">

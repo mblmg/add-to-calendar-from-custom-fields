@@ -1842,5 +1842,13 @@ msgstr ""
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
 #, php-format
-msgid "The token works, but no Instagram account is shared with it. Generate the token again and select the Instagram account. (Token belongs to: %s)"
+msgid "The token works, but the plugin could not find the Instagram account. Enter the account ID below (in the Meta app under \"Generate access tokens\", below the account name) and save again. (Token belongs to: %s)"
+msgstr ""
+
+#: includes/class-admin.php includes/instagram/class-instagram.php
+msgid "Instagram account ID"
+msgstr ""
+
+#: includes/class-admin.php includes/instagram/class-instagram.php
+msgid "Filled in automatically. Only needed if the plugin cannot find the account: in the Meta app under \"Generate access tokens\", the number below the account name."
 msgstr ""
