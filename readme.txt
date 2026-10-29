@@ -134,14 +134,14 @@ If another plugin already outputs event markup for the same posts, turn the opti
 
 = How do I connect Instagram? =
 
-1. Switch your Instagram account to a business account (free, in the Instagram app). Instagram only allows stories through the API for business accounts.
-2. On developers.facebook.com, create an app with the use case "Manage messaging & content on Instagram" and connect it to your business portfolio.
-3. In the app, open Use cases → Customize → "API setup with Unified login". Select a configuration with the permission instagram_content_publish. Under "Generate access tokens", click "Add account" and invite your Instagram account as Instagram tester.
-4. Accept the invitation in a web browser on instagram.com (the Instagram app does not show tester invites): Settings → Website permissions → Apps and websites → Tester invites.
-5. Back in the app, click "Generate token" and copy it. The switch "Webhook subscription" is not needed. The app can stay in development mode, because it only posts to your own account.
-6. Paste the token on the page "Instagram", check the plan for the next days and turn on automatic stories.
+1. Switch your Instagram account to a business account (free, in the Instagram app) and link it to the Facebook Page of your organisation. Instagram only allows stories through the API for business accounts.
+2. Make sure your Facebook account has access to that Page and full access to the Instagram account (in a business portfolio: Settings → Instagram accounts → People).
+3. On developers.facebook.com, create an app with the use case "Manage messaging & content on Instagram". Open Use cases → Customize → "API setup with Facebook login" and click "Add required content permissions". The app can stay in development mode, because it only posts to your own account.
+4. In the Graph API Explorer (developers.facebook.com/tools/explorer), select the app, add the permissions instagram_basic, instagram_content_publish, pages_show_list, pages_read_engagement and business_management, click "Generate Access Token" and select your Page and Instagram account.
+5. Extend the token: click the (i) next to it, "Open in Access Token Tool", then "Extend Access Token". Copy the extended token.
+6. Paste it on the page "Instagram" and save. The plugin finds the Instagram account and keeps the token of your Page, which does not expire. Check the plan for the next days and turn on automatic stories.
 
-Tokens of older apps with "API setup with Instagram login" (starting with IGAA) work too; the plugin renews them every week. Instagram downloads the images from your site, so the uploads folder must be publicly reachable.
+Other tokens work as well: those of older apps with "API setup with Instagram login" (starting with IGAA; the plugin renews them every week) and system user tokens from Meta's newer "API setup with Unified login". With the latter, Meta did not always grant access to the Instagram account in our tests; if the plugin cannot find the account, enter its ID on the page "Instagram". Instagram downloads the images from your site, so the uploads folder must be publicly reachable.
 
 = Can the stories contain a link? =
 
@@ -240,7 +240,7 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 * Breakdance dynamic data fields renamed to `etcf_*`; select them again in elements that use calendar links.
 * Abilities renamed to `etcf/list-events`, `etcf/get-event`, `etcf/get-weekly-preview` and `etcf/post-weekly-preview-to-telegram`.
 * Translations now come from translate.wordpress.org; the plugin no longer ships language files.
-* Instagram: tokens of the "API setup with Unified login" that Meta uses for all new apps (graph.facebook.com). Tokens of older apps keep working. Updated connection guide.
+* Instagram: connection through the Facebook Page (the plugin keeps the Page token, which does not expire). Also accepted: system user tokens of Meta's "API setup with Unified login" and Instagram tokens of older apps. Optional field for the Instagram account ID. New connection guide.
 
 = 2.2.0 =
 * New: page "Newsletter" with guides for Brevo, Mailchimp, MailerLite and other services, and direct sending through Brevo or Emailit.

@@ -1050,10 +1050,6 @@ msgstr "Instagram verbinden"
 msgid "Recent activity"
 msgstr "Letzte Aktivitäten"
 
-#: includes/class-admin.php:1264
-msgid "In the Instagram app, switch the account to a business account (Settings → Account type and tools). This is free."
-msgstr "Stell das Konto in der Instagram-App auf ein Unternehmenskonto um (Einstellungen → Kontotyp und Tools). Das kostet nichts."
-
 #: includes/class-admin.php:1269
 msgid "Instagram downloads the story images from your site, so the uploads folder must be publicly reachable (no maintenance mode or password protection)."
 msgstr "Instagram lädt die Story-Bilder von deiner Seite. Der Uploads-Ordner muss deshalb öffentlich erreichbar sein (kein Wartungsmodus, kein Passwortschutz)."
@@ -1821,26 +1817,6 @@ msgid "Telegram reports: %s"
 msgstr "Telegram meldet: %s"
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "On <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a>, create an app with the use case \"Manage messaging & content on Instagram\" and connect it to your business portfolio."
-msgstr "Leg auf <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a> eine App mit dem Anwendungsfall „Messaging und Content auf Instagram verwalten“ an und verknüpfe sie mit deinem Business-Portfolio."
-
-#: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "In the app, open Use cases → Customize → \"API setup with Unified login\". Select a configuration (it needs the permission instagram_content_publish) and, under \"Generate access tokens\", click \"Add account\" and invite your Instagram account as Instagram tester."
-msgstr "Öffne in der App Anwendungsfälle → Anpassen → „API setup with Unified login“. Wähl eine Konfiguration aus (sie braucht die Berechtigung instagram_content_publish) und lade unter „Zugriffstokens generieren“ mit „Konto hinzufügen“ dein Instagram-Konto als Instagram-Tester ein."
-
-#: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "Accept the invitation with that account in a web browser on instagram.com (the Instagram app does not show tester invites): Settings → Website permissions → Apps and websites → Tester invites."
-msgstr "Nimm die Einladung mit diesem Konto im Webbrowser auf instagram.com an (die Instagram-App zeigt Tester-Einladungen nicht an): Einstellungen → Website-Berechtigungen → Apps und Websites → Tester-Einladungen."
-
-#: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "Back in the app, click \"Generate token\", log in and copy the token. It is shown only once. The switch \"Webhook subscription\" is not needed. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it."
-msgstr "Klick danach in der App auf „Token generieren“, melde dich an und kopier den Token. Er wird nur einmal angezeigt. Den Schalter „Webhook-Abonnement“ brauchst du nicht. Die App kann im Entwicklungsmodus bleiben; sie wird nur für dein eigenes Konto genutzt, deshalb muss Meta sie nicht prüfen."
-
-#: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "Paste the token above and save. The plugin reads the account. Tokens of older apps (starting with IGAA) work too and are renewed every week."
-msgstr "Füg den Token oben ein und speichere. Das Plugin liest das Konto aus. Tokens älterer Apps (beginnen mit IGAA) funktionieren auch und werden jede Woche verlängert."
-
-#: includes/class-admin.php includes/instagram/class-instagram.php
 #, php-format
 msgid "The token works, but the plugin could not find the Instagram account. Enter the account ID below (in the Meta app under \"Generate access tokens\", below the account name) and save again. (Token belongs to: %s)"
 msgstr "Der Token funktioniert, aber das Plugin hat das Instagram-Konto nicht gefunden. Trag unten die Konto-ID ein (in der Meta-App unter „Zugriffstokens generieren“ unter dem Kontonamen) und speichere noch einmal. (Token gehört zu: %s)"
@@ -1852,3 +1828,31 @@ msgstr "Instagram-Konto-ID"
 #: includes/class-admin.php includes/instagram/class-instagram.php
 msgid "Filled in automatically. Only needed if the plugin cannot find the account: in the Meta app under \"Generate access tokens\", the number below the account name."
 msgstr "Wird automatisch ausgefüllt. Nur nötig, wenn das Plugin das Konto nicht findet: in der Meta-App unter „Zugriffstokens generieren“ die Zahl unter dem Kontonamen."
+
+#: includes/class-admin.php
+msgid "In the Instagram app, switch the account to a business account (Settings → Account type and tools; free of charge) and link it to the Facebook Page of your organisation."
+msgstr "Stell das Konto in der Instagram-App auf ein Unternehmenskonto um (Einstellungen → Kontoart und Tools; kostenlos) und verknüpf es mit der Facebook-Seite deines Vereins oder Unternehmens."
+
+#: includes/class-admin.php
+msgid "Your Facebook account needs access to that Page and full access to the Instagram account. In a business portfolio, check this under Settings → Instagram accounts → People."
+msgstr "Dein Facebook-Konto braucht Zugriff auf diese Seite und vollen Zugriff auf das Instagram-Konto. In einem Business-Portfolio prüfst du das unter Einstellungen → Instagram-Konten → Personen."
+
+#: includes/class-admin.php
+msgid "On <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a>, create an app with the use case \"Manage messaging & content on Instagram\". In the app, open Use cases → Customize → \"API setup with Facebook login\" and click \"Add required content permissions\". The app can stay in development mode; it only posts to your own account, so Meta does not need to review it."
+msgstr "Leg auf <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a> eine App mit dem Anwendungsfall „Messaging und Content auf Instagram verwalten“ an. Öffne in der App Anwendungsfälle → Anpassen → „API-Einrichtung mit Facebook-Login“ und klick auf „Add required content permissions“. Die App kann im Entwicklungsmodus bleiben; sie postet nur auf dein eigenes Konto, deshalb muss Meta sie nicht prüfen."
+
+#: includes/class-admin.php
+msgid "Open the <a href=\"https://developers.facebook.com/tools/explorer/\" target=\"_blank\" rel=\"noopener\">Graph API Explorer</a>, select your app and add the permissions instagram_basic, instagram_content_publish, pages_show_list, pages_read_engagement and business_management. Click \"Generate Access Token\" and select your Page and your Instagram account."
+msgstr "Öffne den <a href=\"https://developers.facebook.com/tools/explorer/\" target=\"_blank\" rel=\"noopener\">Graph API Explorer</a>, wähl deine App aus und füg die Berechtigungen instagram_basic, instagram_content_publish, pages_show_list, pages_read_engagement und business_management hinzu. Klick auf „Generate Access Token“ und wähl deine Seite und dein Instagram-Konto aus."
+
+#: includes/class-admin.php
+msgid "Make the token long-lived: click the (i) next to the token, then \"Open in Access Token Tool\", then \"Extend Access Token\" at the bottom. Copy the extended token."
+msgstr "Mach den Token langlebig: Klick auf das (i) neben dem Token, dann auf „Im Zugriffsschlüssel-Tool öffnen“ und dort unten auf „Zugriffsschlüssel verlängern“. Kopier den verlängerten Token."
+
+#: includes/class-admin.php
+msgid "Paste the token above and save. The plugin finds the Instagram account and keeps the token of your Page instead, which does not expire."
+msgstr "Füg den Token oben ein und speichere. Das Plugin findet das Instagram-Konto und speichert stattdessen den Token deiner Seite, der nicht abläuft."
+
+#: includes/class-admin.php
+msgid "Other tokens work as well: those of older apps with \"API setup with Instagram login\" (starting with IGAA, renewed every week) and system user tokens from \"API setup with Unified login\". With the latter, Meta did not always give access to the Instagram account in our tests."
+msgstr "Andere Tokens funktionieren auch: die älterer Apps mit „API-Einrichtung mit Instagram-Login“ (beginnen mit IGAA, werden jede Woche verlängert) und Systemnutzer-Tokens aus „API setup with Unified login“. Bei Letzteren hat Meta in unseren Tests nicht immer Zugriff auf das Instagram-Konto gegeben."

@@ -1050,10 +1050,6 @@ msgstr ""
 msgid "Recent activity"
 msgstr ""
 
-#: includes/class-admin.php:1264
-msgid "In the Instagram app, switch the account to a business account (Settings → Account type and tools). This is free."
-msgstr ""
-
 #: includes/class-admin.php:1269
 msgid "Instagram downloads the story images from your site, so the uploads folder must be publicly reachable (no maintenance mode or password protection)."
 msgstr ""
@@ -1821,26 +1817,6 @@ msgid "Telegram reports: %s"
 msgstr ""
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "On <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a>, create an app with the use case \"Manage messaging & content on Instagram\" and connect it to your business portfolio."
-msgstr ""
-
-#: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "In the app, open Use cases → Customize → \"API setup with Unified login\". Select a configuration (it needs the permission instagram_content_publish) and, under \"Generate access tokens\", click \"Add account\" and invite your Instagram account as Instagram tester."
-msgstr ""
-
-#: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "Accept the invitation with that account in a web browser on instagram.com (the Instagram app does not show tester invites): Settings → Website permissions → Apps and websites → Tester invites."
-msgstr ""
-
-#: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "Back in the app, click \"Generate token\", log in and copy the token. It is shown only once. The switch \"Webhook subscription\" is not needed. The app can stay in development mode; it is only used for your own account, so Meta does not need to review it."
-msgstr ""
-
-#: includes/class-admin.php includes/instagram/class-instagram.php
-msgid "Paste the token above and save. The plugin reads the account. Tokens of older apps (starting with IGAA) work too and are renewed every week."
-msgstr ""
-
-#: includes/class-admin.php includes/instagram/class-instagram.php
 #, php-format
 msgid "The token works, but the plugin could not find the Instagram account. Enter the account ID below (in the Meta app under \"Generate access tokens\", below the account name) and save again. (Token belongs to: %s)"
 msgstr ""
@@ -1851,4 +1827,32 @@ msgstr ""
 
 #: includes/class-admin.php includes/instagram/class-instagram.php
 msgid "Filled in automatically. Only needed if the plugin cannot find the account: in the Meta app under \"Generate access tokens\", the number below the account name."
+msgstr ""
+
+#: includes/class-admin.php
+msgid "In the Instagram app, switch the account to a business account (Settings → Account type and tools; free of charge) and link it to the Facebook Page of your organisation."
+msgstr ""
+
+#: includes/class-admin.php
+msgid "Your Facebook account needs access to that Page and full access to the Instagram account. In a business portfolio, check this under Settings → Instagram accounts → People."
+msgstr ""
+
+#: includes/class-admin.php
+msgid "On <a href=\"https://developers.facebook.com/apps/\" target=\"_blank\" rel=\"noopener\">developers.facebook.com</a>, create an app with the use case \"Manage messaging & content on Instagram\". In the app, open Use cases → Customize → \"API setup with Facebook login\" and click \"Add required content permissions\". The app can stay in development mode; it only posts to your own account, so Meta does not need to review it."
+msgstr ""
+
+#: includes/class-admin.php
+msgid "Open the <a href=\"https://developers.facebook.com/tools/explorer/\" target=\"_blank\" rel=\"noopener\">Graph API Explorer</a>, select your app and add the permissions instagram_basic, instagram_content_publish, pages_show_list, pages_read_engagement and business_management. Click \"Generate Access Token\" and select your Page and your Instagram account."
+msgstr ""
+
+#: includes/class-admin.php
+msgid "Make the token long-lived: click the (i) next to the token, then \"Open in Access Token Tool\", then \"Extend Access Token\" at the bottom. Copy the extended token."
+msgstr ""
+
+#: includes/class-admin.php
+msgid "Paste the token above and save. The plugin finds the Instagram account and keeps the token of your Page instead, which does not expire."
+msgstr ""
+
+#: includes/class-admin.php
+msgid "Other tokens work as well: those of older apps with \"API setup with Instagram login\" (starting with IGAA, renewed every week) and system user tokens from \"API setup with Unified login\". With the latter, Meta did not always give access to the Instagram account in our tests."
 msgstr ""

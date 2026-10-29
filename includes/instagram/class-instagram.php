@@ -5,13 +5,16 @@
  * Stories are published in two steps: create a media container from a public JPEG URL
  * (media_type=STORIES), then publish the container. The API is free of charge; the account
  * must be a professional (business) account, and the access token comes from the site owner's
- * own Meta app. Two kinds of token work:
+ * own Meta app. These tokens work (all but the first on graph.facebook.com):
  *
- * - Unified Login (all apps created since 2026): a system user access token of the business
- *   portfolio (EAA…), on graph.facebook.com. It usually does not expire; the Instagram account
- *   is read from /me/assigned_instagram_accounts.
- * - Instagram Login (older apps): an Instagram user token (IGAA…), on graph.instagram.com.
- *   It expires after 60 days and is renewed here every week.
+ * - Instagram user token (IGAA…, "API setup with Instagram login" of older apps), on
+ *   graph.instagram.com. It expires after 60 days and is renewed here every week.
+ * - Page token of the Facebook Page the Instagram account is linked to. A Facebook user token
+ *   is swapped for it on saving; from a long-lived user token it does not expire. This is the
+ *   way described in the connection guide.
+ * - System user token of "API setup with Unified login" (Meta's newer setup). The account is
+ *   read from /me/assigned_instagram_accounts; in tests Meta did not always grant access to
+ *   it, so the account ID can also be entered by hand.
  */
 
 defined('ABSPATH') || exit;
