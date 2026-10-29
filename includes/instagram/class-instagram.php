@@ -93,14 +93,15 @@ class ETCF_Instagram
                     $account->get_error_message()
                 ));
             } else {
-                $out['token']    = $token;
+                // A Facebook user token is replaced by the token of the Page the Instagram account is linked to.
+                $out['token']    = (string) ($account['token'] ?? '') !== '' ? (string) $account['token'] : $token;
                 $out['user_id']  = $account['id'];
                 $out['username'] = $account['username'];
                 self::update_state([
                     'token_saved'     => time(),
                     'token_refreshed' => 0,
                     // Instagram user tokens last 60 days; system user tokens usually do not expire.
-                    'token_expires'   => self::is_instagram_token($token) ? time() + 60 * DAY_IN_SECONDS : 0,
+                    'token_expires'   => self::is_instagram_token($out['token']) ? time() + 60 * DAY_IN_SECONDS : 0,
                     'account_type'    => $account['account_type'],
                 ]);
             }
@@ -233,6 +234,23 @@ class ETCF_Instagram
             return ['id' => (string) $first['id'], 'username' => (string) ($first['username'] ?? ''), 'account_type' => ''];
         }
 
+        // Page token: the Page itself has the linked Instagram account.
+        $page = self::call('GET', 'me', ['fields' => 'instagram_business_account{id,username}'], $token);
+        $ig   = is_wp_error($page) ? null : ($page['instagram_business_account'] ?? null);
+        if (is_array($ig) && !empty($ig['id'])) {
+            return ['id' => (string) $ig['id'], 'username' => (string) ($ig['username'] ?? ''), 'account_type' => ''];
+        }
+
+        // Facebook user token: the Instagram account is linked to one of the person's Facebook Pages.
+        // The Page token is kept instead; from a long-lived user token it does not expire.
+        $pages = self::call('GET', 'me/accounts', ['fields' => 'access_token,instagram_business_account{id,username}'], $token);
+        foreach (is_wp_error($pages) ? [] : (array) ($pages['data'] ?? []) as $page) {
+            $ig = $page['instagram_business_account'] ?? null;
+            if (is_array($ig) && !empty($ig['id'])) {
+                return ['id' => (string) $ig['id'], 'username' => (string) ($ig['username'] ?? ''), 'account_type' => '', 'token' => (string) ($page['access_token'] ?? '')];
+            }
+        }
+
         // The Instagram accounts the token's permissions are granted for.
         foreach (self::token_info($token)['targets'] as $target) {
             $ig = self::call('GET', $target, ['fields' => 'id,username'], $token);
@@ -249,15 +267,6 @@ class ETCF_Instagram
             $first = is_wp_error($owned) ? null : ($owned['data'][0] ?? null);
             if (is_array($first) && !empty($first['id'])) {
                 return ['id' => (string) $first['id'], 'username' => (string) ($first['username'] ?? ''), 'account_type' => ''];
-            }
-        }
-
-        // Facebook user token: the Instagram account is linked to one of the person's Facebook Pages.
-        $pages = self::call('GET', 'me/accounts', ['fields' => 'instagram_business_account{id,username}'], $token);
-        foreach (is_wp_error($pages) ? [] : (array) ($pages['data'] ?? []) as $page) {
-            $ig = $page['instagram_business_account'] ?? null;
-            if (is_array($ig) && !empty($ig['id'])) {
-                return ['id' => (string) $ig['id'], 'username' => (string) ($ig['username'] ?? ''), 'account_type' => ''];
             }
         }
 
