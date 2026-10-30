@@ -476,5 +476,10 @@ return [
 		'You have the highest badge. Thank you so much!' => 'Du hast die höchste Auszeichnung. Vielen Dank!',
 		'Donate again' => 'Noch einmal spenden',
 		'Donate' => 'Spenden',
+		'The plugin is free. If you like, you can support its development with a donation.' => 'Das Plugin ist kostenlos. Wenn du magst, kannst du die Weiterentwicklung mit einer Spende unterstützen.',
+		'Support Event Toolkit' => 'Event Toolkit unterstützen',
+		'I develop Event Toolkit and offer it free of charge. A donation helps me maintain it, adapt it when Meta, Telegram and the other services change something, and add new features.' => 'Ich entwickle Event Toolkit und stelle es kostenlos zur Verfügung. Eine Spende hilft mir, es zu pflegen, es anzupassen, wenn Meta, Telegram und die anderen Dienste etwas ändern, und neue Funktionen einzubauen.',
+		'Every amount helps. Every feature stays available, with or without a donation.' => 'Jeder Betrag hilft. Alle Funktionen bleiben verfügbar, ob mit oder ohne Spende.',
+		'As a thank-you there is a badge here in the admin area: a bronze heart after the first donation, a silver one after the second, a gold one from the third.' => 'Als Dankeschön gibt es eine Auszeichnung hier im Adminbereich: ein bronzenes Herz nach der ersten Spende, ein silbernes nach der zweiten, ein goldenes ab der dritten.',
 	],
 ];

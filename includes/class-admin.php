@@ -202,6 +202,7 @@ class ETCF_Admin
             'telegram'  => 'Telegram',
             'instagram' => 'Instagram',
             'social'    => 'Mastodon & Bluesky',
+            'donate'    => __('Donate', 'event-toolkit-for-custom-fields'),
         ];
     }
 
@@ -220,6 +221,7 @@ class ETCF_Admin
             'telegram'  => __('A bot posts the weekly preview to your group, topic or channel.', 'event-toolkit-for-custom-fields'),
             'instagram' => __('Stories through the official Instagram API, free of charge: the week, the day before and the day itself.', 'event-toolkit-for-custom-fields'),
             'social'    => __('The weekly preview on Mastodon and Bluesky, through their free, official interfaces.', 'event-toolkit-for-custom-fields'),
+            'donate'    => __('The plugin is free. If you like, you can support its development with a donation.', 'event-toolkit-for-custom-fields'),
         ];
     }
 
@@ -329,8 +331,10 @@ class ETCF_Admin
             <hr class="wp-header-end">
             <?php
             settings_errors();
-            ETCF_Donation::render_prompt();
-            if ($tab !== 'overview' && $tab !== 'events' && !ETCF_Settings::is_configured()) {
+            if ($tab !== 'donate') {
+                ETCF_Donation::render_prompt();
+            }
+            if (!in_array($tab, ['overview', 'events', 'donate'], true) && !ETCF_Settings::is_configured()) {
                 echo '<div class="notice notice-info inline"><p>' . wp_kses(sprintf(
                     /* translators: %s: link to the page "Events" */
                     __('First tell the plugin where your events are: post type and date field on the page %s.', 'event-toolkit-for-custom-fields'),
@@ -349,6 +353,9 @@ class ETCF_Admin
                     break;
                 case 'social':
                     self::render_social();
+                    break;
+                case 'donate':
+                    ETCF_Donation::render_page();
                     break;
                 case 'newsletter':
                     self::render_newsletter();

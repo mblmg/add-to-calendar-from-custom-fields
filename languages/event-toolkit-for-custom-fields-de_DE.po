@@ -1949,3 +1949,23 @@ msgstr "Noch einmal spenden"
 #: includes/class-donation.php
 msgid "Donate"
 msgstr "Spenden"
+
+#: includes/class-admin.php includes/class-donation.php
+msgid "The plugin is free. If you like, you can support its development with a donation."
+msgstr "Das Plugin ist kostenlos. Wenn du magst, kannst du die Weiterentwicklung mit einer Spende unterstützen."
+
+#: includes/class-admin.php includes/class-donation.php
+msgid "Support Event Toolkit"
+msgstr "Event Toolkit unterstützen"
+
+#: includes/class-admin.php includes/class-donation.php
+msgid "I develop Event Toolkit and offer it free of charge. A donation helps me maintain it, adapt it when Meta, Telegram and the other services change something, and add new features."
+msgstr "Ich entwickle Event Toolkit und stelle es kostenlos zur Verfügung. Eine Spende hilft mir, es zu pflegen, es anzupassen, wenn Meta, Telegram und die anderen Dienste etwas ändern, und neue Funktionen einzubauen."
+
+#: includes/class-admin.php includes/class-donation.php
+msgid "Every amount helps. Every feature stays available, with or without a donation."
+msgstr "Jeder Betrag hilft. Alle Funktionen bleiben verfügbar, ob mit oder ohne Spende."
+
+#: includes/class-admin.php includes/class-donation.php
+msgid "As a thank-you there is a badge here in the admin area: a bronze heart after the first donation, a silver one after the second, a gold one from the third."
+msgstr "Als Dankeschön gibt es eine Auszeichnung hier im Adminbereich: ein bronzenes Herz nach der ersten Spende, ein silbernes nach der zweiten, ein goldenes ab der dritten."

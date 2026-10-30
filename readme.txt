@@ -245,7 +245,7 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 * Breakdance dynamic data fields renamed to `etcf_*`; select them again in elements that use calendar links.
 * Abilities renamed to `etcf/list-events`, `etcf/get-event`, `etcf/get-weekly-preview` and `etcf/post-weekly-preview-to-telegram`.
 * Translations now come from translate.wordpress.org; the plugin no longer ships language files.
-* New: donations. Two weeks after setting up, the plugin asks once whether it makes your work easier and offers a donation link (PayPal). "Later" asks again after 30 days, "No, thanks" after 90. Those who donated get a badge in the admin area. Every feature stays available either way.
+* New: donations. Two weeks after setting up, the plugin asks once whether it makes your work easier and offers a donation link (PayPal). "Later" asks again after 30 days, "No, thanks" after 90. Those who do not want to wait can donate any time on the last tab, "Donate". Those who donated get a badge in the admin area. Every feature stays available either way.
 * Instagram: connection through the Facebook Page (the plugin keeps the Page token, which does not expire). Also accepted: system user tokens of Meta's "API setup with Unified login" and Instagram tokens of older apps. Optional field for the Instagram account ID. New connection guide.
 
 = 2.2.0 =

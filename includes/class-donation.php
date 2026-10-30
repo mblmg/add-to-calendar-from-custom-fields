@@ -10,6 +10,7 @@
  *   the count is the administrator's own statement and only decides the badge.
  * - Badges: bronze heart after one donation, silver after two, gold from three. After a donation the
  *   plugin does not ask again; the badge panel on the overview offers to donate once more.
+ * - The tab "Donate", last in the menu, is there from day one for those who want to donate right away.
  *
  * State per user (user meta etcf_donation), the start of use per site (option etcf_first_use).
  */
@@ -124,6 +125,32 @@ class ETCF_Donation
         echo '</div></section>';
     }
 
+    /** The tab "Donate": open from day one, for everyone who does not want to wait for the question. */
+    public static function render_page(): void
+    {
+        $state = self::state();
+        echo '<div class="etcf-layout"><div class="etcf-main">';
+        if ($state['clicked']) {
+            self::render_prompt();
+        }
+        echo '<section class="etcf-panel etcf-donate">';
+        echo '<span class="dashicons dashicons-heart etcf-donate-icon" aria-hidden="true"></span><div>';
+        echo '<h2>' . esc_html__('Support Event Toolkit', 'event-toolkit-for-custom-fields') . '</h2>';
+        echo '<p>' . esc_html__('I develop Event Toolkit and offer it free of charge. A donation helps me maintain it, adapt it when Meta, Telegram and the other services change something, and add new features.', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<p>' . esc_html__('Every amount helps. Every feature stays available, with or without a donation.', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '<p class="etcf-actions"><a class="button button-primary button-hero" href="' . esc_url(self::donate_url()) . '" target="_blank" rel="noopener">'
+            . esc_html($state['count'] ? __('Donate again', 'event-toolkit-for-custom-fields') : __('Donate via PayPal', 'event-toolkit-for-custom-fields')) . '</a></p>';
+        echo '<p class="etcf-panel-note">' . esc_html__('As a thank-you there is a badge here in the admin area: a bronze heart after the first donation, a silver one after the second, a gold one from the third.', 'event-toolkit-for-custom-fields') . '</p>';
+        echo '</div></section>';
+        echo '</div><aside class="etcf-aside">';
+        if ($state['count']) {
+            echo '<section class="etcf-panel etcf-thanks">';
+            self::render_badge_panel(false);
+            echo '</section>';
+        }
+        echo '</aside></div>';
+    }
+
     /** @return array{label: string, level: string}|null The badge for a number of donations. */
     public static function badge(int $count): ?array
     {
@@ -154,7 +181,7 @@ class ETCF_Donation
     }
 
     /** Panel on the overview for those who donated: badge, next level, donate again. */
-    public static function render_badge_panel(): void
+    public static function render_badge_panel(bool $button = true): void
     {
         if (!current_user_can('manage_options')) {
             return;
@@ -181,7 +208,9 @@ class ETCF_Donation
             ? sprintf(__('With another donation you get the next badge: %s.', 'event-toolkit-for-custom-fields'), $next['label'])
             : __('You have the highest badge. Thank you so much!', 'event-toolkit-for-custom-fields'));
         echo '</p>';
-        echo '<p><a class="button" href="' . esc_url(self::donate_url()) . '" target="_blank" rel="noopener">' . esc_html__('Donate again', 'event-toolkit-for-custom-fields') . '</a></p>';
+        if ($button) {
+            echo '<p><a class="button" href="' . esc_url(ETCF_Admin::url('donate')) . '">' . esc_html__('Donate again', 'event-toolkit-for-custom-fields') . '</a></p>';
+        }
     }
 
     public static function handle_donate(): void
