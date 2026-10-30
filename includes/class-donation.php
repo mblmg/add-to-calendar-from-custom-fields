@@ -199,7 +199,7 @@ class ETCF_Donation
         );
         echo '<p>' . esc_html(sprintf(
             /* translators: %d: number of donations */
-            _n('You donated once.', 'You donated %d times.', $count, 'event-toolkit-for-custom-fields'),
+            _n('You donated %d time.', 'You donated %d times.', $count, 'event-toolkit-for-custom-fields'),
             $count
         )) . ' ';
         $next = $count < 3 ? self::badge($count + 1) : null;
