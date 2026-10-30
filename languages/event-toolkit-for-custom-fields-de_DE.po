@@ -1930,7 +1930,7 @@ msgstr "Danke für deine Unterstützung"
 #, php-format
 msgid "You donated %d time."
 msgid_plural "You donated %d times."
-msgstr[0] "Du hast %d-mal gespendet."
+msgstr[0] "Du hast einmal gespendet."
 msgstr[1] "Du hast %d-mal gespendet."
 
 #: includes/class-donation.php

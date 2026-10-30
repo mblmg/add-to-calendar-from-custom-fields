@@ -471,7 +471,7 @@ return [
 		'Bronze heart' => 'Bronzenes Herz',
 		'Thank you for your donation' => 'Danke für deine Spende',
 		'Thank you for your support' => 'Danke für deine Unterstützung',
-		'You donated %d time.' . "\0" . 'You donated %d times.' => 'Du hast %d-mal gespendet.' . "\0" . 'Du hast %d-mal gespendet.',
+		'You donated %d time.' . "\0" . 'You donated %d times.' => 'Du hast einmal gespendet.' . "\0" . 'Du hast %d-mal gespendet.',
 		'With another donation you get the next badge: %s.' => 'Mit einer weiteren Spende bekommst du die nächste Auszeichnung: %s.',
 		'You have the highest badge. Thank you so much!' => 'Du hast die höchste Auszeichnung. Vielen Dank!',
 		'Donate again' => 'Noch einmal spenden',
