@@ -952,3 +952,87 @@
 	min-width: 5.5em;
 	color: #646970;
 }
+
+/* ---------------------------------------------------------------- donations */
+
+.etcf-donate {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+	border-left: 4px solid var(--etcf-heart, #c2410c);
+}
+
+.etcf .etcf-donate h2 {
+	margin-top: 0;
+}
+
+.etcf-donate p {
+	max-width: 70ch;
+}
+
+.etcf-donate .button-link {
+	margin-left: 8px;
+	vertical-align: middle;
+}
+
+.etcf .etcf-donate-icon {
+	flex: none;
+	width: 32px;
+	height: 32px;
+	font-size: 32px;
+	color: var(--etcf-heart, #c2410c);
+}
+
+.etcf-heart {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: 12px;
+	padding: 2px 10px 2px 6px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 22px;
+	vertical-align: middle;
+	color: var(--etcf-heart-ink);
+	background: var(--etcf-heart-bg);
+}
+
+.etcf-heart .dashicons,
+.etcf-heart-big .dashicons {
+	color: var(--etcf-heart-color);
+}
+
+.etcf-heart-big {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 8px 0 12px;
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--etcf-heart-ink);
+}
+
+.etcf .etcf-heart-big .dashicons {
+	width: 36px;
+	height: 36px;
+	font-size: 36px;
+}
+
+.etcf-heart--bronze {
+	--etcf-heart-color: #a0522d;
+	--etcf-heart-ink: #6b3a1f;
+	--etcf-heart-bg: #f8ece3;
+}
+
+.etcf-heart--silver {
+	--etcf-heart-color: #7c8288;
+	--etcf-heart-ink: #3c434a;
+	--etcf-heart-bg: #eef0f2;
+}
+
+.etcf-heart--gold {
+	--etcf-heart-color: #b8860b;
+	--etcf-heart-ink: #6b4e00;
+	--etcf-heart-bg: #fdf3d4;
+}

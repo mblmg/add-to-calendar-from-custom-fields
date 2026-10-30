@@ -1,5 +1,6 @@
 === Event Toolkit for Custom Fields ===
 Contributors: mblmg
+Donate link: https://www.paypal.com/donate/?hosted_button_id=77FT7TBQCZPPS
 Tags: events, calendar, newsletter, instagram, telegram
 Requires at least: 6.9
 Tested up to: 7.1
@@ -234,6 +235,8 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 
 **Google Rich Results Test.** The settings page contains a link to this Google tool. Clicking it opens the tool with the address of one of your event pages. Nothing is sent unless an administrator clicks the link.
 
+**PayPal (donations).** The admin pages contain a donation link to PayPal (paypal.com), provided by PayPal (Europe) S.à r.l. et Cie, S.C.A. It only opens when an administrator clicks it; the plugin sends no data to PayPal and PayPal does not report back to your site. [User Agreement](https://www.paypal.com/legalhub/paypal/useragreement-full), [Privacy Statement](https://www.paypal.com/myaccount/privacy/privacyhub)
+
 == Changelog ==
 
 = 2.3.0 =
@@ -242,6 +245,7 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 * Breakdance dynamic data fields renamed to `etcf_*`; select them again in elements that use calendar links.
 * Abilities renamed to `etcf/list-events`, `etcf/get-event`, `etcf/get-weekly-preview` and `etcf/post-weekly-preview-to-telegram`.
 * Translations now come from translate.wordpress.org; the plugin no longer ships language files.
+* New: donations. Two weeks after setting up, the plugin asks once whether it makes your work easier and offers a donation link (PayPal). "Later" asks again after 30 days, "No, thanks" after 90. Those who donated get a badge in the admin area. Every feature stays available either way.
 * Instagram: connection through the Facebook Page (the plugin keeps the Page token, which does not expire). Also accepted: system user tokens of Meta's "API setup with Unified login" and Instagram tokens of older apps. Optional field for the Instagram account ID. New connection guide.
 
 = 2.2.0 =

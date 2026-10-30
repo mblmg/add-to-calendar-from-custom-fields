@@ -1869,3 +1869,83 @@ msgstr "Meta meldet: %s"
 #: includes/class-admin.php
 msgid "Connect Instagram again"
 msgstr "Instagram neu verbinden"
+
+#: includes/class-donation.php
+msgid "Has Event Toolkit made your work easier?"
+msgstr "Hat dir Event Toolkit die Arbeit leichter gemacht?"
+
+#: includes/class-donation.php
+msgid "The plugin is free and stays free. If it saves you time, a small donation helps me maintain it and keep developing it. Every feature stays available, with or without a donation."
+msgstr "Das Plugin ist kostenlos und bleibt es. Wenn es dir Zeit spart, hilft mir eine kleine Spende, es zu pflegen und weiterzuentwickeln. Alle Funktionen bleiben verfügbar, ob mit oder ohne Spende."
+
+#: includes/class-donation.php
+msgid "Donate via PayPal"
+msgstr "Mit PayPal spenden"
+
+#: includes/class-donation.php
+msgid "Remind me later"
+msgstr "Später erinnern"
+
+#: includes/class-donation.php
+msgid "No, thanks"
+msgstr "Nein, danke"
+
+#: includes/class-donation.php
+msgid "Thank you! Did the donation go through?"
+msgstr "Danke! Hat die Spende geklappt?"
+
+#: includes/class-donation.php
+msgid "Let the plugin know, and you get a small badge here in the admin area. Nobody checks it; it is just for you."
+msgstr "Gib kurz Bescheid, dann bekommst du hier im Adminbereich eine kleine Auszeichnung. Geprüft wird nichts, sie ist nur für dich."
+
+#: includes/class-donation.php
+msgid "Yes, I donated"
+msgstr "Ja, ich habe gespendet"
+
+#: includes/class-donation.php
+msgid "Not yet"
+msgstr "Noch nicht"
+
+#: includes/class-donation.php
+msgid "Gold heart"
+msgstr "Goldenes Herz"
+
+#: includes/class-donation.php
+msgid "Silver heart"
+msgstr "Silbernes Herz"
+
+#: includes/class-donation.php
+msgid "Bronze heart"
+msgstr "Bronzenes Herz"
+
+#: includes/class-donation.php
+msgid "Thank you for your donation"
+msgstr "Danke für deine Spende"
+
+#: includes/class-donation.php
+msgid "Thank you for your support"
+msgstr "Danke für deine Unterstützung"
+
+#: includes/class-donation.php
+#, php-format
+msgid "You donated once."
+msgid_plural "You donated %d times."
+msgstr[0] "Du hast einmal gespendet."
+msgstr[1] "Du hast %d-mal gespendet."
+
+#: includes/class-donation.php
+#, php-format
+msgid "With another donation you get the next badge: %s."
+msgstr "Mit einer weiteren Spende bekommst du die nächste Auszeichnung: %s."
+
+#: includes/class-donation.php
+msgid "You have the highest badge. Thank you so much!"
+msgstr "Du hast die höchste Auszeichnung. Vielen Dank!"
+
+#: includes/class-donation.php
+msgid "Donate again"
+msgstr "Noch einmal spenden"
+
+#: includes/class-donation.php
+msgid "Donate"
+msgstr "Spenden"

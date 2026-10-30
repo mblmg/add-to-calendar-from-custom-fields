@@ -318,7 +318,7 @@ class ETCF_Admin
         ?>
         <div class="wrap etcf">
             <header class="etcf-head">
-                <h1><?php echo esc_html($tab === 'overview' ? __('Event Toolkit', 'event-toolkit-for-custom-fields') : $tabs[$tab]); ?></h1>
+                <h1><?php echo esc_html($tab === 'overview' ? __('Event Toolkit', 'event-toolkit-for-custom-fields') : $tabs[$tab]); ?><?php ETCF_Donation::render_title_badge(); ?></h1>
                 <p class="etcf-intro"><?php echo esc_html(self::intros()[$tab]); ?></p>
             </header>
             <nav class="etcf-nav" aria-label="<?php esc_attr_e('Event Toolkit', 'event-toolkit-for-custom-fields'); ?>">
@@ -329,6 +329,7 @@ class ETCF_Admin
             <hr class="wp-header-end">
             <?php
             settings_errors();
+            ETCF_Donation::render_prompt();
             if ($tab !== 'overview' && $tab !== 'events' && !ETCF_Settings::is_configured()) {
                 echo '<div class="notice notice-info inline"><p>' . wp_kses(sprintf(
                     /* translators: %s: link to the page "Events" */
@@ -444,6 +445,7 @@ class ETCF_Admin
         echo '</ol>';
         echo '</div><aside class="etcf-aside">';
         self::panel([self::class, 'render_channels']);
+        self::panel([ETCF_Donation::class, 'render_badge_panel'], 'etcf-thanks');
         echo '</aside></div>';
     }
 

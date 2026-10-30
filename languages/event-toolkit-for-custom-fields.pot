@@ -1869,3 +1869,83 @@ msgstr ""
 #: includes/class-admin.php
 msgid "Connect Instagram again"
 msgstr ""
+
+#: includes/class-donation.php
+msgid "Has Event Toolkit made your work easier?"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "The plugin is free and stays free. If it saves you time, a small donation helps me maintain it and keep developing it. Every feature stays available, with or without a donation."
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Donate via PayPal"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Remind me later"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "No, thanks"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Thank you! Did the donation go through?"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Let the plugin know, and you get a small badge here in the admin area. Nobody checks it; it is just for you."
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Yes, I donated"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Not yet"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Gold heart"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Silver heart"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Bronze heart"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Thank you for your donation"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Thank you for your support"
+msgstr ""
+
+#: includes/class-donation.php
+#, php-format
+msgid "You donated once."
+msgid_plural "You donated %d times."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-donation.php
+#, php-format
+msgid "With another donation you get the next badge: %s."
+msgstr ""
+
+#: includes/class-donation.php
+msgid "You have the highest badge. Thank you so much!"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Donate again"
+msgstr ""
+
+#: includes/class-donation.php
+msgid "Donate"
+msgstr ""
