@@ -102,8 +102,8 @@ Base path and file names can be changed in the settings.
 2. Open "Event Toolkit" in the admin menu. The overview shows what goes out in the coming days and which channels are on.
 3. On the page "Events", enter the post type of your events and the names of your date, time and location fields. The page lists the field names of a sample event and shows a preview of the next events, so you can check the result right away.
 4. Add the calendar links to your event template:
-   * Breakdance: choose the dynamic data category "Add to Calendar" in the link field of a button or text link.
-   * Any other theme or builder: use the shortcode, e.g. `[etcf_calendar_link type="ics" text="Add to calendar"]`.
+   * Breakdance: choose the dynamic data category "Add to Calendar" in the link field of a button or text link. To hide the button after the event, give it (or its container) the condition "Dynamic data", field "Event as .ics file", "is not empty".
+   * Any other theme or builder: use the shortcode, e.g. `[etcf_calendar_link type="ics" text="Add to calendar"]`. After the event it returns nothing.
 5. Optional: set day and time of the weekly preview, connect a Telegram bot, enter the newsletter feed address in your newsletter service, and connect Instagram.
 
 == Frequently Asked Questions ==
@@ -196,6 +196,7 @@ The first three only return what visitors can see on the website anyway. Posting
 * Filter `etcf_sharepic_fonts` ($files): font files of the story images (`display`, `text`, `bold`).
 * Filter `etcf_site_fonts` ($fonts): the detected fonts of the website (`heading`, `text`).
 * Filter `etcf_ig_plan` ($items, $now): change the stories planned for a day.
+* Filter `etcf_hide_past_calendar_links` ($hide, $event): return false to keep the calendar links of events that are over.
 
 == External services ==
 
@@ -247,6 +248,7 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 * Translations now come from translate.wordpress.org; the plugin no longer ships language files.
 * New: donations. Two weeks after setting up, the plugin asks once whether it makes your work easier and offers a donation link (PayPal). "Later" asks again after 30 days, "No, thanks" after 90. Those who do not want to wait can donate any time on the last tab, "Donate". Those who donated get a badge in the admin area. Every feature stays available either way.
 * Instagram: connection through the Facebook Page (the plugin keeps the Page token, which does not expire). Also accepted: system user tokens of Meta's "API setup with Unified login" and Instagram tokens of older apps. Optional field for the Instagram account ID. New connection guide.
+* Calendar links of an event (.ics, Google, Outlook) are empty once the event is over, so the calendar button disappears like the share button. The shortcode then returns nothing; in Breakdance, show the element only when the field is not empty. Filter `etcf_hide_past_calendar_links` to keep them.
 
 = 2.2.0 =
 * New: page "Newsletter" with guides for Brevo, Mailchimp, MailerLite and other services, and direct sending through Brevo or Emailit.

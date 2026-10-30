@@ -23,7 +23,11 @@ class ETCF_Links
         ];
     }
 
-    /** Link for an event or the feed. Empty string if there is no valid event. */
+    /**
+     * Link for an event or the feed. Empty string if there is no valid event.
+     * The calendar links of an event are empty once it is over, so elements that show them
+     * only when they are not empty disappear, like the share button.
+     */
     public static function get(string $type, $post = null): string
     {
         switch ($type) {
@@ -37,6 +41,12 @@ class ETCF_Links
 
         $event = ETCF_Event::from_post($post ?: self::current_post_id());
         if (!$event) {
+            return '';
+        }
+
+        $calendar = in_array($type, ['ics', 'google', 'outlook', 'office365'], true);
+        if ($calendar && $event->end <= new DateTimeImmutable('now', wp_timezone())
+            && apply_filters('etcf_hide_past_calendar_links', true, $event)) {
             return '';
         }
 
