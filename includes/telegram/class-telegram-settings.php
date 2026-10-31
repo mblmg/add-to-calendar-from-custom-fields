@@ -19,8 +19,9 @@ class ETCF_Telegram_Settings
             'chat_id'      => '',
             'thread_id'    => '',
             'link_preview' => 'above', // Preview with image for the next event: above, below or none.
-            'today'        => 0,       // Silent "Today" post on event days.
+            'today'        => 0,       // "Today" post on event days.
             'today_time'   => '12:00',
+            'today_silent' => 1,       // Without notification sound.
             'notify_status' => 1,      // Short message when an upcoming event is cancelled or postponed.
         ];
     }
@@ -65,6 +66,7 @@ class ETCF_Telegram_Settings
             'thread_id'    => preg_replace('/\D/', '', (string) ($input['thread_id'] ?? '')),
             'link_preview' => in_array($input['link_preview'] ?? '', ['above', 'below', 'none'], true) ? $input['link_preview'] : 'above',
             'today'        => empty($input['today']) ? 0 : 1,
+            'today_silent' => empty($input['today_silent']) ? 0 : 1,
             'notify_status' => empty($input['notify_status']) ? 0 : 1,
             'today_time'   => preg_match('/^([01]?\d|2[0-3]):([0-5]\d)$/', trim((string) ($input['today_time'] ?? '')), $m) ? sprintf('%02d:%02d', $m[1], $m[2]) : '12:00',
         ];

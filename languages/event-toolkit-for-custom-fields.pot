@@ -852,10 +852,6 @@ msgstr ""
 msgid "Short \"Today\" post at"
 msgstr ""
 
-#: includes/class-admin.php:914
-msgid "One silent message per day with all events of the day: members see it in the chat, but their phone does not ring. Not on the day of the weekly preview, which already lists them. Fewer notifications mean fewer members who mute the chat."
-msgstr ""
-
 #: includes/class-admin.php:933
 msgid "The preview was posted to the chat."
 msgstr ""
@@ -1968,4 +1964,16 @@ msgstr ""
 
 #: includes/class-admin.php includes/class-donation.php
 msgid "As a thank-you there is a badge here in the admin area: a bronze heart after the first donation, a silver one after the second, a gold one from the third."
+msgstr ""
+
+#: includes/class-admin.php
+msgid "One message per day with all events of the day. Not on the day of the weekly preview, which already lists them."
+msgstr ""
+
+#: includes/class-admin.php
+msgid "Silent: members see the message in the chat, but their phone does not ring. Fewer notifications mean fewer members who mute the chat."
+msgstr ""
+
+#: includes/class-admin.php
+msgid "\"Today\" message"
 msgstr ""

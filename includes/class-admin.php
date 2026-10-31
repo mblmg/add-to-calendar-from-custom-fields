@@ -498,7 +498,7 @@ class ETCF_Admin
         if ($events && !$issue_day && ETCF_Telegram_Settings::get('today') && ETCF_Telegram_Settings::is_ready()) {
             $time = $at((string) ETCF_Telegram_Settings::get('today_time'));
             if ($time > $now) {
-                $items[] = ['sort' => $time, 'channel' => 'Telegram', 'label' => __('"Today" message, silent', 'event-toolkit-for-custom-fields')];
+                $items[] = ['sort' => $time, 'channel' => 'Telegram', 'label' => ETCF_Telegram_Settings::get('today_silent') ? __('"Today" message, silent', 'event-toolkit-for-custom-fields') : __('"Today" message', 'event-toolkit-for-custom-fields')];
             }
         }
         if ($events && !$issue_day && ETCF_Social::get('today')) {
@@ -924,7 +924,8 @@ class ETCF_Admin
                     <td>
                         <label><input type="checkbox" name="<?php echo esc_attr($field('today')); ?>" value="1" <?php checked(!empty($s['today'])); ?>> <?php esc_html_e('Short "Today" post at', 'event-toolkit-for-custom-fields'); ?></label>
                         <input type="time" name="<?php echo esc_attr($field('today_time')); ?>" value="<?php echo esc_attr($s['today_time']); ?>">
-                        <p class="description"><?php esc_html_e('One silent message per day with all events of the day: members see it in the chat, but their phone does not ring. Not on the day of the weekly preview, which already lists them. Fewer notifications mean fewer members who mute the chat.', 'event-toolkit-for-custom-fields'); ?></p>
+                        <p class="description"><?php esc_html_e('One message per day with all events of the day. Not on the day of the weekly preview, which already lists them.', 'event-toolkit-for-custom-fields'); ?></p>
+                        <p><label><input type="checkbox" name="<?php echo esc_attr($field('today_silent')); ?>" value="1" <?php checked(!empty($s['today_silent'])); ?>> <?php esc_html_e('Silent: members see the message in the chat, but their phone does not ring. Fewer notifications mean fewer members who mute the chat.', 'event-toolkit-for-custom-fields'); ?></label></p>
                     </td>
                 </tr>
             </table>

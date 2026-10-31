@@ -31,7 +31,7 @@ Once a week, a preview of what is coming up: the events of the next days, plus t
 
 * **Telegram:** a bot posts it to a group, a topic in a group or a channel, with the link preview and image of the next event
 * **E-mail newsletter:** an RSS feed with one entry per week, ready for the RSS campaigns of newsletter services such as Brevo, CleverReach or Mailchimp. Optionally only in weeks in which an event was added.
-* **Telegram, on event days (optional):** one short, silent "Today" message with the events of the day
+* **Telegram, on event days (optional):** one short "Today" message with the events of the day, silent by default (no notification sound)
 
 **Instagram stories**
 
@@ -191,7 +191,7 @@ The first three only return what visitors can see on the website anyway. Posting
 * Filter `etcf_digest_events` ($selection, $issue): change the events of a weekly preview (`week` and `new`).
 * Filter `etcf_digest_email_html` ($html, $selection): change the newsletter HTML.
 * Filter `etcf_tg_message` ($message, $selection): change the Telegram message (Telegram HTML).
-* Filter `etcf_tg_today_message` ($message, $events): change the silent "Today" message.
+* Filter `etcf_tg_today_message` ($message, $events): change the "Today" message.
 * Filter `etcf_share_text` ($text): change the texts on the page "Share".
 * Filter `etcf_sharepic_fonts` ($files): font files of the story images (`display`, `text`, `bold`).
 * Filter `etcf_site_fonts` ($fonts): the detected fonts of the website (`heading`, `text`).
@@ -249,6 +249,7 @@ No data about visitors of your site is sent. [Terms of Use](https://help.instagr
 * New: donations. Two weeks after setting up, the plugin asks once whether it makes your work easier and offers a donation link (PayPal). "Later" asks again after 30 days, "No, thanks" after 90. Those who do not want to wait can donate any time on the last tab, "Donate". Those who donated get a badge in the admin area. Every feature stays available either way.
 * Instagram: connection through the Facebook Page (the plugin keeps the Page token, which does not expire). Also accepted: system user tokens of Meta's "API setup with Unified login" and Instagram tokens of older apps. Optional field for the Instagram account ID. New connection guide.
 * Calendar links of an event (.ics, Google, Outlook) are empty once the event is over, so the calendar button disappears like the share button. The shortcode then returns nothing; in Breakdance, show the element only when the field is not empty. Filter `etcf_hide_past_calendar_links` to keep them.
+* Telegram: the "Today" message can now also go out with notification sound (switch on the page "Telegram"; silent stays the default).
 
 = 2.2.0 =
 * New: page "Newsletter" with guides for Brevo, Mailchimp, MailerLite and other services, and direct sending through Brevo or Emailit.

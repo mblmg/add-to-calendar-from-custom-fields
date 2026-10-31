@@ -213,7 +213,6 @@ return [
 		'Needs the status field on the page "Events". Goes out once, about a minute after saving.' => 'Braucht das Statusfeld auf der Seite „Termine“. Geht einmal raus, etwa eine Minute nach dem Speichern.',
 		'On event days' => 'An Veranstaltungstagen',
 		'Short "Today" post at' => 'Kurzer „Heute“-Post um',
-		'One silent message per day with all events of the day: members see it in the chat, but their phone does not ring. Not on the day of the weekly preview, which already lists them. Fewer notifications mean fewer members who mute the chat.' => 'Eine lautlose Nachricht pro Tag mit allen Terminen des Tages: Sie steht im Chat, aber das Handy klingelt nicht. Am Tag der Wochenvorschau entfällt sie, weil die Vorschau die Termine schon nennt. Wer seltener benachrichtigt wird, schaltet den Chat seltener stumm.',
 		'The preview was posted to the chat.' => 'Die Vorschau wurde in den Chat gepostet.',
 		'Next digest' => 'Nächste Vorschau',
 		'not scheduled (turn on the weekly digest and enter token and chat ID)' => 'nicht geplant (Wochenvorschau einschalten und Token und Chat-ID eintragen)',
@@ -481,5 +480,8 @@ return [
 		'I develop Event Toolkit and offer it free of charge. A donation helps me maintain it, adapt it when Meta, Telegram and the other services change something, and add new features.' => 'Ich entwickle Event Toolkit und stelle es kostenlos zur Verfügung. Eine Spende hilft mir, es zu pflegen, es anzupassen, wenn Meta, Telegram und die anderen Dienste etwas ändern, und neue Funktionen einzubauen.',
 		'Every amount helps. Every feature stays available, with or without a donation.' => 'Jeder Betrag hilft. Alle Funktionen bleiben verfügbar, ob mit oder ohne Spende.',
 		'As a thank-you there is a badge here in the admin area: a bronze heart after the first donation, a silver one after the second, a gold one from the third.' => 'Als Dankeschön gibt es eine Auszeichnung hier im Adminbereich: ein bronzenes Herz nach der ersten Spende, ein silbernes nach der zweiten, ein goldenes ab der dritten.',
+		'One message per day with all events of the day. Not on the day of the weekly preview, which already lists them.' => 'Eine Nachricht pro Tag mit allen Terminen des Tages. Am Tag der Wochenvorschau entfällt sie, weil die Vorschau die Termine schon nennt.',
+		'Silent: members see the message in the chat, but their phone does not ring. Fewer notifications mean fewer members who mute the chat.' => 'Lautlos: Die Nachricht steht im Chat, aber das Handy klingelt nicht. Wer seltener benachrichtigt wird, schaltet den Chat seltener stumm.',
+		'"Today" message' => '„Heute“-Hinweis',
 	],
 ];

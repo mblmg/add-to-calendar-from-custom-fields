@@ -177,7 +177,7 @@ class ETCF_Telegram
     }
 
     /**
-     * Posts today's events as one silent message (no notification sound).
+     * Posts today's events as one message, silent (no notification sound) unless switched off.
      *
      * @return array|WP_Error|null Telegram result, error, or null if there is nothing today.
      */
@@ -190,7 +190,7 @@ class ETCF_Telegram
         if ($message === '') {
             return null;
         }
-        return self::send($message, $events[0]->url, true);
+        return self::send($message, $events[0]->url, (bool) ETCF_Telegram_Settings::get('today_silent'));
     }
 
     /** "Today" message in Telegram HTML. Empty string without events. */

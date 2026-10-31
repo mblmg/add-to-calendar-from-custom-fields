@@ -852,10 +852,6 @@ msgstr "An Veranstaltungstagen"
 msgid "Short \"Today\" post at"
 msgstr "Kurzer „Heute“-Post um"
 
-#: includes/class-admin.php:914
-msgid "One silent message per day with all events of the day: members see it in the chat, but their phone does not ring. Not on the day of the weekly preview, which already lists them. Fewer notifications mean fewer members who mute the chat."
-msgstr "Eine lautlose Nachricht pro Tag mit allen Terminen des Tages: Sie steht im Chat, aber das Handy klingelt nicht. Am Tag der Wochenvorschau entfällt sie, weil die Vorschau die Termine schon nennt. Wer seltener benachrichtigt wird, schaltet den Chat seltener stumm."
-
 #: includes/class-admin.php:933
 msgid "The preview was posted to the chat."
 msgstr "Die Vorschau wurde in den Chat gepostet."
@@ -1969,3 +1965,15 @@ msgstr "Jeder Betrag hilft. Alle Funktionen bleiben verfügbar, ob mit oder ohne
 #: includes/class-admin.php includes/class-donation.php
 msgid "As a thank-you there is a badge here in the admin area: a bronze heart after the first donation, a silver one after the second, a gold one from the third."
 msgstr "Als Dankeschön gibt es eine Auszeichnung hier im Adminbereich: ein bronzenes Herz nach der ersten Spende, ein silbernes nach der zweiten, ein goldenes ab der dritten."
+
+#: includes/class-admin.php
+msgid "One message per day with all events of the day. Not on the day of the weekly preview, which already lists them."
+msgstr "Eine Nachricht pro Tag mit allen Terminen des Tages. Am Tag der Wochenvorschau entfällt sie, weil die Vorschau die Termine schon nennt."
+
+#: includes/class-admin.php
+msgid "Silent: members see the message in the chat, but their phone does not ring. Fewer notifications mean fewer members who mute the chat."
+msgstr "Lautlos: Die Nachricht steht im Chat, aber das Handy klingelt nicht. Wer seltener benachrichtigt wird, schaltet den Chat seltener stumm."
+
+#: includes/class-admin.php
+msgid "\"Today\" message"
+msgstr "„Heute“-Hinweis"
